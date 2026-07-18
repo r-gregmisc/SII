@@ -27,7 +27,7 @@ Calculation of the Speech Intelligibility Index" American National Stan-
 dards Institute, New York.
 
 Other software programs for calculating SII are available from
-\url{http://www.sii.to/html/programs.html}.
+\url{https://sii.to/html/programs.html}.
 }
 \keyword{ package }
 \examples{

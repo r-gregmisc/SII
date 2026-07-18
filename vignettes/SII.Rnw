@@ -3,6 +3,7 @@
 % \VignetteKeyword{Speech Intelligibility Index} 
 %
 \documentclass[letterpaper]{article}
+\usepackage{inputenc}
 \usepackage{Rd}
 \usepackage{Sweave}
 \usepackage[margin=1.0in]{geometry}

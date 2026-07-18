@@ -20,7 +20,8 @@ sii <- function(
                   "SPIN",
                   "CST"
                   ),
-                interpolate=FALSE
+                interpolate=FALSE,
+                prescription=NULL
                 )
 {
   ## Assumptions:
@@ -54,7 +55,7 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  data(list=data.name, package="SII")
+  data(list=data.name, package="SII", envir=environment())
   table <- get(data.name)
 
   ## Get the correct importance functions
@@ -64,7 +65,7 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          data(list=sic.name, package="SII")
+          data(list=sic.name, package="SII", envir=environment())
           sic.table <- get(sic.name)
           table[,"Ii"] <- sic.table[[importance]]
         }
@@ -88,10 +89,13 @@ sii <- function(
     {
       const.speech=TRUE
       speech <- match.arg(speech)
+      vocal_effort <- speech
       speech <- table[[speech]]
     }
-  else
+  else {
     const.speech=FALSE
+    vocal_effort <- "Custom"
+  }
 
   ## Handle missing noise
   if(missing(noise))
@@ -155,6 +159,14 @@ sii <- function(
               obs.freq <- obs.freq[!nas]
             }
           
+          if(length(value) < 2)
+            {
+              if (length(value) == 1)
+                return(rep(value, length(target.freq)))
+              else
+                return(rep(NA, length(target.freq)))
+            }
+            
           tmp <- approx(
                         x=log10(obs.freq),
                         y=value,
@@ -177,6 +189,26 @@ sii <- function(
       freq   <- sii.freqs
     }
       
+  #########
+  ## Calculate Prescription Gain if requested
+  #########
+  if (!is.null(prescription) && prescription == "NAL-R") {
+    gain <- calculate_nalr_gain(freq, threshold)
+  } else {
+    gain <- rep(0, length(freq))
+  }
+  
+  ## Save the unaided speech to return it for plotting
+  unaided_speech <- speech
+  
+  ## Apply gain to speech and external noise for aided calculation
+  speech <- speech + gain
+  # Only amplify external noise if explicitly provided, not the -50 internal default
+  has_explicit_noise <- !is.null(match.call()$noise)
+  if (has_explicit_noise) {
+    noise <- noise + gain
+  }
+
   #########
   ## Calcuate SII following ANSI S3.5-1997 Section 4
   #########
@@ -347,13 +379,28 @@ sii <- function(
   
   ##         Sum IiAi to determine SII
   sii.val <- sum(sii.tab[,"IiAi"])  
+  
+  if (!is.null(prescription)) {
+     # Calculate the unaided SII for comparison using a recursive call
+     orig_noise <- noise
+     if (has_explicit_noise) orig_noise <- noise - gain
+     
+     unaided_obj <- sii(speech = unaided_speech, noise = orig_noise, threshold = threshold, 
+                        loss = loss, freq = freq, method = method, importance = importance, 
+                        interpolate = FALSE)
+     retval$unaided_sii <- unaided_obj$sii
+  }
 
   ## Package it all up to return to the user
   retval$speech    <- speech
+  retval$unaided_speech <- unaided_speech
+  retval$vocal_effort <- vocal_effort
   retval$noise     <- noise
   retval$threshold <- threshold
   retval$loss      <- loss
   retval$freq      <- freq
+  retval$gain      <- gain
+  retval$prescription <- prescription
   retval$method    <- method
   retval$table     <- sii.tab
   retval$sii       <- sii.val

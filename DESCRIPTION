@@ -1,12 +1,14 @@
 Package: SII
 Type: Package
 Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
-Version: 1.0.3
-Date: 2013-12-06
+Version: 1.0.4
+Date: 2026-07-18
 Author: Gregory R. Warnes
-Maintainer: Gregory R. Warnes <greg@warnes.net>
+Maintainer: Mark Shaver <mark.shaver@posteo.net>
+Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = "aut"),
+             person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description: 
-   This package calculates ANSI S3.5-1997 Speech Intelligibility Index
+   Calculates ANSI S3.5-1997 Speech Intelligibility Index
    (SII), a standard method for computing the intelligibility of
    speech from acoustical measurements of speech, noise, and hearing
    thresholds. This package includes data frames corresponding to
@@ -21,7 +23,11 @@ Description:
    Development of this package was funded by the Center for Bioscience
    Education and Technology (CBET) of the Rochester Institute of
    Technology (RIT).
-Depends: 
-Suggests: splines, gdata, xtable
+Depends:
+Suggests: splines, readxl, xtable, gdata
 License: GPL-2
 LazyLoad: yes
+Packaged: 2018-11-18 09:53:18 UTC; hornik
+NeedsCompilation: no
+Repository: CRAN
+Date/Publication: 2018-11-18 09:56:48 UTC

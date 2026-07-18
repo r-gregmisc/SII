@@ -6,7 +6,8 @@ export(
        )
 
 importFrom("utils", "data")
-
+importFrom("graphics", "abline", "legend", "lines")
+importFrom("stats", "approx", "predict")
 S3method(plot, SII)
 S3method(print, SII)
 S3method(summary, SII)

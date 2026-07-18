@@ -4,8 +4,8 @@ sii.excel <- function(
                       matlab.spline=TRUE
                 )
 {
-  if(!require("splines"))
-    stop("'splines' package must be installed to run this function.")
+  if(!requireNamespace("splines", quietly = TRUE))
+      stop("'splines' package is required for 'matlab.spline' option.")
   
   if(length(THDI) != length(freq))
     stop("THDI must have the same length as freq")

@@ -17,9 +17,10 @@ sii(speech = c("normal", "raised", "loud", "shout"),
                "one-third octave", "octave"),
     importance = c("SII", "NNS", "CID22", "NU6", "DRT",
                    "ShortPassage", "SPIN", "CST"),
-    interpolate=FALSE)
+    interpolate=FALSE,
+    prescription=NULL)
 \method{print}{SII}(x, digits=3, ...)
-\method{plot}{SII}(x, ...)
+\method{plot}{SII}(x, clinical=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
 }
 \arguments{
@@ -58,8 +59,10 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     from the provide measurement values and frequencies to those 
     required by the specified method via linear interpolation on the log
     scale.}
+  \item{prescription}{A character string (e.g. \code{"NAL-R"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
+  \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area and using an octave-scaled frequency axis.}
   \item{...}{Optional arguments to \code{print}, \code{summary}, and
     \code{plot} methods} 
 }
@@ -99,6 +102,11 @@ sii(speech = c("normal", "raised", "loud", "shout"),
       \code{loss}.}
     \item{speech, noise, threshold, loss, and freq}{Values used in
       calculations (extrapolated if necessary)}
+    \item{unaided_speech}{Original speech array before applying any prescriptive gain}
+    \item{vocal_effort}{String representing the stated vocal effort}
+    \item{gain}{Insertion gain array added to speech and noise when a prescription is used}
+    \item{prescription}{The fitting rationale used (if any)}
+    \item{unaided_sii}{Calculated SII value before applying the prescriptive gain (if a prescription was used)}
     \item{table}{SII calculation worksheet, containing columns
       corresponding to both Table C.1 and C.2 in Annex C of the
       standard. Table columns are
@@ -137,7 +145,7 @@ Calculation of the Speech Intelligibility Index" American National
 Standards Institute, New York. 
 
 Other software programs for calculating SII are available from
-\url{http://www.sii.to/html/programs.html}.
+\url{https://sii.to/html/programs.html}.
 
 }
 \author{Gregory R. Warnes \email{greg@warnes.net}}
@@ -156,6 +164,7 @@ sii.C1                        # rounded to 2 digits by default
 print(sii.C1$sii, digits=20)  # full precision
 summary(sii.C1)               # full details
 plot(sii.C1)                  # plot
+plot(sii.C1, clinical=TRUE)   # clinical SPLogram plot
 ## The value given in the Standard is $0.504$.
 
 

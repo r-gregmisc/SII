@@ -52,7 +52,7 @@ data(sic.octave)
   Standards Institute, New York. 
 
   Values in the \code{CST} columns are from:
-  \url{http://www.sii.to/CSTdata.txt}
+  \url{https://sii.to/CSTdata.txt}
 }
 \references{
   ANSI S3.5-1997, "American National Standard Methods for 
