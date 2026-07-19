@@ -48,6 +48,21 @@ calculate_open_nl_gain <- function(freq, threshold, input_level) {
   hf_boost_max <- approx(x = log10(c(250, 1000, 4000, 8000)), y = c(0, 0, 6, 6), xout = log10(freq), rule = 2)$y
   hf_scaling <- pmin(1, pmax(0, (threshold - 30) / 30))
   g_65 <- g_65 + (hf_boost_max * hf_scaling)
+  # High-Frequency Roll-off (Dead Region & Feedback Protection)
+  # Only applies to SLOPING losses. If the loss is relatively flat, we allow the full gain.
+  best_low_thresh <- min(threshold[freq <= 1000], na.rm = TRUE)
+  
+  # Slope factor: 0 if difference < 20 dB, 1 if difference > 40 dB
+  slope_factor <- pmax(0, pmin(1, (threshold - best_low_thresh - 20) / 20))
+  
+  hf_rolloff_freq_scaling <- pmax(0, pmin(1, (freq - 2000) / 2000))
+  hf_rolloff_thresh_scaling <- pmax(0, threshold - 80) * 0.8
+  
+  # Apply roll-off ONLY if it's a sloping loss
+  g_65 <- g_65 - (hf_rolloff_freq_scaling * hf_rolloff_thresh_scaling * slope_factor)
+  
+  # Ensure gain doesn't go below 0, but allow it to exceed 25 dB for flat/severe losses
+  g_65 <- pmax(g_65, 0)
   
   # 2. Multi-channel WDRC Pivot
   # We pivot WDRC around the expected band level for normal speech (65 dB overall)
@@ -78,8 +93,29 @@ calculate_open_nl_gain <- function(freq, threshold, input_level) {
   return(ig)
 }
 
-calculate_nal_sspl90 <- function(threshold) {
-  # Predictive NAL-SSPL90 MPO (Maximum Power Output) calculation
-  mpo <- 90 + 0.25 * threshold
+calculate_nal_sspl90 <- function(threshold, gain) {
+  # 1. Broad NAL-SSPL90 baseline based on three-frequency PTA equivalents
+  # From heuristics: 89 for normal, 107 for 60 dB HL, 139 for 120 dB HL
+  base_sspl <- approx(x = c(0, 60, 120), y = c(89, 107, 139), xout = threshold, rule = 2)$y
+  
+  # 2. Frequency-specific heuristic (Prescribed Gain + Loud Peaks)
+  # Loud speech peaks reach ~75 dB SPL, so MPO needs to at least clear this to avoid clipping speech.
+  heuristic_mpo <- gain + 75
+  
+  # 3. Estimated LDL & Safety Margin
+  # Estimated LDLs often range around 100 dB SPL for normal hearing, 
+  # expanding up to 130-140 dB SPL for profound loss. 
+  # We apply the 5 dB safety margin from the heuristics to account for real-ear SPL variations:
+  estimated_ldl <- 100 + pmax(0, threshold - 40) * 0.5
+  safe_mpo <- estimated_ldl - 5
+  
+  # Final MPO: Take the heuristic MPO, but cap it at the Safe MPO limit.
+  mpo <- pmin(heuristic_mpo, safe_mpo)
+  
+  # Absolute ceiling (Johnson 2017 PTS Safety Limits)
+  # Limit output based on threshold to avoid permanent threshold shift.
+  pts_safe_limit <- 105 + pmax(0, threshold - 50) * 0.5
+  mpo <- pmin(mpo, pts_safe_limit)
+  
   return(mpo)
 }

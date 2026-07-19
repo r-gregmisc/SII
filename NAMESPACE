@@ -4,7 +4,8 @@ export(
        print.SII,
        summary.SII,
        predict_aided_sii,
-       launch_app
+       launch_app,
+       calculate_loudness
        )
 
 importFrom("utils", "data")

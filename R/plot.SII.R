@@ -9,9 +9,14 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # The masking threshold is the maximum of the internal/external noise and hearing threshold
       masker <- pmax(noise, thresh, na.rm=TRUE)
       
+      # Increase margins for legend but keep clipping enabled (xpd=FALSE) for the main plot
+      old_par <- par(no.readonly = TRUE)
+      on.exit(par(old_par))
+      par(mar = c(10, 4, 4, 2) + 0.1, xpd = FALSE)
+      
       # Determine bounds for the plot
       y_min <- 0 # Start Y axis at 0 dB SPL
-      y_max <- max(c(100, thresh, noise, speech), na.rm=TRUE) + 10
+      y_max <- max(c(100, thresh, noise, speech), na.rm=TRUE) + 5
       
       is_aided <- !is.null(x$prescription)
       
@@ -137,15 +142,20 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       }
       
       if (legend) {
-        legend("topright",
+        par(xpd = TRUE) # Allow legend to be drawn outside the plot box
+        legend("bottom",
+               inset = c(0, -0.35),
                legend = leg_names,
                col = leg_cols,
                pch = leg_pch,
                lty = leg_lty,
                lwd = leg_lwd,
                pt.cex = leg_cex,
-               bg = "white",
-               cex = 0.75
+               bg = grDevices::rgb(1, 1, 1, 0.85), # Semi-transparent white background
+               cex = 0.9,
+               horiz = FALSE,
+               ncol = 2, # Split into 2 columns to save vertical space
+               bty = "n"
           )
       }
       
@@ -254,6 +264,11 @@ plot_gain <- function(res55, res65, res75, ...) {
   prescription <- res65$prescription
   if (is.null(prescription)) prescription <- "Custom"
   
+  # Increase margins for legend but keep clipping enabled (xpd=FALSE) for the main plot
+  old_par <- par(no.readonly = TRUE)
+  on.exit(par(old_par))
+  par(mar = c(8, 4, 4, 2) + 0.1, xpd = FALSE)
+  
   # Determine bounds
   y_max <- max(c(g55, g65, g75), na.rm=TRUE) + 5
   if (y_max < 20) y_max <- 20
@@ -284,11 +299,16 @@ plot_gain <- function(res55, res65, res75, ...) {
   lines(x = freq, y = g75, col = "red", lwd = 2, lty = 2) # Dashed for 75 (Loud)
   
   # Add legend
-  legend("topleft",
+  par(xpd = TRUE) # Allow legend to be drawn outside the plot box
+  legend("bottom",
+         inset = c(0, -0.25),
          legend = c("55 dB SPL (Soft)", "65 dB SPL (Average)", "75 dB SPL (Loud)"),
          col = c("blue", "black", "red"),
          lty = c(3, 1, 2),
          lwd = 2,
-         bg = "white"
+         bg = grDevices::rgb(1, 1, 1, 0.85), # Semi-transparent white
+         horiz = TRUE, # Horizontal layout
+         cex = 1,
+         bty = "n"
   )
 }

@@ -205,7 +205,7 @@ sii <- function(
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
     # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold)
+    mpo <- calculate_nal_sspl90(threshold, gain)
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     
@@ -448,8 +448,43 @@ sii <- function(
   retval
 }
 
-# Simplified Psychoacoustic Loudness Estimator (Sones)
-# Models loudness recruitment by normalizing the Sensation Level to the patient's Dynamic Range
+#' Calculate Psychoacoustic Loudness (Sones)
+#'
+#' @description
+#' Calculates the total perceived loudness in Sones based on the specific
+#' speech spectrum and hearing thresholds of the patient.
+#' 
+#' @details
+#' The current implementation uses a first-order heuristic model of recruitment 
+#' based on Stevens' Power Law, mapped over an estimated dynamic range. While it
+#' is computationally fast and demonstrates the restoration of loudness conceptually,
+#' it is not a full psychoacoustic model (like Moore-Glasberg / CAM2Q), as it does
+#' not calculate basilar membrane excitation patterns via RoEx filters.
+#'
+#' \strong{Mathematical Formula:}
+#' 
+#' 1. \strong{Uncomfortable Loudness Level (UCL)} is predicted from the threshold ($T_i$):
+#' \deqn{UCL_i = 100 + 0.25 \times \max(0, T_i - 20)}
+#'
+#' 2. \strong{Dynamic Range (DR)}:
+#' \deqn{DR_i = \max(1, UCL_i - T_i)}
+#' 
+#' 3. \strong{Sensation Level (SL)} of speech peaks (RMS + 15 dB):
+#' \deqn{SL_i = \max(0, E_i + 15 - T_i)}
+#' 
+#' 4. \strong{Loudness Level (Phons)} modeling recruitment:
+#' \deqn{Phons_i = \left( \frac{SL_i}{DR_i} \right) \times 100}
+#' 
+#' 5. \strong{Specific Loudness (Sones)} per band via Stevens' Power Law:
+#' \deqn{Sones_i = 2^{\frac{Phons_i - 40}{10}} \quad \text{for } Phons_i \ge 40}
+#' \deqn{Sones_i = \left(\frac{Phons_i}{40}\right)^{2.5} \quad \text{for } Phons_i < 40}
+#' 
+#' 6. \strong{Total Loudness (Sones)}:
+#' \deqn{Sones_{Total} = \sum Sones_i}
+#' 
+#' @param x An object of class \code{SII}.
+#' @return A numeric value representing the total loudness in Sones.
+#' @export
 calculate_loudness <- function(x) {
   if (!inherits(x, "SII")) {
     stop("Input must be an object of class 'SII'")

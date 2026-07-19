@@ -6,6 +6,7 @@ library(SII)
 ui <- page_sidebar(
   title = "SII Advanced Interactive Dashboard",
   theme = bs_theme(version = 5, bootswatch = "flatly", primary = "#2c3e50"),
+  fillable = FALSE,
   
   sidebar = sidebar(
     width = 300,
@@ -35,12 +36,17 @@ ui <- page_sidebar(
     card(
       full_screen = TRUE,
       card_header("Clinical SPLogram"),
-      plotOutput("splogram", height = "400px")
+      plotOutput("splogram", height = "600px")
     ),
     card(
       full_screen = TRUE,
       card_header("Insertion Gain / Plot"),
-      plotOutput("gain_plot", height = "400px")
+      plotOutput("gain_plot", height = "600px")
+    ),
+    card(
+      full_screen = TRUE,
+      card_header("Prescription Benchmark Comparison"),
+      tableOutput("comparison_table")
     )
   )
 )
@@ -95,6 +101,38 @@ server <- function(input, output, session) {
     # the 3-line Insertion Gain compression curves for 55, 65, and 75 dB SPL!
     plot(obj, clinical = FALSE)
   })
+  
+  # Render the Benchmark Comparison Table
+  output$comparison_table <- renderTable({
+    req(input$htl250)
+    d <- setup_data()
+    f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
+    threshold <- c(input$htl250, input$htl500, input$htl1000, 
+                   input$htl2000, input$htl4000, input$htl8000)
+    htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
+    
+    # Calculate Unaided
+    obj_unaided <- sii(speech = d$speech_65, threshold = htl_21, freq = d$f_21, prescription = NULL, desensitization = input$desensitization)
+    
+    # Calculate NAL-R
+    obj_nalr <- sii(speech = d$speech_65, threshold = htl_21, freq = d$f_21, prescription = "NAL-R", desensitization = input$desensitization)
+    
+    # Calculate Open-NL
+    obj_opennl <- sii(speech = d$speech_65, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", desensitization = input$desensitization)
+    
+    # Predict NAL-NL2 and DSL v5.0
+    pred_nalnl2 <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "NAL-NL2", desensitized = input$desensitization)
+    pred_dsl <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
+    
+    data.frame(
+      Prescription = c("Unaided", "NAL-R", "Open-NL", "NAL-NL2 (Predicted)", "DSL v5.0 (Predicted)"),
+      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, pred_nalnl2, pred_dsl)),
+      Sones = c(sprintf("%.1f", calculate_loudness(obj_unaided)), 
+                sprintf("%.1f", calculate_loudness(obj_nalr)), 
+                sprintf("%.1f", calculate_loudness(obj_opennl)), 
+                "N/A", "N/A")
+    )
+  }, align = "c")
 }
 
 # Launch the Application 

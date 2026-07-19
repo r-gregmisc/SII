@@ -1,9 +1,9 @@
 Package: SII
 Type: Package
 Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
-Version: 1.0.4
-Date: 2026-07-18
-Author: Gregory R. Warnes
+Version: 1.1.0
+Date: 2026-07-19
+Author: Gregory R. Warnes, Mark Shaver
 Maintainer: Mark Shaver <mark.shaver@posteo.net>
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = "aut"),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
