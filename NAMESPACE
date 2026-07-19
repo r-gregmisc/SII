@@ -3,7 +3,8 @@ export(
        plot.SII,
        print.SII,
        summary.SII,
-       predict_aided_sii
+       predict_aided_sii,
+       launch_app
        )
 
 importFrom("utils", "data")

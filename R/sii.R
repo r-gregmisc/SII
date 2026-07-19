@@ -424,7 +424,7 @@ sii <- function(
      
      unaided_obj <- sii(speech = unaided_speech, noise = orig_noise, threshold = threshold, 
                         loss = loss, freq = freq, method = method, importance = importance, 
-                        interpolate = FALSE)
+                        interpolate = FALSE, desensitization = desensitization)
      retval$unaided_sii <- unaided_obj$sii
   }
 
@@ -441,6 +441,7 @@ sii <- function(
   retval$method    <- method
   retval$table     <- sii.tab
   retval$sii       <- sii.val
+  retval$desensitization <- desensitization
   
   class(retval) <- "SII"
   

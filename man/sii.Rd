@@ -20,7 +20,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     interpolate=FALSE,
     prescription=NULL)
 \method{print}{SII}(x, digits=3, ...)
-\method{plot}{SII}(x, clinical=FALSE, ...)
+\method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
 }
 \arguments{
@@ -63,7 +63,9 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   \item{desensitization}{Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
-  \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area and using an octave-scaled frequency axis.}
+  \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area. If \code{FALSE} (the default), the behavior depends on whether the object is aided or unaided. For unaided objects, it plots a diagnostic interpolation graph. For aided objects (when a prescription was used), it automatically generates a 3-line Insertion Gain plot for 55, 65, and 75 dB SPL input levels (dynamically loading and scaling the true Normal and Loud LTASS spectra).}
+  \item{legend}{Logical flag. If \code{TRUE} (the default), draws a legend on the plot.}
+  \item{legend_only}{Logical flag. If \code{TRUE}, suppresses the main plot and only draws the legend in the center of the plotting window. Useful for multi-plot layouts.}
   \item{...}{Optional arguments to \code{print}, \code{summary}, and
     \code{plot} methods} 
 }

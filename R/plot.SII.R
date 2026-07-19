@@ -153,17 +153,59 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # If clinical=FALSE and the object is aided, show the 3-line Insertion Gain Plot
       if (!is.null(x$prescription)) {
         
-        # Dynamically recalculate SII for -10 and +10 dB input levels
-        call55 <- x$call
-        call55$speech <- x$orig[[2]] - 10
-        res55 <- eval(call55, envir = parent.frame())
+        # Determine which calculation method was used to fetch the correct standard spectra
+        n_bands <- length(x$freq)
+        tbl_name <- if (n_bands == 21) "critical" else 
+                    if (n_bands == 18) "onethird" else 
+                    if (n_bands == 17) "equal" else "octave"
         
-        call75 <- x$call
-        call75$speech <- x$orig[[2]] + 10
-        res75 <- eval(call75, envir = parent.frame())
+        # Create a local environment to load the data to avoid cluttering the workspace
+        local_env <- new.env()
+        data(list = tbl_name, package = "SII", envir = local_env)
+        tbl <- get(tbl_name, envir = local_env)
+        
+        # Calculate overall dB SPL levels of the standard Normal and Loud spectra
+        overall_normal <- 10 * log10(sum(10^(tbl$normal / 10)))
+        overall_loud <- 10 * log10(sum(10^(tbl$loud / 10)))
+        
+        # Safely extract desensitization flag (default to FALSE if not found)
+        desens <- if (!is.null(x$desensitization)) x$desensitization else FALSE
+        
+        # Recover unaided noise
+        unaided_noise <- x$noise - x$gain
+        
+        # Dynamically recalculate SII for 55 dB SPL (using Normal LTASS scaled down)
+        res55 <- sii(speech = tbl$normal + (55 - overall_normal),
+                     noise = unaided_noise,
+                     threshold = x$threshold,
+                     loss = x$loss,
+                     freq = tbl$fi,
+                     method = tbl_name,
+                     prescription = x$prescription,
+                     desensitization = desens)
+        
+        # Dynamically recalculate SII for 65 dB SPL (using Normal LTASS scaled to 65)
+        res65 <- sii(speech = tbl$normal + (65 - overall_normal),
+                     noise = unaided_noise,
+                     threshold = x$threshold,
+                     loss = x$loss,
+                     freq = tbl$fi,
+                     method = tbl_name,
+                     prescription = x$prescription,
+                     desensitization = desens)
+        
+        # Dynamically recalculate SII for 75 dB SPL (using Loud LTASS scaled to 75)
+        res75 <- sii(speech = tbl$loud + (75 - overall_loud),
+                     noise = unaided_noise,
+                     threshold = x$threshold,
+                     loss = x$loss,
+                     freq = tbl$fi,
+                     method = tbl_name,
+                     prescription = x$prescription,
+                     desensitization = desens)
         
         # Call the insertion gain plotting function
-        plot_gain(res55, x, res75, ...)
+        plot_gain(res55, res65, res75, ...)
         
       } else {
         # Original interpolation diagnostic plot for unaided objects
