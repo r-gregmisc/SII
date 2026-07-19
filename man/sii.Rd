@@ -60,6 +60,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     required by the specified method via linear interpolation on the log
     scale.}
   \item{prescription}{A character string (e.g. \code{"NAL-R"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
+  \item{desensitization}{Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
   \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area and using an octave-scaled frequency axis.}
@@ -92,6 +93,22 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     using linear interpolation (of the log-scaled data).  In this case,
     missing values may be provided and will be appropriately
     interpolated.
+    
+    \subsection{Prescriptive Fitting Rationales}{
+    If the \code{prescription} argument is provided, the function will dynamically calculate a frequency-specific hearing aid insertion gain and apply it to the speech and noise spectrum, calculating an Aided SII. The following rationales are supported:
+    
+    \itemize{
+      \item \code{"NAL-R"}: A classic linear fitting rationale designed by the National Acoustic Laboratories to maximize speech intelligibility for mild-to-moderate losses. Gain is a linear function of the pure-tone average (PTA) and frequency-specific thresholds.
+      \item \code{"Open-NL"}: A completely transparent, open-source non-linear fitting algorithm developed specifically for this package. It was designed to serve as an open-source alternative to proprietary modern non-linear clinical targets (such as DSL v5.0). The algorithm calculates insertion gain using the following explicit mathematical steps:
+      \enumerate{
+        \item \strong{Linear Base Gain}: Starts with the classic NAL-R linear target: \eqn{G_{base} = X + 0.31 \times HTL + C}, where \eqn{X = 0.15 \times PTA}.
+        \item \strong{Boosters}: Adds a High-Frequency Booster (up to +6 dB from 4-8 kHz) and a Severe-Loss Booster (\eqn{+0.5 \times (HTL - 60)} for thresholds > 60 dB HL) to maximize audibility.
+        \item \strong{Wide Dynamic Range Compression (WDRC)}: A dynamic compression ratio is applied relative to a "pivot point" (the equivalent speech spectrum level of normal 65 dB SPL conversational speech). 
+        \item \strong{Compression Ratios (CR)}: For sounds softer than the pivot, \eqn{CR_{soft} = 1 + (HTL / 100)}. For sounds louder than the pivot, \eqn{CR_{loud} = 1 + (HTL / 50)}. The maximum CR is strictly capped at 3.0 to prevent acoustic distortion.
+        \item \strong{MPO Limits}: The final aided output is strictly capped by the predictive NAL-SSPL90 limits (\eqn{MPO = 90 + 0.25 \times HTL}) to ensure the prescribed gain never causes the output to exceed uncomfortable loudness levels.
+      }
+    }
+    }
 }
 \value{
     The return value is an object of class SII, containing the following
@@ -138,6 +155,20 @@ sii(speech = c("normal", "raised", "loud", "shout"),
       }
     }
     \item{sii}{Calculated SII value}
+}
+\section{Open-NL Prescription Rationale}{
+  \strong{DISCLAIMER:} \code{Open-NL} is an untested, experimental fitting rationale. It is designed to mimic aspects of other generic non-linear fitting rationales (such as NAL-NL2 and DSL v5.0) strictly to promote open research, algorithmic transparency, and rapid iteration within the audiology community. It is not intended for clinical use.
+
+  When \code{prescription = "Open-NL"} is selected, the function calculates and applies this WDRC-optimized rationale to maximize the aided Speech Intelligibility Index.
+  
+  The mathematical algorithm consists of:
+  \enumerate{
+    \item \strong{WDRC Base Anchor:} A base 65 dB SPL insertion gain anchor is calculated using a custom modification of the NAL-R linear formula. To preserve audibility while preventing Upward Spread of Masking and Level Distortion for flat losses, it utilizes a flatter low-frequency profile (-8 dB at 250 Hz, -3 dB at 500 Hz).
+    \item \strong{Severe-Loss Booster:} For thresholds > 60 dB HL, a gain multiplier is dynamically applied to push audibility through the cochlear desensitization barrier.
+    \item \strong{Adaptive High-Frequency Boost:} High-frequency gain (+6 dB at 4000 Hz) is adaptively scaled based on the hearing loss. Mild losses receive 0 dB boost to prevent Level Distortion rollover, while severe losses receive the full boost.
+    \item \strong{Bi-directional WDRC:} Gain is dynamically adjusted based on the band-specific input speech level pivoting around a 65 dB normal speech spectrum. Soft inputs receive expansion (CR = 0.6) for listening comfort, while loud inputs receive aggressive compression ($CR = 1 + (Threshold - 20)/25$, capped at 3.0) to protect against ANSI level distortion penalties.
+    \item \strong{SSPL90 MPO Limiting:} The final aided speech envelope is safely limited using a predictive NAL-SSPL90 ceiling ($MPO = 90 + 0.25 \times Threshold$). Instead of hard peak clipping, a 10:1 compression ratio is applied to any signal exceeding the MPO, preventing dangerous amplification while preserving the acoustic envelope.
+  }
 }
 \references{
 ANSI S3.5-1997, "American National Standard Methods for 

@@ -1,4 +1,4 @@
-plot.SII <- function(x, clinical = FALSE, ...)
+plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ...)
   {
     if (clinical) {
       freq <- x$freq
@@ -15,16 +15,71 @@ plot.SII <- function(x, clinical = FALSE, ...)
       
       is_aided <- !is.null(x$prescription)
       
-      vocal_effort_str <- "Custom"
-      if (!is.null(x$vocal_effort)) {
-        # Capitalize first letter
-        vocal_effort_str <- paste0(toupper(substr(x$vocal_effort, 1, 1)), substring(x$vocal_effort, 2))
+      if (grepl("dB SPL", x$vocal_effort)) {
+        vocal_effort_str <- paste("Input Level:", x$vocal_effort)
+      } else {
+        vocal_effort_str <- paste("Vocal Effort:", tools::toTitleCase(x$vocal_effort))
       }
       
       line1 <- if (is_aided) paste("Clinical SPLogram - Aided SII:", round(x$sii, 3), " (Unaided:", round(x$unaided_sii, 3), ")") else paste("Clinical SPLogram - SII:", round(x$sii, 3))
-      line2 <- paste("Vocal Effort:", vocal_effort_str)
+      line2 <- vocal_effort_str
       
       plot_title <- paste(line1, "\n", line2, sep="")
+      
+      has_noise <- !is.null(x$call$noise)
+      
+      # Prepare Legend Variables
+      leg_names <- c("Speech Level (E'i)", "Hearing Threshold (T'i)")
+      if (is_aided) {
+         leg_names[1] <- paste("Aided Speech Level (", x$prescription, ")", sep="")
+      }
+      leg_cols <- c("forestgreen", "red")
+      leg_pch <- c(NA, 4)
+      leg_lty <- c(1, 1)
+      leg_lwd <- c(2, 2)
+      leg_cex <- c(1, 1.2)
+      
+      if (is_aided) {
+        leg_names <- c(leg_names, "Unaided Speech Level")
+        leg_cols <- c(leg_cols, "forestgreen")
+        leg_pch <- c(leg_pch, NA)
+        leg_lty <- c(leg_lty, 2)
+        leg_lwd <- c(leg_lwd, 2)
+        leg_cex <- c(leg_cex, 1)
+      }
+      
+      if (has_noise) {
+        leg_names <- c(leg_names, "Noise Level (N'i)")
+        leg_cols <- c(leg_cols, "darkgray")
+        leg_pch <- c(leg_pch, NA)
+        leg_lty <- c(leg_lty, 2)
+        leg_lwd <- c(leg_lwd, 2)
+        leg_cex <- c(leg_cex, 1)
+      }
+      
+      leg_names <- c(leg_names, "Audible Speech Area")
+      leg_cols <- c(leg_cols, grDevices::rgb(0.2, 0.8, 0.2, 0.3))
+      leg_pch <- c(leg_pch, 15)
+      leg_lty <- c(leg_lty, NA)
+      leg_lwd <- c(leg_lwd, NA)
+      leg_cex <- c(leg_cex, 2)
+      
+      # If legend_only is true, draw the isolated legend and return immediately
+      if (legend_only) {
+        plot(1, type="n", axes=FALSE, xlab="", ylab="", main="")
+        legend("center",
+               legend = leg_names,
+               col = leg_cols,
+               pch = leg_pch,
+               lty = leg_lty,
+               lwd = leg_lwd,
+               pt.cex = leg_cex,
+               bg = "white",
+               cex = 1.2,
+               bty = "n"
+          )
+        return(invisible())
+      }
       
       plot(
            x = freq, 
@@ -44,18 +99,15 @@ plot.SII <- function(x, clinical = FALSE, ...)
       axis(1, at = c(250, 500, 1000, 2000, 4000, 8000), labels = c(250, 500, 1000, 2000, 4000, 8000))
       
       # Shade the audible speech area
-      # Top of the shaded area is the speech spectrum
       top <- speech
-      # Bottom is the masker, but constrained so it doesn't go above the speech
       bottom <- pmin(speech, masker, na.rm=TRUE)
       
-      # Remove NAs for polygon
       valid <- !is.na(top) & !is.na(bottom) & !is.na(freq)
       if (any(valid)) {
           graphics::polygon(
             x = c(freq[valid], rev(freq[valid])),
             y = c(top[valid], rev(bottom[valid])),
-            col = grDevices::rgb(0.2, 0.8, 0.2, 0.3), # Light transparent green
+            col = grDevices::rgb(0.2, 0.8, 0.2, 0.3),
             border = NA
           )
       }
@@ -64,92 +116,137 @@ plot.SII <- function(x, clinical = FALSE, ...)
       abline(v = freq, lty = 3, col = "lightgray")
       
       # Draw lines
-      lines(x = freq, y = thresh, col = "red", lwd = 2, type = "l") # Threshold line
-      points(x = x$orig[[1]], y = x$orig[[4]], col = "red", pch = 4, lwd = 2, cex = 1.2) # Threshold original points
+      lines(x = freq, y = thresh, col = "red", lwd = 2, type = "l")
+      
+      # Draw exactly 6 threshold markers on the standard clinical octaves
+      octaves <- c(250, 500, 1000, 2000, 4000, 8000)
+      orig_freqs <- x$orig[[1]]
+      orig_thresh <- x$orig[[4]]
+      
+      # Re-interpolate original thresholds onto the exact octave grid
+      octave_thresh <- approx(x = log10(orig_freqs), y = orig_thresh, xout = log10(octaves), rule = 2)$y
+      points(x = octaves, y = octave_thresh, col = "red", pch = 4, lwd = 2, cex = 1.2)
       
       if (is_aided) {
-        lines(x = freq, y = x$unaided_speech, col = "forestgreen", lwd = 2, type = "l", lty = 2) # Unaided Speech
+        lines(x = freq, y = x$unaided_speech, col = "forestgreen", lwd = 2, type = "l", lty = 2)
       }
-      lines(x = freq, y = speech, col = "forestgreen", lwd = 2, type = "l") # Aided / Final Speech
-      
-      has_noise <- !is.null(x$call$noise)
-      
-      leg_names <- c("Speech Level (E'i)", "Hearing Threshold (T'i)")
-      if (is_aided) {
-         leg_names[1] <- paste("Aided Speech Level (", x$prescription, ")", sep="")
-      }
-      
-      leg_cols <- c("forestgreen", "red")
-      leg_pch <- c(NA, 4)
-      leg_lty <- c(1, 1)
-      leg_lwd <- c(2, 2)
-      leg_cex <- c(1, 1.2)
-      
-      if (is_aided) {
-        leg_names <- c(leg_names, "Unaided Speech Level")
-        leg_cols <- c(leg_cols, "forestgreen")
-        leg_pch <- c(leg_pch, NA)
-        leg_lty <- c(leg_lty, 2)
-        leg_lwd <- c(leg_lwd, 2)
-        leg_cex <- c(leg_cex, 1)
-      }
+      lines(x = freq, y = speech, col = "forestgreen", lwd = 2, type = "l")
       
       if (has_noise) {
-        lines(x = freq, y = noise, col = "darkgray", lwd = 2, type = "l", lty = 2) # Noise
-        leg_names <- c(leg_names, "Noise Level (N'i)")
-        leg_cols <- c(leg_cols, "darkgray")
-        leg_pch <- c(leg_pch, NA)
-        leg_lty <- c(leg_lty, 2)
-        leg_lwd <- c(leg_lwd, 2)
-        leg_cex <- c(leg_cex, 1)
+        lines(x = freq, y = noise, col = "darkgray", lwd = 2, type = "l", lty = 2)
       }
       
-      # Always add shaded area to legend at the end
-      leg_names <- c(leg_names, "Audible Speech Area")
-      leg_cols <- c(leg_cols, grDevices::rgb(0.2, 0.8, 0.2, 0.3))
-      leg_pch <- c(leg_pch, 15)
-      leg_lty <- c(leg_lty, NA)
-      leg_lwd <- c(leg_lwd, NA)
-      leg_cex <- c(leg_cex, 2)
-      
-      legend("topright",
-             legend = leg_names,
-             col = leg_cols,
-             pch = leg_pch,
-             lty = leg_lty,
-             lwd = leg_lwd,
-             pt.cex = leg_cex,
-             bg = "white"
-        )
+      if (legend) {
+        legend("topright",
+               legend = leg_names,
+               col = leg_cols,
+               pch = leg_pch,
+               lty = leg_lty,
+               lwd = leg_lwd,
+               pt.cex = leg_cex,
+               bg = "white",
+               cex = 0.75
+          )
+      }
       
     } else {
-      plot(
-           x=x$freq.orig, 
-           y=x$x.orig, 
-           col="black", 
-           cex=2, 
-           lwd=2,
-           log="x",
-           xlab="Frequency (Herz)", 
-           ylab="Threshhold of Detection (dB)",
-           ylim=c(0, 80), 
-           xlim=c(100, 8500),
-           ...
-           ) 
-      
-      lines( x=x$freq, y=x$table[, "T'i"],
-            col="blue", lwd=2, type="o", pch=2)
-      abline(v=x$freq, lty=2)
-      legend("topleft",
-             legend=c(
-               "Measured data",
-               "Interpolated values"
-               ),
-             col=c("black",  "blue"),
-             pch=c(      1,     2 ),
-             lty=c(     NA,     1 ),
-             lwd=c(     NA,     1 ),
-             bg="white"
-        )
+      # If clinical=FALSE and the object is aided, show the 3-line Insertion Gain Plot
+      if (!is.null(x$prescription)) {
+        
+        # Dynamically recalculate SII for -10 and +10 dB input levels
+        call55 <- x$call
+        call55$speech <- x$orig[[2]] - 10
+        res55 <- eval(call55, envir = parent.frame())
+        
+        call75 <- x$call
+        call75$speech <- x$orig[[2]] + 10
+        res75 <- eval(call75, envir = parent.frame())
+        
+        # Call the insertion gain plotting function
+        plot_gain(res55, x, res75, ...)
+        
+      } else {
+        # Original interpolation diagnostic plot for unaided objects
+        plot(
+             x=x$freq.orig, 
+             y=x$x.orig, 
+             col="black", 
+             cex=2, 
+             lwd=2,
+             log="x",
+             xlab="Frequency (Hz)", 
+             ylab="Threshold of Detection (dB HL)",
+             ylim=c(0, 80), 
+             xlim=c(250, 8000),
+             ...
+             ) 
+        
+        lines( x=x$freq, y=x$table[, "T'i"],
+              col="blue", lwd=2, type="o", pch=2)
+        abline(v=x$freq, lty=2, col="lightgray")
+        legend("topleft",
+               legend=c(
+                 "Measured data",
+                 "Interpolated values"
+                 ),
+               col=c("black",  "blue"),
+               pch=c(      1,     2 ),
+               lty=c(     NA,     1 ),
+               lwd=c(     NA,     1 ),
+               bg="white"
+          )
+      }
     }
   }
+
+plot_gain <- function(res55, res65, res75, ...) {
+  if (!inherits(res55, "SII") || !inherits(res65, "SII") || !inherits(res75, "SII")) {
+    stop("All inputs must be objects of class 'SII'")
+  }
+  
+  freq <- res65$freq
+  g55 <- res55$gain
+  g65 <- res65$gain
+  g75 <- res75$gain
+  
+  prescription <- res65$prescription
+  if (is.null(prescription)) prescription <- "Custom"
+  
+  # Determine bounds
+  y_max <- max(c(g55, g65, g75), na.rm=TRUE) + 5
+  if (y_max < 20) y_max <- 20
+  
+  plot(
+    x = freq,
+    y = g65,
+    type = "n",
+    log = "x",
+    xlab = "Frequency (Hz)",
+    ylab = "Insertion Gain (dB)",
+    ylim = c(0, y_max),
+    xlim = c(250, 8000),
+    xaxt = "n",
+    main = paste("Insertion Gain -", prescription),
+    ...
+  )
+  
+  # Draw custom octave x-axis
+  axis(1, at = c(250, 500, 1000, 2000, 4000, 8000), labels = c(250, 500, 1000, 2000, 4000, 8000))
+  
+  # Add vertical dashed lines for frequency bands
+  abline(v = freq, lty = 3, col = "lightgray")
+  
+  # Plot curves
+  lines(x = freq, y = g55, col = "blue", lwd = 2, lty = 3) # Dotted for 55 (Soft)
+  lines(x = freq, y = g65, col = "black", lwd = 2, lty = 1) # Solid for 65 (Average)
+  lines(x = freq, y = g75, col = "red", lwd = 2, lty = 2) # Dashed for 75 (Loud)
+  
+  # Add legend
+  legend("topleft",
+         legend = c("55 dB SPL (Soft)", "65 dB SPL (Average)", "75 dB SPL (Loud)"),
+         col = c("blue", "black", "red"),
+         lty = c(3, 1, 2),
+         lwd = 2,
+         bg = "white"
+  )
+}

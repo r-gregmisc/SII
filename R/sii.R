@@ -21,7 +21,8 @@ sii <- function(
                   "CST"
                   ),
                 interpolate=FALSE,
-                prescription=NULL
+                prescription=NULL,
+                desensitization=FALSE
                 )
 {
   ## Assumptions:
@@ -94,7 +95,9 @@ sii <- function(
     }
   else {
     const.speech=FALSE
-    vocal_effort <- "Custom"
+    # Calculate the overall broadband SPL for the custom speech array
+    overall_spl <- 10 * log10(sum(10^(speech/10), na.rm = TRUE))
+    vocal_effort <- paste0(round(overall_spl), " dB SPL")
   }
 
   ## Handle missing noise
@@ -194,8 +197,25 @@ sii <- function(
   #########
   if (!is.null(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
+  } else if (!is.null(prescription) && prescription == "Open-NL") {
+    # Calculate dynamic WDRC gain independently for each frequency band
+    # This acts as a multi-channel compressor, preventing upward spread of masking
+    gain <- calculate_open_nl_gain(freq, threshold, speech)
+    
+    # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
+    # Instead of hard peak clipping, we use a high compression ratio (10:1) 
+    # for the portion of the signal that exceeds the maximum output limit.
+    mpo <- calculate_nal_sspl90(threshold)
+    raw_output <- speech + gain
+    overshoot <- pmax(0, raw_output - mpo)
+    
+    final_output <- pmin(raw_output, mpo) + (overshoot / 10.0)
+    gain <- final_output - speech
+    
+    # Ensure no negative gain after MPO restriction
+    gain <- pmax(gain, 0)
   } else {
-    gain <- rep(0, length(freq))
+    gain <- rep(0, length(speech))
   }
   
   ## Save the unaided speech to return it for plotting
@@ -368,6 +388,23 @@ sii <- function(
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
   sii.tab$"Ki" <- enforce.range( sii.tab$"Ki" )
   
+  if (desensitization) {
+    # Apply Hearing Loss Desensitization (Johnson 2013 / Ching et al. 2011)
+    T_hl <- sii.tab$"T'i"
+    
+    # Calculate m and p variables based on frequency-specific hearing loss (T)
+    m <- 1 / (1 + exp(0.075 * (T_hl - 66)))
+    p <- (T_hl / 8) - 15
+    
+    # Prevent division by exactly zero for mathematical safety
+    p[p == 0] <- -1e-6
+    
+    # Apply desensitization to the audibility index (Ki)
+    # k' = [ (k/30)^p + m^p ]^(1/p) where k/30 is equivalent to our bounded Ki
+    sii.tab$"Ki" <- (sii.tab$"Ki"^p + m^p)^(1/p)
+    sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
+  }
+  
   ##         Calculate Ai
   sii.tab$"Ai" <- sii.tab$"Li" * sii.tab$"Ki"
   
@@ -408,4 +445,42 @@ sii <- function(
   class(retval) <- "SII"
   
   retval
+}
+
+# Simplified Psychoacoustic Loudness Estimator (Sones)
+# Models loudness recruitment by normalizing the Sensation Level to the patient's Dynamic Range
+calculate_loudness <- function(x) {
+  if (!inherits(x, "SII")) {
+    stop("Input must be an object of class 'SII'")
+  }
+  
+  # Aided Equivalent Speech Spectrum Level (E'i) and Threshold (T'i)
+  E_prime <- x$table[, "E'i"]
+  T_prime <- x$table[, "T'i"]
+  
+  # Predict Uncomfortable Loudness Level (UCL) for each band
+  # Normal UCL is ~100 dB SPL. It increases slightly with hearing loss.
+  UCL <- 100 + 0.25 * pmax(0, T_prime - 20, na.rm = TRUE)
+  
+  # Patient's Dynamic Range (Threshold to UCL)
+  DR <- pmax(1, UCL - T_prime, na.rm = TRUE) # pmax(1) prevents division by zero
+  
+  # Sensation Level (dB above threshold)
+  # Speech peaks are 15 dB above the RMS E'i spectrum level
+  peak_level <- E_prime + 15
+  SL <- pmax(0, peak_level - T_prime, na.rm = TRUE)
+  
+  # Normalize to a 100-Phon scale to model recruitment
+  # E.g., if SL equals the full Dynamic Range, perceived loudness is 100 Phons
+  phons <- (SL / DR) * 100 
+  
+  # Stevens' Power Law (1 Sone = 40 Phons. Sones double every 10 Phons)
+  sones_band <- ifelse(phons >= 40,
+                       2^((phons - 40) / 10),
+                       (phons / 40)^2.5)
+                       
+  # Sum specific loudness across all critical bands to get Total Loudness (Sones)
+  total_sones <- sum(sones_band, na.rm = TRUE)
+  
+  return(total_sones)
 }
