@@ -16,7 +16,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       
       # Determine bounds for the plot
       y_min <- 0 # Start Y axis at 0 dB SPL
-      y_max <- max(c(100, thresh, noise, speech), na.rm=TRUE) + 5
+      y_max <- max(c(100, thresh, noise, speech, x$mpo), na.rm=TRUE) + 5
       
       is_aided <- !is.null(x$prescription)
       
@@ -62,12 +62,30 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
         leg_cex <- c(leg_cex, 1)
       }
       
-      leg_names <- c(leg_names, "Audible Speech Area")
+      if (!is.null(x$mpo)) {
+        leg_names <- c(leg_names, "MPO / SSPL90")
+        leg_cols <- c(leg_cols, "black")
+        leg_pch <- c(leg_pch, 8)
+        leg_lty <- c(leg_lty, 2)
+        leg_lwd <- c(leg_lwd, 2)
+        leg_cex <- c(leg_cex, 1.2)
+      }
+      
+      leg_names <- c(leg_names, if (is_aided) "Aided Dynamic Range" else "Speech Dynamic Range")
       leg_cols <- c(leg_cols, grDevices::rgb(0.2, 0.8, 0.2, 0.3))
       leg_pch <- c(leg_pch, 15)
       leg_lty <- c(leg_lty, NA)
       leg_lwd <- c(leg_lwd, NA)
       leg_cex <- c(leg_cex, 2)
+      
+      if (is_aided) {
+        leg_names <- c(leg_names, "Unaided Dynamic Range")
+        leg_cols <- c(leg_cols, grDevices::rgb(0.5, 0.5, 0.5, 0.2))
+        leg_pch <- c(leg_pch, 15)
+        leg_lty <- c(leg_lty, NA)
+        leg_lwd <- c(leg_lwd, NA)
+        leg_cex <- c(leg_cex, 2)
+      }
       
       # If legend_only is true, draw the isolated legend and return immediately
       if (legend_only) {
@@ -103,15 +121,29 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # Draw custom octave x-axis
       axis(1, at = c(250, 500, 1000, 2000, 4000, 8000), labels = c(250, 500, 1000, 2000, 4000, 8000))
       
-      # Shade the audible speech area
-      top <- speech
-      bottom <- pmin(speech, masker, na.rm=TRUE)
-      
-      valid <- !is.na(top) & !is.na(bottom) & !is.na(freq)
-      if (any(valid)) {
+      # Shade the Unaided Speech Dynamic Range (+12 / -18 dB)
+      if (is_aided) {
+        u_top <- x$unaided_speech + 12
+        u_bottom <- x$unaided_speech - 18
+        u_valid <- !is.na(u_top) & !is.na(u_bottom) & !is.na(freq)
+        if (any(u_valid)) {
           graphics::polygon(
-            x = c(freq[valid], rev(freq[valid])),
-            y = c(top[valid], rev(bottom[valid])),
+            x = c(freq[u_valid], rev(freq[u_valid])),
+            y = c(u_top[u_valid], rev(u_bottom[u_valid])),
+            col = grDevices::rgb(0.5, 0.5, 0.5, 0.2),
+            border = NA
+          )
+        }
+      }
+      
+      # Shade the Aided (or standard if unaided) Speech Dynamic Range (+12 / -18 dB)
+      a_top <- speech + 12
+      a_bottom <- speech - 18
+      a_valid <- !is.na(a_top) & !is.na(a_bottom) & !is.na(freq)
+      if (any(a_valid)) {
+          graphics::polygon(
+            x = c(freq[a_valid], rev(freq[a_valid])),
+            y = c(a_top[a_valid], rev(a_bottom[a_valid])),
             col = grDevices::rgb(0.2, 0.8, 0.2, 0.3),
             border = NA
           )
@@ -139,6 +171,10 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       
       if (has_noise) {
         lines(x = freq, y = noise, col = "darkgray", lwd = 2, type = "l", lty = 2)
+      }
+      
+      if (!is.null(x$mpo)) {
+        lines(x = freq, y = x$mpo, col = "black", lwd = 2, type = "b", pch = 8, lty = 2)
       }
       
       if (legend) {

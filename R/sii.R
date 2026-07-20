@@ -22,7 +22,13 @@ sii <- function(
                   ),
                 interpolate=FALSE,
                 prescription=NULL,
-                desensitization=FALSE
+                desensitization=FALSE,
+                ldl=NULL,
+                gender="male",
+                experience="experienced",
+                config="bilateral",
+                age="adult",
+                coupling="custom_occluded"
                 )
 {
   ## Assumptions:
@@ -195,17 +201,18 @@ sii <- function(
   #########
   ## Calculate Prescription Gain if requested
   #########
+  mpo <- NULL
   if (!is.null(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && prescription == "Open-NL") {
     # Calculate dynamic WDRC gain independently for each frequency band
     # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech)
+    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling)
     
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
     # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold, gain)
+    mpo <- calculate_nal_sspl90(threshold, gain, ldl)
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     
@@ -437,6 +444,7 @@ sii <- function(
   retval$loss      <- loss
   retval$freq      <- freq
   retval$gain      <- gain
+  retval$mpo       <- mpo
   retval$prescription <- prescription
   retval$method    <- method
   retval$table     <- sii.tab
