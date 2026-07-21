@@ -164,7 +164,11 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # We dynamically scale the gain limit so severe losses can still get the amplification they need.
   # Lifted base limit from 25 to 30 dB to prevent underamplification of steep slopes
-  gain_limit <- 30 + pmax(0, threshold - 60) * 0.4
+  if (!is.null(age) && substr(age, 1, 5) == "child") {
+    gain_limit <- 40 + pmax(0, threshold - 60) * 0.5
+  } else {
+    gain_limit <- 30 + pmax(0, threshold - 60) * 0.4
+  }
   excess_gain <- pmax(0, g_65 - gain_limit)
   
   # Compress the excess (2:1 ratio instead of 4:1 to allow more gain through)
@@ -175,8 +179,13 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 1e. NAL-NL3 Bandwidth Roll-off
   # Reduced emphasis on using low-frequency (<= 250 Hz) and very high-frequency (>= 6 kHz) gain
-  bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
-                       y = c(0.7, 1.0, 1.0, 1.0, 1.0, 0.8, 0.5), xout = freq, rule = 2)$y
+  if (!is.null(age) && substr(age, 1, 5) == "child") {
+    bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
+                         y = c(0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0), xout = freq, rule = 2)$y
+  } else {
+    bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
+                         y = c(0.7, 1.0, 1.0, 1.0, 1.0, 0.8, 0.5), xout = freq, rule = 2)$y
+  }
   g_65 <- g_65 * bw_rolloff
   
   # Ensure gain doesn't go below 0
@@ -233,9 +242,16 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Clinical Limits: Ensure CR stays between 1.0 (linear) and a strict 2.5 maximum (NAL-NL3 standard).
   cr_loud <- pmax(1.0, pmin(cr_loud, 2.5))
   
-  # 3.5 Variable Compression Threshold (DSL v5.0a Philosophy)
-  # Instead of a fixed low knee-point, the CT increases with hearing loss severity.
-  ct_overall <- approx(x = c(20, 50, 80, 100), y = c(35, 45, 60, 70), xout = threshold, rule = 2)$y
+  # 3.5 Variable Compression Threshold (CT)
+  # Standardizing CT to be universally lower (30-45 dB SPL) to match NAL-NL2 and DSL.
+  # A lower CT ensures WDRC kicks in earlier, applying more gain to soft speech (55 dB SPL).
+  # This restores audibility for soft sounds and dramatically reduces listening effort,
+  # especially when using our lower-gain comfort multipliers (e.g. 0.40 / 0.45).
+  if (!is.null(age) && substr(age, 1, 5) == "child") {
+    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = threshold, rule = 2)$y
+  } else {
+    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(30, 35, 40, 45), xout = threshold, rule = 2)$y
+  }
   
   # ct_overall is the OVERALL speech level CT. We must convert it to a BAND level CT.
   # Since 'pivot' is the band level for 65 dB SPL overall speech, 
@@ -275,10 +291,10 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Age / Acquired-Loss Penalty (DSL v5.0a Philosophy)
   # Adults prefer less gain than children, particularly for mild-to-moderate losses.
   # This difference shrinks as the hearing loss becomes more severe.
-  if (age == "child") {
+  if (!is.null(age) && substr(age, 1, 5) == "child") {
     # We apply a dynamic boost for children relative to the adult baseline.
-    # ~7 dB for mild/moderate losses, tapering to ~3 dB for severe losses.
-    child_boost <- approx(x = c(20, 50, 80, 100), y = c(7, 7, 3, 1), xout = threshold, rule = 2)$y
+    # ~5 dB for mild/moderate losses, tapering to ~1 dB for severe losses.
+    child_boost <- approx(x = c(20, 50, 80, 100), y = c(5, 5, 2, 1), xout = threshold, rule = 2)$y
     adjustment <- adjustment + child_boost
   }
   # Configuration: Unilateral fittings require ~3 dB more gain due to lack of binaural summation
@@ -332,7 +348,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   return(ig)
 }
 
-calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL) {
+calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult") {
   # NAL SSPL90 rule (Maximum Power Output)
   # Derived from Dillon (2012) and NAL guidelines for avoiding discomfort
   
@@ -361,7 +377,11 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL) {
   
   # Absolute ceiling (Johnson 2017 PTS Safety Limits)
   # Limit output based on threshold to avoid permanent threshold shift.
-  pts_safe_limit <- 105 + pmax(0, threshold - 50) * 0.5
+  if (!is.null(age) && substr(age, 1, 5) == "child") {
+    pts_safe_limit <- 110 + pmax(0, threshold - 50) * 0.5
+  } else {
+    pts_safe_limit <- 105 + pmax(0, threshold - 50) * 0.5
+  }
   mpo <- pmin(mpo, pts_safe_limit)
   
   # ABSOLUTE CLINICAL HARD CAP: NEVER exceed 120 dB SPL

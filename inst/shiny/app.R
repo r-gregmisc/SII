@@ -68,7 +68,14 @@ ui <- page_sidebar(
       accordion_panel(
         "Demographics & Fitting",
         selectInput("gender", "Gender:", choices = c("Male" = "male", "Female" = "female"), selected = "male"),
-        selectInput("age", "Age Group:", choices = c("Adult (>18)" = "adult", "Child" = "child"), selected = "adult"),
+        selectInput("age", "Age Group:", 
+                    choices = c("Adult (>5 years)" = "adult", 
+                                "Child: 36-59 months" = "child_36_59",
+                                "Child: 24-35 months" = "child_24_35",
+                                "Child: 12-23 months" = "child_12_23",
+                                "Child: 6-11 months" = "child_6_11",
+                                "Child: 0-5 months" = "child_0_5"), 
+                    selected = "adult"),
         selectInput("experience", "Experience:", 
                     choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
                     selected = "experienced"),
@@ -78,7 +85,11 @@ ui <- page_sidebar(
                                 "Double Dome" = "double_dome", 
                                 "Tulip Dome" = "tulip_dome", 
                                 "Open Dome" = "open_dome"), 
-                    selected = "custom_occluded")
+                    selected = "custom_occluded"),
+        selectInput("transducer", "Audiometric Transducer:", 
+                    choices = c("Insert Earphones (ER-3A)" = "inserts", 
+                                "Supra-aural Headphones (TDH-39)" = "supra_aural"),
+                    selected = "inserts")
       )
     )
   ),
@@ -233,7 +244,8 @@ server <- function(input, output, session) {
         config = input$config,
         age = input$age,
         coupling = input$coupling,
-        module = input$module)
+        module = input$module,
+        transducer = input$transducer)
         
     # Append JD2011 targets for plotting if a preset is selected
     preset <- input$preset
@@ -278,27 +290,26 @@ server <- function(input, output, session) {
     
     # Calculate Unaided
     obj_unaided <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = NULL, 
-                       desensitization = input$desensitization)
+                       desensitization = input$desensitization, transducer = input$transducer)
     
     # Calculate NAL-R
     obj_nalr <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "NAL-R", 
-                    desensitization = input$desensitization)
+                    desensitization = input$desensitization, transducer = input$transducer)
     
     # Calculate Open-NL
     obj_opennl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", 
                       desensitization = input$desensitization, 
                       gender = input$gender, experience = input$experience, 
-                      config = input$config, age = input$age, coupling = input$coupling)
+                      config = input$config, age = input$age, 
+                      coupling = input$coupling, module = input$module, transducer = input$transducer)
     
     # Predict NAL-NL2 and DSL v5.0
     preset <- input$preset
     if (preset %in% c("a1", "a2", "a3", "a4")) {
       target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
       target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
-      
-      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization)
-      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization)
-      
+      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer)
+      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer)
       val_nalnl2_sii <- obj_nalnl2$sii
       val_dsl_sii <- obj_dsl$sii
       val_nalnl2_sones <- calculate_loudness(obj_nalnl2)

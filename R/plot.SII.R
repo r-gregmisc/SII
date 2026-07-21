@@ -19,7 +19,42 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # Convert all ANSI Spectrum Levels (dB SPL/Hz) to Clinical Band Levels (dB SPL)
       speech <- x$table[, "E'i"] + bw_db
       noise <- x$table[, "N'i"] + bw_db
-      thresh_spl <- x$table[, "X'i"] + bw_db
+      f_oct <- c(250, 500, 1000, 2000, 4000, 8000)
+      
+      if (!is.null(x$transducer) && x$transducer == "supra_aural") {
+        # Supra-Aural Headphones (TDH-39) use REDD to directly convert HL to Real-Ear SPL
+        # We bypass RETSPL and RECD entirely.
+        # Standard Adult REDD (Scollie et al., 1998)
+        redd <- c(14.0, 14.0, 10.0, 17.0, 16.0, 19.0)
+        eardrum_offset <- approx(x = log10(f_oct), y = redd, xout = log10(freq), rule = 2)$y
+      } else {
+        # Insert Earphones (ER-3A) use RETSPL + RECD
+        retspl <- c(14.0, 5.5, 0.0, 3.0, 5.5, 0.0)
+        
+        # DSL v5.0a RECD (Real-Ear-to-Coupler Difference) based on specific age bracket
+        if (is.null(x$age) || x$age == "adult") {
+          recd <- c(2.0, 4.0, 5.0, 6.0, 8.0, 4.0)
+        } else if (x$age == "child_36_59") {
+          recd <- c(3.0, 6.0, 8.0, 12.0, 15.0, 14.0)
+        } else if (x$age == "child_24_35") {
+          recd <- c(3.0, 6.0, 9.0, 13.0, 15.0, 15.0)
+        } else if (x$age == "child_12_23") {
+          recd <- c(4.0, 6.0, 9.0, 14.0, 17.0, 16.0)
+        } else if (x$age == "child_6_11") {
+          recd <- c(4.0, 7.0, 10.0, 15.0, 18.0, 18.0)
+        } else if (x$age == "child_0_5") {
+          recd <- c(4.0, 7.0, 11.0, 16.0, 21.0, 21.0)
+        } else {
+          # Fallback generic pediatric
+          recd <- c(4.0, 6.0, 8.0, 10.0, 12.0, 9.0)
+        }
+        
+        # Interpolate RETSPL + RECD to get the True Eardrum SPL offset
+        eardrum_offset <- approx(x = log10(f_oct), y = retspl + recd, xout = log10(freq), rule = 2)$y
+      }
+      
+      # True Clinical SPLogram Eardrum Threshold
+      thresh_spl <- x$table[, "T'i"] + eardrum_offset
       
       # The masking threshold is the maximum of the internal/external noise and hearing threshold in SPL
       masker <- pmax(noise, thresh_spl, na.rm=TRUE)

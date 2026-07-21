@@ -30,6 +30,7 @@ sii <- function(
                 age="adult",
                 coupling="custom_occluded",
                 module="standard",
+                transducer="inserts",
                 custom_gain=NULL
                 )
 {
@@ -158,6 +159,7 @@ sii <- function(
   retval$config <- config
   retval$age <- age
   retval$coupling <- coupling
+  retval$transducer <- transducer
 
   
   if(interpolate)
@@ -227,7 +229,7 @@ sii <- function(
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
     # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold, gain, ldl)
+    mpo <- calculate_nal_sspl90(threshold, gain, ldl, age)
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     
