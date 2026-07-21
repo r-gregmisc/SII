@@ -2,6 +2,15 @@ library(shiny)
 library(bslib)
 library(SII)
 
+# Force source the absolute paths to ensure the latest code is used (overriding the installed package)
+tryCatch({
+  source("/home/mark/Development/SII for R/SII/R/sii.R")
+  source("/home/mark/Development/SII for R/SII/R/nalr.R")
+  source("/home/mark/Development/SII for R/SII/R/plot.SII.R")
+  source("/home/mark/Development/SII for R/SII/R/predict_aided_sii.R")
+  source("/home/mark/Development/SII for R/SII/R/benchmark_targets.R")
+}, error = function(e) print(paste("Error sourcing absolute paths:", e$message)))
+
 # Define the Modern UI Layout
 ui <- page_sidebar(
   title = "SII Advanced Interactive Dashboard",
@@ -14,6 +23,13 @@ ui <- page_sidebar(
       open = c("Audiogram Thresholds (dB HL)", "Configuration"),
       accordion_panel(
         "Audiogram Thresholds (dB HL)",
+        selectInput("preset", "Load Preset Audiogram:", 
+                    choices = c("Custom" = "custom", 
+                                "A-1 (Flat Moderate)" = "a1", 
+                                "A-2 (Reverse Slope)" = "a2", 
+                                "A-3 (Cookie Bite)" = "a3", 
+                                "A-4 (Steep Sloping)" = "a4"),
+                    selected = "custom"),
         sliderInput("htl250", "250 Hz", min = 0, max = 120, value = 20, step = 5),
         sliderInput("htl500", "500 Hz", min = 0, max = 120, value = 30, step = 5),
         sliderInput("htl1000", "1000 Hz", min = 0, max = 120, value = 45, step = 5),
@@ -42,13 +58,20 @@ ui <- page_sidebar(
         selectInput("prescription", "Fitting Rationale:", 
                     choices = c("Unaided" = "none", "NAL-R" = "NAL-R", "Open-NL" = "Open-NL"),
                     selected = "Open-NL"),
-        checkboxInput("desensitization", "Apply Desensitization (Johnson 2013)", value = TRUE)
+        selectInput("module", "Operating Module:",
+                    choices = c("Standard (Everyday)" = "standard", 
+                                "Comfort in Noise (CIN)" = "cin", 
+                                "Minimal Hearing Loss (MHL)" = "mhl"),
+                    selected = "standard"),
+        checkboxInput("desensitization", "Apply Desensitization (Johnson 2013)", value = FALSE)
       ),
       accordion_panel(
         "Demographics & Fitting",
         selectInput("gender", "Gender:", choices = c("Male" = "male", "Female" = "female"), selected = "male"),
         selectInput("age", "Age Group:", choices = c("Adult (>18)" = "adult", "Child" = "child"), selected = "adult"),
-        selectInput("experience", "Experience:", choices = c("Experienced User" = "experienced", "New User" = "new"), selected = "experienced"),
+        selectInput("experience", "Experience:", 
+                    choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
+                    selected = "experienced"),
         selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "bilateral"),
         selectInput("coupling", "Acoustic Coupling / Vent:", 
                     choices = c("Custom Solid Earmold" = "custom_occluded", 
@@ -80,6 +103,51 @@ ui <- page_sidebar(
   )
 )
 
+# Helper to estimate Loudness for proprietary prescriptions
+estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii) {
+  if (is.na(target_sii)) return(NA)
+  
+  if (abs(target_sii - base_obj$sii) < 0.001) {
+    return(calculate_loudness(base_obj))
+  }
+  
+  sii_error <- function(shift_dB) {
+    shifted_speech <- base_obj$speech + shift_dB
+    temp_obj <- sii(speech = shifted_speech, 
+                    threshold = base_obj$threshold,
+                    freq = base_obj$freq,
+                    prescription = NULL,
+                    desensitization = base_obj$desensitization)
+    return(temp_obj$sii - target_sii)
+  }
+  
+  shift_dB <- 0
+  lower_val <- sii_error(-60)
+  upper_val <- sii_error(60)
+  
+  if (lower_val * upper_val <= 0) {
+    try({
+      res <- uniroot(sii_error, lower = -60, upper = 60)
+      shift_dB <- res$root
+    }, silent = TRUE)
+  } else {
+    sii_diff <- base_obj$sii - unaided_obj$sii
+    sone_diff <- calculate_loudness(base_obj) - calculate_loudness(unaided_obj)
+    if (sii_diff != 0) {
+      return(calculate_loudness(unaided_obj) + sone_diff * (target_sii - unaided_obj$sii) / sii_diff)
+    }
+  }
+  
+  shifted_speech <- base_obj$speech + shift_dB
+  proxy_obj <- sii(speech = shifted_speech, 
+                   threshold = base_obj$threshold,
+                   freq = base_obj$freq,
+                   prescription = NULL, 
+                   desensitization = base_obj$desensitization)
+                   
+  return(calculate_loudness(proxy_obj))
+}
+
 # Define the Application Logic
 server <- function(input, output, session) {
   
@@ -89,6 +157,39 @@ server <- function(input, output, session) {
     f_21 <- critical$fi
     overall_normal <- 10 * log10(sum(10^(critical$normal/10)))
     list(f_21 = f_21, normal_spectrum = critical$normal, overall_normal = overall_normal)
+  })
+  
+  # Handle Presets
+  observeEvent(input$preset, {
+    if (input$preset == "a1") {
+      updateSliderInput(session, "htl250", value = 50)
+      updateSliderInput(session, "htl500", value = 50)
+      updateSliderInput(session, "htl1000", value = 50)
+      updateSliderInput(session, "htl2000", value = 50)
+      updateSliderInput(session, "htl4000", value = 50)
+      updateSliderInput(session, "htl8000", value = 50)
+    } else if (input$preset == "a2") {
+      updateSliderInput(session, "htl250", value = 50)
+      updateSliderInput(session, "htl500", value = 40)
+      updateSliderInput(session, "htl1000", value = 30)
+      updateSliderInput(session, "htl2000", value = 20)
+      updateSliderInput(session, "htl4000", value = 10)
+      updateSliderInput(session, "htl8000", value = 10)
+    } else if (input$preset == "a3") {
+      updateSliderInput(session, "htl250", value = 20)
+      updateSliderInput(session, "htl500", value = 40)
+      updateSliderInput(session, "htl1000", value = 50)
+      updateSliderInput(session, "htl2000", value = 50)
+      updateSliderInput(session, "htl4000", value = 40)
+      updateSliderInput(session, "htl8000", value = 20)
+    } else if (input$preset == "a4") {
+      updateSliderInput(session, "htl250", value = 10)
+      updateSliderInput(session, "htl500", value = 10)
+      updateSliderInput(session, "htl1000", value = 20)
+      updateSliderInput(session, "htl2000", value = 50)
+      updateSliderInput(session, "htl4000", value = 80)
+      updateSliderInput(session, "htl8000", value = 80)
+    }
   })
   
   # Reactive SII Calculation triggers every time a slider is moved
@@ -121,7 +222,7 @@ server <- function(input, output, session) {
     speech_input <- d$normal_spectrum + (target_level - d$overall_normal)
     
     # 4. Run the robust SII calculation engine
-    sii(speech = speech_input, 
+    obj <- sii(speech = speech_input, 
         threshold = htl_21, 
         freq = d$f_21, 
         prescription = presc, 
@@ -131,7 +232,20 @@ server <- function(input, output, session) {
         experience = input$experience,
         config = input$config,
         age = input$age,
-        coupling = input$coupling)
+        coupling = input$coupling,
+        module = input$module)
+        
+    # Append JD2011 targets for plotting if a preset is selected
+    preset <- input$preset
+    target_level <- as.numeric(input$speech_level)
+    if (preset %in% c("a1", "a2", "a3", "a4") && !is.null(presc) && presc == "Open-NL") {
+      obj$target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
+      obj$target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
+    }
+    
+    obj$target_level <- target_level
+    
+    return(obj)
   })
   
   # Render the SPLogram Plot
@@ -158,34 +272,57 @@ server <- function(input, output, session) {
                    input$htl2000, input$htl4000, input$htl8000)
     htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
     
-    # Calculate Speech Input at 65 dB SPL
-    speech_65 <- d$normal_spectrum + (65 - d$overall_normal)
+    # Calculate Speech Input at selected level
+    target_level <- as.numeric(input$speech_level)
+    speech_input <- d$normal_spectrum + (target_level - d$overall_normal)
     
     # Calculate Unaided
-    obj_unaided <- sii(speech = speech_65, threshold = htl_21, freq = d$f_21, prescription = NULL, 
+    obj_unaided <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = NULL, 
                        desensitization = input$desensitization)
     
     # Calculate NAL-R
-    obj_nalr <- sii(speech = speech_65, threshold = htl_21, freq = d$f_21, prescription = "NAL-R", 
+    obj_nalr <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "NAL-R", 
                     desensitization = input$desensitization)
     
     # Calculate Open-NL
-    obj_opennl <- sii(speech = speech_65, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", 
+    obj_opennl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", 
                       desensitization = input$desensitization, 
                       gender = input$gender, experience = input$experience, 
                       config = input$config, age = input$age, coupling = input$coupling)
     
     # Predict NAL-NL2 and DSL v5.0
-    pred_nalnl2 <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "NAL-NL2", desensitized = input$desensitization)
-    pred_dsl <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
+    preset <- input$preset
+    if (preset %in% c("a1", "a2", "a3", "a4")) {
+      target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
+      target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
+      
+      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization)
+      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization)
+      
+      val_nalnl2_sii <- obj_nalnl2$sii
+      val_dsl_sii <- obj_dsl$sii
+      val_nalnl2_sones <- calculate_loudness(obj_nalnl2)
+      val_dsl_sones <- calculate_loudness(obj_dsl)
+      name_nalnl2 <- "NAL-NL2 (JD2011)"
+      name_dsl <- "DSL v5.0 (JD2011)"
+    } else {
+      val_nalnl2_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "NAL-NL2", desensitized = input$desensitization)
+      val_dsl_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
+      
+      val_nalnl2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_nalnl2_sii)
+      val_dsl_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_dsl_sii)
+      name_nalnl2 <- "NAL-NL2 (Predicted)"
+      name_dsl <- "DSL v5.0 (Predicted)"
+    }
     
     data.frame(
-      Prescription = c("Unaided", "NAL-R", "Open-NL", "NAL-NL2 (Predicted)", "DSL v5.0 (Predicted)"),
-      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, pred_nalnl2, pred_dsl)),
+      Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl),
+      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii)),
       Sones = c(sprintf("%.1f", calculate_loudness(obj_unaided)), 
                 sprintf("%.1f", calculate_loudness(obj_nalr)), 
                 sprintf("%.1f", calculate_loudness(obj_opennl)), 
-                "N/A", "N/A")
+                sprintf("%.1f", val_nalnl2_sones), 
+                sprintf("%.1f", val_dsl_sones))
     )
   }, align = "c")
 }

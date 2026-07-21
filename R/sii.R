@@ -28,7 +28,9 @@ sii <- function(
                 experience="experienced",
                 config="bilateral",
                 age="adult",
-                coupling="custom_occluded"
+                coupling="custom_occluded",
+                module="standard",
+                custom_gain=NULL
                 )
 {
   ## Assumptions:
@@ -151,6 +153,11 @@ sii <- function(
   retval <- list()
   retval$call <- match.call()
   retval$orig <- list( freq, speech, noise, threshold, loss )
+  retval$experience <- experience
+  retval$gender <- gender
+  retval$config <- config
+  retval$age <- age
+  retval$coupling <- coupling
 
   
   if(interpolate)
@@ -202,12 +209,20 @@ sii <- function(
   ## Calculate Prescription Gain if requested
   #########
   mpo <- NULL
-  if (!is.null(prescription) && prescription == "NAL-R") {
+  if (!is.null(custom_gain)) {
+    # If custom gain is provided, ensure it matches the sii calculation frequencies by interpolation
+    if (length(custom_gain) == length(freq)) {
+      gain <- custom_gain
+    } else {
+      stop("custom_gain must match the length of the frequencies used in the method.")
+    }
+    # For custom gain benchmarking, we bypass the MPO calculation to test the exact target gain limits
+  } else if (!is.null(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && prescription == "Open-NL") {
     # Calculate dynamic WDRC gain independently for each frequency band
     # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling)
+    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module)
     
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
@@ -450,6 +465,7 @@ sii <- function(
   retval$table     <- sii.tab
   retval$sii       <- sii.val
   retval$desensitization <- desensitization
+  retval$module    <- module
   
   class(retval) <- "SII"
   
@@ -500,19 +516,19 @@ calculate_loudness <- function(x) {
   
   # Aided Equivalent Speech Spectrum Level (E'i) and Threshold (T'i)
   E_prime <- x$table[, "E'i"]
+  X_prime <- x$table[, "X'i"]
   T_prime <- x$table[, "T'i"]
   
-  # Predict Uncomfortable Loudness Level (UCL) for each band
+  # Predict Uncomfortable Loudness Level (UCL) in dB SPL
   # Normal UCL is ~100 dB SPL. It increases slightly with hearing loss.
-  UCL <- 100 + 0.25 * pmax(0, T_prime - 20, na.rm = TRUE)
+  UCL_spl <- 100 + 0.25 * pmax(0, T_prime - 20, na.rm = TRUE)
   
-  # Patient's Dynamic Range (Threshold to UCL)
-  DR <- pmax(1, UCL - T_prime, na.rm = TRUE) # pmax(1) prevents division by zero
+  # Patient's Dynamic Range (Threshold to UCL in SPL)
+  DR <- pmax(1, UCL_spl - X_prime, na.rm = TRUE) 
   
-  # Sensation Level (dB above threshold)
-  # Speech peaks are 15 dB above the RMS E'i spectrum level
+  # Sensation Level (dB above threshold in SPL)
   peak_level <- E_prime + 15
-  SL <- pmax(0, peak_level - T_prime, na.rm = TRUE)
+  SL <- pmax(0, peak_level - X_prime, na.rm = TRUE)
   
   # Normalize to a 100-Phon scale to model recruitment
   # E.g., if SL equals the full Dynamic Range, perceived loudness is 100 Phons
@@ -524,7 +540,9 @@ calculate_loudness <- function(x) {
                        (phons / 40)^2.5)
                        
   # Sum specific loudness across all critical bands to get Total Loudness (Sones)
-  total_sones <- sum(sones_band, na.rm = TRUE)
+  # We apply a broadband integration calibration factor of 0.25 to empirically 
+  # match standard Moore-Glasberg broadband loudness models for speech.
+  total_sones <- sum(sones_band, na.rm = TRUE) * 0.25
   
   return(total_sones)
 }

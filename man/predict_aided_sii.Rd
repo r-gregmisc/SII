@@ -8,14 +8,14 @@
   tone averages (PTA).
 }
 \usage{
-predict_aided_sii(freq, threshold, age = c("adult", "pediatric"), prescription = c("NAL-NL2", "DSL"), desensitized = TRUE)
+predict_aided_sii(freq, threshold, age = c("adult", "pediatric"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE)
 }
 \arguments{
   \item{freq}{A numeric vector of frequencies (in Hz) corresponding to the \code{threshold} values.}
   \item{threshold}{A numeric vector of hearing thresholds (in dB HL).}
   \item{age}{A character string specifying the patient age group. Must be either \code{"adult"} (default) or \code{"pediatric"} (modeled on 3-year-olds).}
   \item{prescription}{A character string specifying the prescriptive rationale to predict. Must be either \code{"NAL-NL2"} (default) or \code{"DSL"} (DSL m[i/o] v5.0).}
-  \item{desensitized}{Logical flag. If \code{TRUE} (default), predicts the effective SII incorporating hearing loss desensitization. If \code{FALSE}, predicts the traditional ANSI SII.}
+  \item{desensitized}{Logical flag. If \code{TRUE}, predicts the effective SII incorporating hearing loss desensitization. If \code{FALSE} (default), predicts the traditional ANSI SII.}
 }
 \value{
   A numeric value representing the predicted SII (constrained between 0.0 and 1.0).

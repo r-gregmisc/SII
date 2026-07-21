@@ -18,7 +18,8 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     importance = c("SII", "NNS", "CID22", "NU6", "DRT",
                    "ShortPassage", "SPIN", "CST"),
     interpolate=FALSE,
-    prescription=NULL)
+    prescription=NULL,
+    desensitization=FALSE)
 \method{print}{SII}(x, digits=3, ...)
 \method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
