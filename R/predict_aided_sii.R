@@ -9,7 +9,7 @@
 #' @param freq A numeric vector of frequencies (in Hz) corresponding to the \code{threshold} values.
 #' @param threshold A numeric vector of hearing thresholds (in dB HL).
 #' @param age A character string specifying the patient age group. Must be either \code{"adult"} (default) or \code{"pediatric"} (modeled on 3-year-olds).
-#' @param prescription A character string specifying the proprietary prescriptive rationale to predict. Must be either \code{"NAL-NL2"} (default) or \code{"DSL"} (DSL m[i/o] v5.0).
+#' @param prescription A character string specifying the clinical prescriptive rationale to predict. Must be either \code{"NAL-NL2"} (default) or \code{"DSL"} (DSL m[i/o] v5.0).
 #' @param desensitized Logical flag. If \code{TRUE}, predicts the effective SII incorporating hearing loss desensitization. If \code{FALSE} (default), predicts the traditional ANSI SII.
 #'
 #' @return A numeric value representing the predicted SII (constrained between 0.0 and 1.0).

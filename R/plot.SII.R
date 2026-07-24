@@ -5,13 +5,16 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       
       # Determine calculation method to fetch bandwidths for spectrum-to-band conversion
       n_bands <- length(freq)
-      tbl_name <- if (n_bands == 21) "critical" else 
-                  if (n_bands == 18) "onethird" else 
-                  if (n_bands == 17) "equal" else "octave"
+      method_name <- if (n_bands == 21) "critical" else 
+                     if (n_bands == 18) "one-third octave" else 
+                     if (n_bands == 17) "equal-contributing" else "octave"
+      data_name <- if (n_bands == 21) "critical" else 
+                   if (n_bands == 18) "onethird" else 
+                   if (n_bands == 17) "equal" else "octave"
                   
       local_env <- new.env()
-      data(list = tbl_name, package = "SII", envir = local_env)
-      tbl <- get(tbl_name, envir = local_env)
+      data(list = data_name, package = "SII", envir = local_env)
+      tbl <- get(data_name, envir = local_env)
       
       # Calculate the Bandwidth Correction factor in dB (10 * log10(BW))
       bw_db <- 10 * log10(tbl$hi - tbl$li)
@@ -223,6 +226,13 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       
       if (!is.null(x$mpo)) {
         lines(x = freq, y = x$mpo, col = "black", lwd = 2, type = "b", pch = 8, lty = 2)
+        
+        # MPO Collision Detector
+        collision_idx <- which(speech >= x$mpo - 1)
+        if (length(collision_idx) > 0) {
+          points(x = freq[collision_idx], y = speech[collision_idx], col = "red", cex = 2.5, lwd = 3)
+          text(x = 1000, y = y_max - 2, "WARNING: MPO COMPRESSION LIMITING DETECTED", col = "red", font = 2, cex = 1.2)
+        }
       }
       
       if (legend) {
@@ -249,17 +259,25 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
         
         # Determine which calculation method was used to fetch the correct standard spectra
         n_bands <- length(x$freq)
-        tbl_name <- if (n_bands == 21) "critical" else 
-                    if (n_bands == 18) "onethird" else 
-                    if (n_bands == 17) "equal" else "octave"
+        method_name <- if (n_bands == 21) "critical" else 
+                       if (n_bands == 18) "one-third octave" else 
+                       if (n_bands == 17) "equal-contributing" else "octave"
+        data_name <- if (n_bands == 21) "critical" else 
+                     if (n_bands == 18) "onethird" else 
+                     if (n_bands == 17) "equal" else "octave"
         
         # Create a local environment to load the data to avoid cluttering the workspace
         local_env <- new.env()
-        data(list = tbl_name, package = "SII", envir = local_env)
-        tbl <- get(tbl_name, envir = local_env)
+        data(list = data_name, package = "SII", envir = local_env)
+        tbl <- get(data_name, envir = local_env)
         
         # Calculate overall dB SPL levels of the standard Normal spectrum
-        overall_normal <- 10 * log10(sum(10^(tbl$normal / 10)))
+        # Calculate overall normal speech SPL properly by integrating over bandwidth (ANSI S3.5 standard = 62.35)
+        if ("hi" %in% names(tbl) && "li" %in% names(tbl)) {
+          overall_normal <- 10 * log10(sum((10^(tbl$normal / 10)) * (tbl$hi - tbl$li), na.rm = TRUE))
+        } else {
+          overall_normal <- 62.35
+        }
         
         # Safely extract desensitization flag (default to FALSE if not found)
         desens <- if (!is.null(x$desensitization)) x$desensitization else FALSE
@@ -273,13 +291,14 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      threshold = x$threshold,
                      loss = x$loss,
                      freq = tbl$fi,
-                     method = tbl_name,
+                     method = method_name,
                      prescription = x$prescription,
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
                      age = x$age,
+                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module)
         
@@ -289,13 +308,14 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      threshold = x$threshold,
                      loss = x$loss,
                      freq = tbl$fi,
-                     method = tbl_name,
+                     method = method_name,
                      prescription = x$prescription,
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
                      age = x$age,
+                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module)
         
@@ -305,18 +325,19 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      threshold = x$threshold,
                      loss = x$loss,
                      freq = tbl$fi,
-                     method = tbl_name,
+                     method = method_name,
                      prescription = x$prescription,
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
                      age = x$age,
+                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module)
         
         # Call the insertion gain plotting function
-        plot_gain(res55, res65, res75, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_level = x$target_level, ...)
+        plot_gain(res55, res65, res75, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_cameq2 = x$target_cameq2, target_level = x$target_level, ...)
         
       } else {
         # Original interpolation diagnostic plot for unaided objects
@@ -352,7 +373,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
     }
   }
 
-plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NULL, target_level = NULL, ...) {
+plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NULL, target_cameq2 = NULL, target_level = NULL, ...) {
   if (!inherits(res55, "SII") || !inherits(res65, "SII") || !inherits(res75, "SII")) {
     stop("All inputs must be objects of class 'SII'")
   }
@@ -372,7 +393,7 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
   on.exit(par(old_par))
   
   # Determine bounds
-  y_max <- max(c(g55, g65, g75, target_nalnl2, target_dsl), na.rm=TRUE) + 5
+  y_max <- max(c(g55, g65, g75, target_nalnl2, target_dsl, target_cameq2), na.rm=TRUE) + 5
   if (y_max < 20) y_max <- 20
   
   # Setup standard margins, increase bottom margin for CR values
@@ -400,7 +421,7 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
   abline(v = octaves, lty = 3, col = "lightgray")
   
   # Plot curves
-  if (!is.null(target_nalnl2) || !is.null(target_dsl)) {
+  if (!is.null(target_nalnl2) || !is.null(target_dsl) || !is.null(target_cameq2)) {
     # Preset Benchmark Mode: Plot the specific target_level curve to match UI dropdown
     t_level <- target_level
     if (is.null(t_level)) t_level <- 65
@@ -443,6 +464,12 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
     leg_names <- c(leg_names, "DSL Target")
     leg_cols <- c(leg_cols, "orange")
     leg_lty <- c(leg_lty, 5)
+  }
+  if (!is.null(target_cameq2)) {
+    lines(x = freq, y = target_cameq2, col = "forestgreen", lwd = 2, lty = 6)
+    leg_names <- c(leg_names, "CAMEQ2-HF Target")
+    leg_cols <- c(leg_cols, "forestgreen")
+    leg_lty <- c(leg_lty, 6)
   }
   
   # Add legend inside the plot to prevent clipping

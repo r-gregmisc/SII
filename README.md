@@ -19,3 +19,20 @@ required frequencies
 Development of this package was funded by the Center for Bioscience
 Education and Technology (CBET) of the Rochester Institute of
 Technology (RIT).
+
+## Features
+
+- **Interactive Dashboard**: Includes a Shiny web application (`launch_app()`) to visually explore hearing loss configurations, prescriptions, and age-related changes.
+- **Dynamic Compression (Open-NL)**: A proprietary hearing aid proxy prescription for modern WDRC (Wide Dynamic Range Compression) aids.
+- **Prescription Benchmarking**: Compare your fitted models against extrapolated targets for NAL-NL2, DSL v5.0a, and CAMEQ2-HF (from Johnson & Dillon, 2011).
+- **Clinical SPLogram**: Patient-friendly visualizations overlaying audibility area, environmental noise, and aided speech on a traditional clinical SPLogram format.
+
+## Usage
+
+To launch the interactive dashboard:
+```R
+library(SII)
+launch_app()
+# Alternatively, from the inst directory:
+# shiny::runApp('inst/shiny')
+```

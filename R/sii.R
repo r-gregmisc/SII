@@ -28,6 +28,7 @@ sii <- function(
                 experience="experienced",
                 config="bilateral",
                 age="adult",
+                age_years=NULL,
                 coupling="custom_occluded",
                 module="standard",
                 transducer="inserts",
@@ -56,6 +57,7 @@ sii <- function(
   ##   conductive hearing loss in dB.  If missing, assumed to be 0
 
   ## Determine which method will be used
+  print(paste("DEBUG: method argument is:", method))
   method=match.arg(method)
 
   ## Get the appropriate table of constants
@@ -105,7 +107,11 @@ sii <- function(
   else {
     const.speech=FALSE
     # Calculate the overall broadband SPL for the custom speech array
-    overall_spl <- 10 * log10(sum(10^(speech/10), na.rm = TRUE))
+    if ("hi" %in% names(table) && "li" %in% names(table)) {
+      overall_spl <- 10 * log10(sum((10^(speech/10)) * (table$hi - table$li), na.rm = TRUE))
+    } else {
+      overall_spl <- 10 * log10(sum(10^(speech/10), na.rm = TRUE))
+    }
     vocal_effort <- paste0(round(overall_spl), " dB SPL")
   }
 
@@ -158,7 +164,9 @@ sii <- function(
   retval$gender <- gender
   retval$config <- config
   retval$age <- age
+  retval$age_years <- age_years
   retval$coupling <- coupling
+  retval$module <- module
   retval$transducer <- transducer
 
   
@@ -224,7 +232,7 @@ sii <- function(
   } else if (!is.null(prescription) && prescription == "Open-NL") {
     # Calculate dynamic WDRC gain independently for each frequency band
     # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module)
+    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years)
     
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
@@ -468,6 +476,8 @@ sii <- function(
   retval$sii       <- sii.val
   retval$desensitization <- desensitization
   retval$module    <- module
+  retval$age       <- age
+  retval$age_years <- age_years
   
   class(retval) <- "SII"
   
@@ -506,7 +516,11 @@ sii <- function(
 #' \deqn{Sones_i = \left(\frac{Phons_i}{40}\right)^{2.5} \quad \text{for } Phons_i < 40}
 #' 
 #' 6. \strong{Total Loudness (Sones)}:
-#' \deqn{Sones_{Total} = \sum Sones_i}
+#' \deqn{Sones_{Total} = \sum Sones_i \times \text{calibration\_factor}}
+#' 
+#' The calibration factor (0.25 for 21 critical bands) is scaled dynamically based on the number of frequency bands
+#' used in the underlying SII method (e.g., 21 for critical, 6 for octave) to ensure
+#' equivalent loudness summation across different resolutions.
 #' 
 #' @param x An object of class \code{SII}.
 #' @return A numeric value representing the total loudness in Sones.
@@ -542,9 +556,12 @@ calculate_loudness <- function(x) {
                        (phons / 40)^2.5)
                        
   # Sum specific loudness across all critical bands to get Total Loudness (Sones)
-  # We apply a broadband integration calibration factor of 0.25 to empirically 
-  # match standard Moore-Glasberg broadband loudness models for speech.
-  total_sones <- sum(sones_band, na.rm = TRUE) * 0.25
+  # We apply a broadband integration calibration factor of 0.25 (calibrated for 21 bands) to empirically 
+  # match standard Moore-Glasberg broadband loudness models for speech. We scale this factor
+  # based on the number of bands used in the underlying SII calculation method.
+  num_bands <- nrow(x$table)
+  calibration_factor <- 0.25 * (21 / num_bands)
+  total_sones <- sum(sones_band, na.rm = TRUE) * calibration_factor
   
   return(total_sones)
 }

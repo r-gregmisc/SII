@@ -25,10 +25,13 @@ ui <- page_sidebar(
         "Audiogram Thresholds (dB HL)",
         selectInput("preset", "Load Preset Audiogram:", 
                     choices = c("Custom" = "custom", 
-                                "A-1 (Flat Moderate)" = "a1", 
+                                "A-1 (Mild-to-Moderate Sloping)" = "a1", 
                                 "A-2 (Reverse Slope)" = "a2", 
-                                "A-3 (Cookie Bite)" = "a3", 
-                                "A-4 (Steep Sloping)" = "a4"),
+                                "A-3 (Moderately Sloping)" = "a3", 
+                                "A-4 (Steep Sloping)" = "a4",
+                                "A-5 (Severe Steep Sloping)" = "a5",
+                                "A-6 (Mixed)" = "a6",
+                                "A-7 (Conductive)" = "a7"),
                     selected = "custom"),
         sliderInput("htl250", "250 Hz", min = 0, max = 120, value = 20, step = 5),
         sliderInput("htl500", "500 Hz", min = 0, max = 120, value = 30, step = 5),
@@ -76,15 +79,27 @@ ui <- page_sidebar(
                                 "Child: 6-11 months" = "child_6_11",
                                 "Child: 0-5 months" = "child_0_5"), 
                     selected = "adult"),
+        conditionalPanel(
+          condition = "input.age == 'adult'",
+          numericInput("adult_age", "Adult Age (Years):", value = 65, min = 18, max = 110, step = 1)
+        ),
         selectInput("experience", "Experience:", 
                     choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
                     selected = "experienced"),
         selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "bilateral"),
         selectInput("coupling", "Acoustic Coupling / Vent:", 
-                    choices = c("Custom Solid Earmold" = "custom_occluded", 
-                                "Double Dome" = "double_dome", 
-                                "Tulip Dome" = "tulip_dome", 
-                                "Open Dome" = "open_dome"), 
+                    choices = list(
+                      "Solid Earmolds" = c("Unvented Earmold (Custom Occluded)" = "custom_occluded",
+                                           "1 mm Solid Vent (Pressure)" = "vent_1mm_solid",
+                                           "2 mm Solid Vent (Moderate)" = "vent_2mm_solid",
+                                           "3 mm Solid Vent (Large)" = "vent_3mm_solid"),
+                      "Hollow Earmolds (Short Vent)" = c("1 mm Hollow Vent (Pressure)" = "vent_1mm_hollow",
+                                                         "2 mm Hollow Vent (Moderate)" = "vent_2mm_hollow",
+                                                         "3 mm Hollow Vent (Large)" = "vent_3mm_hollow"),
+                      "Generic Domes" = c("Double Dome" = "double_dome",
+                                          "Tulip Dome" = "tulip_dome",
+                                          "Open Dome" = "open_dome")
+                    ), 
                     selected = "custom_occluded"),
         selectInput("transducer", "Audiometric Transducer:", 
                     choices = c("Insert Earphones (ER-3A)" = "inserts", 
@@ -104,7 +119,19 @@ ui <- page_sidebar(
     card(
       full_screen = TRUE,
       card_header("Insertion Gain / Plot"),
-      plotOutput("gain_plot", height = "600px")
+      plotOutput("gain_plot", height = "600px"),
+      accordion(
+        open = FALSE,
+        accordion_panel(
+          "Insertion Gain Targets (dB)",
+          tableOutput("ig_table")
+        )
+      )
+    ),
+    card(
+      full_screen = TRUE,
+      card_header("Dynamic Compression Prescription"),
+      uiOutput("compression_prescription")
     ),
     card(
       full_screen = TRUE,
@@ -114,7 +141,7 @@ ui <- page_sidebar(
   )
 )
 
-# Helper to estimate Loudness for proprietary prescriptions
+# Helper to estimate Loudness for complex non-linear prescriptions
 estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii) {
   if (is.na(target_sii)) return(NA)
   
@@ -166,40 +193,63 @@ server <- function(input, output, session) {
   setup_data <- reactive({
     data("critical", package="SII")
     f_21 <- critical$fi
-    overall_normal <- 10 * log10(sum(10^(critical$normal/10)))
+    # The ANSI S3.5 normal overall SPL is 62.35 dB SPL. Summing spectrum levels directly without 
+    # bandwidth scaling yields incorrect levels, resulting in massive over-amplification!
+    overall_normal <- 62.35
     list(f_21 = f_21, normal_spectrum = critical$normal, overall_normal = overall_normal)
   })
   
   # Handle Presets
   observeEvent(input$preset, {
     if (input$preset == "a1") {
+      updateSliderInput(session, "htl250", value = 15)
+      updateSliderInput(session, "htl500", value = 20)
+      updateSliderInput(session, "htl1000", value = 30)
+      updateSliderInput(session, "htl2000", value = 40)
+      updateSliderInput(session, "htl4000", value = 50)
+      updateSliderInput(session, "htl8000", value = 60)
+    } else if (input$preset == "a2") {
+      updateSliderInput(session, "htl250", value = 60)
+      updateSliderInput(session, "htl500", value = 50)
+      updateSliderInput(session, "htl1000", value = 40)
+      updateSliderInput(session, "htl2000", value = 30)
+      updateSliderInput(session, "htl4000", value = 20)
+      updateSliderInput(session, "htl8000", value = 15)
+    } else if (input$preset == "a3") {
+      updateSliderInput(session, "htl250", value = 10)
+      updateSliderInput(session, "htl500", value = 20)
+      updateSliderInput(session, "htl1000", value = 40)
+      updateSliderInput(session, "htl2000", value = 50)
+      updateSliderInput(session, "htl4000", value = 55)
+      updateSliderInput(session, "htl8000", value = 60)
+    } else if (input$preset == "a4") {
+      updateSliderInput(session, "htl250", value = 0)
+      updateSliderInput(session, "htl500", value = 0)
+      updateSliderInput(session, "htl1000", value = 10)
+      updateSliderInput(session, "htl2000", value = 40)
+      updateSliderInput(session, "htl4000", value = 70)
+      updateSliderInput(session, "htl8000", value = 80)
+    } else if (input$preset == "a5") {
+      updateSliderInput(session, "htl250", value = 10)
+      updateSliderInput(session, "htl500", value = 10)
+      updateSliderInput(session, "htl1000", value = 20)
+      updateSliderInput(session, "htl2000", value = 60)
+      updateSliderInput(session, "htl4000", value = 80)
+      updateSliderInput(session, "htl8000", value = 100)
+    } else if (input$preset == "a6") {
+      updateSliderInput(session, "htl250", value = 50)
+      updateSliderInput(session, "htl500", value = 55)
+      updateSliderInput(session, "htl1000", value = 60)
+      updateSliderInput(session, "htl2000", value = 65)
+      updateSliderInput(session, "htl4000", value = 75)
+      updateSliderInput(session, "htl8000", value = 80)
+    } else if (input$preset == "a7") {
       updateSliderInput(session, "htl250", value = 50)
       updateSliderInput(session, "htl500", value = 50)
       updateSliderInput(session, "htl1000", value = 50)
       updateSliderInput(session, "htl2000", value = 50)
       updateSliderInput(session, "htl4000", value = 50)
       updateSliderInput(session, "htl8000", value = 50)
-    } else if (input$preset == "a2") {
-      updateSliderInput(session, "htl250", value = 50)
-      updateSliderInput(session, "htl500", value = 40)
-      updateSliderInput(session, "htl1000", value = 30)
-      updateSliderInput(session, "htl2000", value = 20)
-      updateSliderInput(session, "htl4000", value = 10)
-      updateSliderInput(session, "htl8000", value = 10)
-    } else if (input$preset == "a3") {
-      updateSliderInput(session, "htl250", value = 20)
-      updateSliderInput(session, "htl500", value = 40)
-      updateSliderInput(session, "htl1000", value = 50)
-      updateSliderInput(session, "htl2000", value = 50)
-      updateSliderInput(session, "htl4000", value = 40)
-      updateSliderInput(session, "htl8000", value = 20)
-    } else if (input$preset == "a4") {
-      updateSliderInput(session, "htl250", value = 10)
-      updateSliderInput(session, "htl500", value = 10)
-      updateSliderInput(session, "htl1000", value = 20)
-      updateSliderInput(session, "htl2000", value = 50)
-      updateSliderInput(session, "htl4000", value = 80)
-      updateSliderInput(session, "htl8000", value = 80)
     }
   })
   
@@ -243,6 +293,7 @@ server <- function(input, output, session) {
         experience = input$experience,
         config = input$config,
         age = input$age,
+        age_years = input$adult_age,
         coupling = input$coupling,
         module = input$module,
         transducer = input$transducer)
@@ -250,9 +301,10 @@ server <- function(input, output, session) {
     # Append JD2011 targets for plotting if a preset is selected
     preset <- input$preset
     target_level <- as.numeric(input$speech_level)
-    if (preset %in% c("a1", "a2", "a3", "a4") && !is.null(presc) && presc == "Open-NL") {
+    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7") && !is.null(presc) && presc == "Open-NL") {
       obj$target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
       obj$target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
+      obj$target_cameq2 <- get_jd2011_target(preset, "CAMEQ2-HF", d$f_21, target_level)
     }
     
     obj$target_level <- target_level
@@ -275,6 +327,47 @@ server <- function(input, output, session) {
     plot(obj, clinical = FALSE)
   })
   
+  # Render the Insertion Gain Table
+  output$ig_table <- renderTable({
+    obj <- sii_obj()
+    req(obj, obj$prescription == "Open-NL")
+    
+    d <- setup_data()
+    # Use preloaded critical band normal spectrum to avoid environment resolution issues
+    tbl_normal <- d$normal_spectrum
+    overall_normal <- d$overall_normal
+    tbl_fi <- d$f_21
+    
+    unaided_noise <- obj$noise - obj$gain
+    threshold_21 <- obj$threshold
+    loss_21 <- obj$loss
+    
+    # Run SII for 55, 65, 75
+    res55 <- sii(speech = tbl_normal + (55 - overall_normal), noise = unaided_noise, threshold = threshold_21, loss = loss_21, freq = tbl_fi, method = "critical", prescription = "Open-NL", desensitization = input$desensitization, experience = input$experience, gender = input$gender, config = input$config, age = input$age, age_years = input$adult_age, coupling = input$coupling, module = input$module)
+    res65 <- sii(speech = tbl_normal + (65 - overall_normal), noise = unaided_noise, threshold = threshold_21, loss = loss_21, freq = tbl_fi, method = "critical", prescription = "Open-NL", desensitization = input$desensitization, experience = input$experience, gender = input$gender, config = input$config, age = input$age, age_years = input$adult_age, coupling = input$coupling, module = input$module)
+    res75 <- sii(speech = tbl_normal + (75 - overall_normal), noise = unaided_noise, threshold = threshold_21, loss = loss_21, freq = tbl_fi, method = "critical", prescription = "Open-NL", desensitization = input$desensitization, experience = input$experience, gender = input$gender, config = input$config, age = input$age, age_years = input$adult_age, coupling = input$coupling, module = input$module)
+    
+    g55 <- pmax(0, res55$table[, "E'i"] - res55$unaided_speech)
+    g65 <- pmax(0, res65$table[, "E'i"] - res65$unaided_speech)
+    g75 <- pmax(0, res75$table[, "E'i"] - res75$unaided_speech)
+    
+    octaves <- c(250, 500, 1000, 2000, 4000, 8000)
+    g55_oct <- round(approx(x = log10(tbl_fi), y = g55, xout = log10(octaves), rule = 2)$y)
+    g65_oct <- round(approx(x = log10(tbl_fi), y = g65, xout = log10(octaves), rule = 2)$y)
+    g75_oct <- round(approx(x = log10(tbl_fi), y = g75, xout = log10(octaves), rule = 2)$y)
+    
+    df <- data.frame(
+      Level = c("55 dB SPL", "65 dB SPL", "75 dB SPL"),
+      `250 Hz` = c(g55_oct[1], g65_oct[1], g75_oct[1]),
+      `500 Hz` = c(g55_oct[2], g65_oct[2], g75_oct[2]),
+      `1000 Hz` = c(g55_oct[3], g65_oct[3], g75_oct[3]),
+      `2000 Hz` = c(g55_oct[4], g65_oct[4], g75_oct[4]),
+      `4000 Hz` = c(g55_oct[5], g65_oct[5], g75_oct[5]),
+      `8000 Hz` = c(g55_oct[6], g65_oct[6], g75_oct[6]),
+      check.names = FALSE
+    )
+    df
+  })
   # Render the Benchmark Comparison Table
   output$comparison_table <- renderTable({
     req(input$htl250)
@@ -300,42 +393,72 @@ server <- function(input, output, session) {
     obj_opennl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", 
                       desensitization = input$desensitization, 
                       gender = input$gender, experience = input$experience, 
-                      config = input$config, age = input$age, 
+                      config = input$config, age = input$age, age_years = input$adult_age, 
                       coupling = input$coupling, module = input$module, transducer = input$transducer)
     
     # Predict NAL-NL2 and DSL v5.0
     preset <- input$preset
-    if (preset %in% c("a1", "a2", "a3", "a4")) {
+    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7")) {
       target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
       target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
-      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer)
-      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer)
+      target_cameq2 <- get_jd2011_target(preset, "CAMEQ2-HF", d$f_21, target_level)
+      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      obj_cameq2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_cameq2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
       val_nalnl2_sii <- obj_nalnl2$sii
       val_dsl_sii <- obj_dsl$sii
+      val_cameq2_sii <- obj_cameq2$sii
       val_nalnl2_sones <- calculate_loudness(obj_nalnl2)
       val_dsl_sones <- calculate_loudness(obj_dsl)
+      val_cameq2_sones <- calculate_loudness(obj_cameq2)
       name_nalnl2 <- "NAL-NL2 (JD2011)"
       name_dsl <- "DSL v5.0 (JD2011)"
+      name_cameq2 <- "CAMEQ2-HF (JD2011)"
     } else {
       val_nalnl2_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "NAL-NL2", desensitized = input$desensitization)
       val_dsl_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
+      val_cameq2_sii <- NA
       
       val_nalnl2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_nalnl2_sii)
       val_dsl_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_dsl_sii)
+      val_cameq2_sones <- NA
+      
       name_nalnl2 <- "NAL-NL2 (Predicted)"
       name_dsl <- "DSL v5.0 (Predicted)"
+      name_cameq2 <- "CAMEQ2-HF (Predicted)"
     }
     
     data.frame(
-      Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl),
-      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii)),
+      Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl, name_cameq2),
+      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii, val_cameq2_sii)),
       Sones = c(sprintf("%.1f", calculate_loudness(obj_unaided)), 
                 sprintf("%.1f", calculate_loudness(obj_nalr)), 
                 sprintf("%.1f", calculate_loudness(obj_opennl)), 
                 sprintf("%.1f", val_nalnl2_sones), 
-                sprintf("%.1f", val_dsl_sones))
+                sprintf("%.1f", val_dsl_sones),
+                sprintf("%.1f", val_cameq2_sones))
     )
   }, align = "c")
+  
+  # Render the Compression Prescription
+  output$compression_prescription <- renderUI({
+    req(input$htl250)
+    f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
+    threshold <- c(input$htl250, input$htl500, input$htl1000, 
+                   input$htl2000, input$htl4000, input$htl8000)
+    
+    # Calculate prescription
+    comp_presc <- prescribe_compression(freq = f_htl, threshold = threshold, module = input$module)
+    
+    div(
+      class = "p-3 bg-light rounded",
+      h5(class = "text-primary", "Recommended Settings based on Patient Hearing"),
+      p(strong("4-Frequency Average (PTA4): "), sprintf("%.1f dB HL", comp_presc$pta4)),
+      p(strong("Compression Speed: "), span(class = "badge bg-info", comp_presc$speed), " ", em(comp_presc$speed_reason)),
+      p(strong("Suggested Release Time: "), comp_presc$release_time),
+      p(strong("Compression Ratio Note: "), comp_presc$ratio_note)
+    )
+  })
 }
 
 # Launch the Application 

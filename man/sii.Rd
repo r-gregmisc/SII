@@ -19,7 +19,17 @@ sii(speech = c("normal", "raised", "loud", "shout"),
                    "ShortPassage", "SPIN", "CST"),
     interpolate=FALSE,
     prescription=NULL,
-    desensitization=FALSE)
+    desensitization=FALSE,
+    ldl=NULL,
+    gender="male",
+    experience="experienced",
+    config="bilateral",
+    age="adult",
+    age_years=NULL,
+    coupling="custom_occluded",
+    module="standard",
+    transducer="inserts",
+    custom_gain=NULL)
 \method{print}{SII}(x, digits=3, ...)
 \method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
@@ -60,8 +70,18 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     from the provide measurement values and frequencies to those 
     required by the specified method via linear interpolation on the log
     scale.}
-  \item{prescription}{A character string (e.g. \code{"NAL-R"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
+  \item{prescription}{A character string (e.g. \code{"NAL-R"}, \code{"Open-NL"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
   \item{desensitization}{Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).}
+  \item{ldl}{Numeric vector specifying Loudness Discomfort Levels (LDL) in dB HL for each frequency. If \code{NULL}, limits are estimated based on hearing thresholds.}
+  \item{gender}{Character string specifying patient gender ("male" or "female"). Used for prescriptive algorithms. Defaults to "male".}
+  \item{experience}{Character string specifying user hearing aid experience ("experienced", "new", "power"). Defaults to "experienced".}
+  \item{config}{Character string for fitting configuration ("bilateral" or "unilateral"). Defaults to "bilateral".}
+  \item{age}{Character string for patient age group (e.g., "adult", "child_0_5", "child_6_11", "child_12_23", "child_24_35", "child_36_59"). Used for RECD corrections and pediatric prescriptive modifications.}
+  \item{age_years}{Numeric value representing adult age in years. Modifies compression ratios for older adults in prescriptive formulas.}
+  \item{coupling}{Character string specifying the acoustic coupling / vent ("custom_occluded", "double_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "vent_2mm_solid", "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3mm_hollow"). Modifies low-frequency leakage and insertion gain targets.}
+  \item{module}{Character string for hearing aid module ("standard" or other specific module constraints).}
+  \item{transducer}{Character string specifying the audiometric transducer used for testing ("inserts" or "supra_aural"). Determines RETSPL and RECD corrections for SPLogram plots.}
+  \item{custom_gain}{Numeric vector specifying a custom insertion gain array (in dB) for each frequency. If provided along with \code{prescription="Custom"}, this gain is explicitly applied.}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
   \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area. If \code{FALSE} (the default), the behavior depends on whether the object is aided or unaided. For unaided objects, it plots a diagnostic interpolation graph. For aided objects (when a prescription was used), it automatically generates a 3-line Insertion Gain plot for 55, 65, and 75 dB SPL input levels (dynamically loading and scaling the true Normal and Loud LTASS spectra).}
@@ -166,11 +186,44 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   
   The mathematical algorithm consists of:
   \enumerate{
-    \item \strong{WDRC Base Anchor:} A base 65 dB SPL insertion gain anchor is calculated using a custom modification of the NAL-R linear formula. To preserve audibility while preventing Upward Spread of Masking and Level Distortion for flat losses, it utilizes a flatter low-frequency profile (-8 dB at 250 Hz, -3 dB at 500 Hz).
-    \item \strong{Severe-Loss Booster:} For thresholds > 60 dB HL, a gain multiplier is dynamically applied to push audibility through the cochlear desensitization barrier.
-    \item \strong{Adaptive High-Frequency Boost:} High-frequency gain (+6 dB at 4000 Hz) is adaptively scaled based on the hearing loss. Mild losses receive 0 dB boost to prevent Level Distortion rollover, while severe losses receive the full boost.
-    \item \strong{Bi-directional WDRC:} Gain is dynamically adjusted based on the band-specific input speech level pivoting around a 65 dB normal speech spectrum. Soft inputs receive expansion (CR = 0.6) for listening comfort, while loud inputs receive aggressive compression ($CR = 1 + (Threshold - 20)/25$, capped at 3.0) to protect against ANSI level distortion penalties.
-    \item \strong{SSPL90 MPO Limiting:} The final aided speech envelope is safely limited using a predictive NAL-SSPL90 ceiling ($MPO = 90 + 0.25 \times Threshold$). Instead of hard peak clipping, a 10:1 compression ratio is applied to any signal exceeding the MPO, preventing dangerous amplification while preserving the acoustic envelope.
+    \item \strong{Minimal Hearing Loss (MHL) Bypass:} If \code{module == "mhl"} and \eqn{PTA_{.5,1,2,4k} \le 25} dB HL, WDRC is bypassed. Applies flat linear gain interpolated from \eqn{(f, G) = \{(250,0), (500,0), (1k,3), (2k,5), (4k,5), (8k,5)\}} dB, with a 1.5 compression ratio for loud inputs.
+    \item \strong{Base Anchor (65 dB SPL Input):} \eqn{g_{65} = \max(0, m \times HTL + C)}, where \eqn{m \in \{0.40, 0.45, 0.50\}} depending on \code{experience}, and \eqn{C} interpolates arrays such as \eqn{\{-8, -1, +3, +1, 0, 0, 0, 0\}} dB evaluated at standard audiometric frequencies.
+    \item \strong{Audiometric Profile Corrections:}
+      \itemize{
+        \item \emph{Steep Slope Knee:} For slopes \eqn{>30} dB/octave, penalizes the "knee" (500-1500 Hz) by up to 6 dB, and boosts frequencies \eqn{\ge 2000} Hz by up to 6 dB.
+        \item \emph{Severe-Loss Booster (SLB):} Adds \eqn{\min(15, \max(0, HTL - 60) \times 0.5)} dB. Tapered heavily in mid-frequencies and disabled in dead regions.
+      }
+    \item \strong{High-Frequency Desensitization:} To prevent distortion, excess gain above a limit is compressed at a 2:1 ratio.
+      \itemize{
+        \item Adult \eqn{Limit = 30 + 0.4 \times \max(0, HTL - 60)}
+        \item Child \eqn{Limit = 40 + 0.5 \times \max(0, HTL - 60)}
+      }
+    \item \strong{Roll-offs and Dead Regions:}
+      \itemize{
+        \item \emph{Bandwidth Roll-off:} Multiplies \eqn{g_{65}}. Adults: interpolates \eqn{\{(250Hz, 0.7), (500, 1.0), ..., (6k, 0.8), (8k, 0.5)\}}. Children: 1.0 across all frequencies.
+        \item \emph{Dead Regions:} Identifies HF Dead Regions (\eqn{HTL \ge 90} at \eqn{f \ge 1k}) and LF Dead Regions (\eqn{HTL \ge 80} at \eqn{f \le 1k}). Applies a 30 dB/octave penalty beyond viable boundaries (\eqn{1.7 \times f_{e}} for HF, \eqn{0.57 \times f_{e}} for LF).
+      }
+    \item \strong{Bi-directional WDRC:}
+      \itemize{
+        \item \emph{Compression Ratio (CR):} \eqn{CR_{base} = 1 + \max(0, HTL - 20) / 40}. For \eqn{HTL > 65}, CR reduces toward 1.0 in low frequencies. Overall bounded strictly to \eqn{\le 1.5} for low frequencies (\eqn{\le 500} Hz) and up to \eqn{2.4} for high frequencies (\eqn{\ge 3000} Hz).
+        \item \emph{Compression Threshold (CT):} Interpolated from \eqn{(HTL, CT)}. Adult: \eqn{\{(20HL, 30SPL), ..., (100, 45)\}}. Child: \eqn{\{(20, 25), ..., (100, 40)\}}.
+        \item \emph{Aggressive MPO Defense:} For steeply sloping losses (\eqn{>15} dB difference) with low LDLs (\eqn{<100} dB SPL), the formula proactively defends against MPO collision. The \eqn{CT} is aggressively lowered by up to 10 dB, and the \eqn{CR} is forced up by an additional 0.05 per dB of LDL penalty.
+        \item \emph{I/O Computation:} Calculates gain at CT ($G_{CT}$) scaling back from 65 dB SPL pivot. Applies linear gain below CT, and WDRC above CT.
+      }
+    \item \strong{Empirical Adjustments and Smoothing:}
+      \itemize{
+        \item \emph{Demographic Boosts:} Child Boost: Interpolates \eqn{(HTL, Boost) = \{(20, 5), (50, 5), (80, 2), (100, 1)\}} dB. Gender: Female \eqn{= -1.5} dB. Config: Unilateral \eqn{= +3.0} dB. Experience: New users with \eqn{PTA > 40} get up to \eqn{-6.0} dB penalty.
+        \item \emph{LDL Dynamic Range Mapping:} If \code{ldl} is provided, dynamic range is evaluated. For every 1 dB the measured LDL is lower than predicted, \eqn{g_{65}} is reduced by 0.2 dB and \eqn{CR_{base}} is increased by 0.02.
+        \item \emph{Acoustic Coupling:} Subtracts vent leakage (e.g., Open Dome \eqn{= \{-35, -28, -15, -2, 0, 0\}} dB).
+        \item Applies a 3-point moving average to the final gain array.
+      }
+    \item \strong{SSPL90 MPO Limiting:} 
+      \itemize{
+        \item \eqn{MPO_{heuristic} = 100 + 0.5 \times \max(0, HTL - 40)}.
+        \item \eqn{MPO_{safe} = LDL_{spl} - 5}.
+        \item \eqn{PTS_{safe\_limit} = 105 + 0.5 \times \max(0, HTL - 50)} (110 for Children).
+        \item \eqn{MPO_{final} = \min(120, MPO_{heuristic}, MPO_{safe}, PTS_{safe\_limit})}.
+      }
   }
 }
 \references{

@@ -31,7 +31,7 @@ calculate_nalr_gain <- function(freq, threshold) {
   return(ig)
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard") {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL) {
   # 0. Minimal Hearing Loss (MHL) Module Bypass
   # If the patient has near-normal hearing (PTA <= 25) and selects the MHL module,
   # we completely bypass the standard WDRC compensation formula.
@@ -78,6 +78,10 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     base_mult <- 0.45
   }
   
+  # Apply a broadband loudness penalty (-3 dB) to lower overall gain and optimize comfort, 
+  # similar to NAL-NL2 and DSL, while preserving the relative shape for SII maximization.
+  c_vals <- c_vals - 3
+  
   c_interp <- approx(x = log10(c_freqs), y = c_vals, xout = log10(freq), rule = 2)$y
   # 1a. Reverse Slope Correction
   # Standard linear formulas apply massive low-frequency penalties (c_vals = -17 dB at 250 Hz) 
@@ -88,12 +92,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   high_thresh_mean <- mean(threshold[freq >= 2000], na.rm = TRUE)
   reverse_slope_diff <- pmax(0, low_thresh_mean - high_thresh_mean)
   
-  if (reverse_slope_diff > 0) {
-    # If it's a reverse slope, we neutralize the c_vals negative constants 
-    # proportionally to how steep the reverse slope is.
-    neutralize_factor <- pmin(1, reverse_slope_diff / 30)
-    c_interp <- c_interp + neutralize_factor * pmax(0, -c_interp)
-  }
+  # (Reverse slope correction removed - full low-frequency penalty is retained to prevent upward spread of masking)
   
   # 1b. Steep Slope Knee Correction (e.g. A-4)
   # For steeply sloping losses, upward spread of masking is a severe problem.
@@ -117,9 +116,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     # Bell curve weighting around 1000 Hz
     knee_weight <- pmax(0, 1 - abs(log10(freq) - log10(1000)) / log10(2))
     
-    # Boost the highs (>= 2000 Hz) to restore audibility
+    # Boost the highs (>= 2000 Hz) to pull them out of the steep slope and restore audibility
     high_boost <- steep_factor * 6 # Up to 6 dB boost
-    # Disable the high boost if the frequency is inside a high-frequency dead region
+    # Disable the high boost if the frequency is inside a true high-frequency dead region
     high_boost_vec <- ifelse(freq >= f_e_hf, 0, high_boost)
     
     # Fades in from 1500 Hz upwards
@@ -177,6 +176,21 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Apply the smooth compression only to the high frequencies of a sloping loss
   g_65 <- g_65 - (hf_weight * slope_factor * (excess_gain - compressed_excess))
   
+  # 1.5 Dynamic Range Mapping (DSL v5.0 philosophy)
+  # Compare measured LDL to expected LDL
+  predicted_ldl_spl <- 100 + pmax(0, threshold - 40) * 0.5
+  
+  if (!is.null(ldl) && length(ldl) == length(threshold)) {
+    measured_ldl_spl <- ifelse(is.na(ldl), predicted_ldl_spl, ldl + 10)
+    ldl_diff <- measured_ldl_spl - predicted_ldl_spl
+  } else {
+    ldl_diff <- 0
+  }
+  
+  # Decrease gain if LDL is lower than expected (dynamic range is squeezed)
+  # 0.2 dB gain reduction for every 1 dB the LDL is lowered
+  g_65 <- pmax(0, g_65 + (ldl_diff * 0.2))
+  
   # 1e. NAL-NL3 Bandwidth Roll-off
   # Reduced emphasis on using low-frequency (<= 250 Hz) and very high-frequency (>= 6 kHz) gain
   if (!is.null(age) && substr(age, 1, 5) == "child") {
@@ -219,13 +233,24 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   data("critical", package="SII")
   pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
   
+  # 2.5 Smoothed Minimum Gain Floor for Mild-to-Moderate Losses
+  # Instead of inverting the speech spectrum (which causes jagged MPO hits),
+  # we provide a flat minimum gain buffer based on the threshold.
+  min_gain_floor <- pmax(0, threshold * 0.35)
+  is_mild_mod <- threshold <= 55
+  g_65[is_mild_mod] <- pmax(g_65[is_mild_mod], min_gain_floor[is_mild_mod])
+  
   # 3. Bi-directional Dynamic Range Optimization (WDRC)
   # To match evidence-based targets (e.g., Keidser et al., NAL-NL2), we scale the Compression Ratio (CR).
   
-  # Moderate (40-65 HL): CR climbs from 1.5 to ~2.5
-  # We steepen the CR curve to match the high compression of NAL-NL2 and DSL, 
-  # which dramatically boosts gain for 55 dB SPL soft speech.
-  base_cr <- 1 + pmax(0, threshold - 20) / 25
+  # Moderate (40-65 HL):
+  # To preserve the speech envelope and avoid SNR degradation at high levels (Hornsby & Ricketts, 2001),
+  # we scale the CR conservatively.
+  base_cr <- 1 + pmax(0, threshold - 20) / 40
+  
+  # Adjust base_cr based on LDL discrepancy
+  # A lower LDL (squeezed dynamic range) requires a higher compression ratio
+  base_cr <- base_cr - (ldl_diff * 0.02)
   
   # Severe/Profound (>65 HL): CR actually REDUCES back toward linear.
   # Patients with severe loss prefer lower compression (1:1 to 2:1) to preserve the temporal envelope.
@@ -239,8 +264,20 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   cr_loud <- base_cr - adjusted_penalty
   
-  # Clinical Limits: Ensure CR stays between 1.0 (linear) and a strict 2.5 maximum (NAL-NL3 standard).
-  cr_loud <- pmax(1.0, pmin(cr_loud, 2.5))
+  # Clinical Limits: Ensure CR stays between 1.0 (linear) and a strict frequency-dependent maximum.
+  # Based on Keidser et al. (2007) and Hornsby & Ricketts (2001), low frequencies are strictly capped at 1.5,
+  # while high frequencies can tolerate slightly more (up to 2.4).
+  max_cr <- 1.5 + (0.9 * freq_modifier) # 1.5 at <=500Hz, 2.4 at >=3000Hz
+  
+  # Grant & Walden (2013) Age-based Compression Relaxing
+  # Older adults (>60 years) have significantly poorer temporal resolution (gap detection).
+  # We reduce the max_cr progressively toward 1.5 to preserve the temporal speech envelope.
+  if (!is.null(age_years) && age == "adult" && age_years > 60) {
+    age_factor <- pmin(1.0, (age_years - 60) / 30.0) # Scales from 0 at age 60 to 1 at age 90
+    max_cr <- max_cr - (max_cr - 1.5) * age_factor
+  }
+  
+  cr_loud <- pmax(1.0, pmin(cr_loud, max_cr))
   
   # 3.5 Variable Compression Threshold (CT)
   # Standardizing CT to be universally lower (30-45 dB SPL) to match NAL-NL2 and DSL.
@@ -258,12 +295,31 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # the band level CT is simply pivot + (ct_overall - 65).
   ct_band <- pivot + (ct_overall - 65)
   
+  # 3.7 Aggressive MPO Defense (Collision Prevention)
+  # For steeply sloping losses with low LDLs, loud speech peaks run a high risk of 
+  # striking the MPO limit, causing severe distortion. We aggressively lower the CT 
+  # and increase the CR to squash the peaks.
+  if (!is.null(ldl) && length(ldl) == length(threshold)) {
+    measured_ldl_spl <- ifelse(is.na(ldl), predicted_ldl_spl, ldl + 10)
+    low_ldl_mask <- measured_ldl_spl < 100
+    
+    if (steep_slope_diff > 15 && any(low_ldl_mask)) {
+      ldl_penalty <- pmax(0, 100 - measured_ldl_spl)
+      
+      # Drop CT by up to 10 dB, engaging compression earlier
+      ct_band <- ct_band - ldl_penalty
+      
+      # Forcefully increase the CR in the danger zones
+      cr_loud[low_ldl_mask] <- cr_loud[low_ldl_mask] + (ldl_penalty[low_ldl_mask] * 0.05)
+    }
+  }
+  
   # 3.8 Comfort in Noise (CIN) Module
   if (module == "cin") {
-    # NAL-NL3 CIN Module aims to reduce loudness for high input levels
-    # while preserving speech intelligibility (soft/average inputs).
-    # We increase the compression ratio significantly for loud sounds.
-    cr_loud <- pmax(cr_loud, 2.0)
+    # Comfort in Noise (CIN) module aims to reduce loudness and improve comfort
+    # in high-level noise environments. Based on evidence, listeners prefer
+    # less compression (linear or 1.5:1) when noise exceeds the compression threshold.
+    cr_loud <- pmin(cr_loud, 1.5)
     
     # We lower the WDRC pivot / CT so compression kicks in earlier.
     ct_band <- ct_band - 10
@@ -324,6 +380,18 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
       ve_loss <- c(-25, -18, -5, 0, 0, 0)
     } else if (coupling == "double_dome") {
       ve_loss <- c(-20, -10, 0, 0, 0, 0)
+    } else if (coupling == "vent_1mm_solid") {
+      ve_loss <- c(-3, -1, 0, 0, 0, 0)
+    } else if (coupling == "vent_2mm_solid") {
+      ve_loss <- c(-8, -2, 0, 0, 0, 0)
+    } else if (coupling == "vent_3mm_solid") {
+      ve_loss <- c(-12, -4, 0, 0, 0, 0)
+    } else if (coupling == "vent_1mm_hollow") {
+      ve_loss <- c(-12, -3, 0, 0, 0, 0)
+    } else if (coupling == "vent_2mm_hollow") {
+      ve_loss <- c(-22, -12, -5, -2, 0, 0)
+    } else if (coupling == "vent_3mm_hollow") {
+      ve_loss <- c(-25, -15, -8, -4, 0, 0)
     } else {
       ve_loss <- c(0, 0, 0, 0, 0, 0)
     }
@@ -352,14 +420,14 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult") {
   # NAL SSPL90 rule (Maximum Power Output)
   # Derived from Dillon (2012) and NAL guidelines for avoiding discomfort
   
-  # 1. Base SSPL90 for normal hearing is roughly 90-100 dB SPL
-  # 2. SSPL90 increases by roughly 0.5 dB for every 1 dB of hearing loss above 40 dB HL
-  heuristic_mpo <- 100 + pmax(0, threshold - 40) * 0.5
+  # 1. Base SSPL90 for normal hearing is roughly 90-100 dB SPL (we use 105 to provide headroom)
+  # 2. SSPL90 increases by roughly 0.5 dB for every 1 dB of hearing loss above 20 dB HL
+  heuristic_mpo <- 105 + pmax(0, threshold - 20) * 0.5
   
   # 3. Estimated LDL & Safety Margin
   # Estimated LDLs often range around 100 dB SPL for normal hearing, 
   # expanding up to 130-140 dB SPL for profound loss. 
-  estimated_ldl_spl <- 100 + pmax(0, threshold - 40) * 0.5
+  estimated_ldl_spl <- 105 + pmax(0, threshold - 20) * 0.5
   
   if (!is.null(ldl) && length(ldl) == length(threshold)) {
     # If explicit LDL is provided (in HL), convert to approximate SPL (HL + 10)
@@ -388,4 +456,49 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult") {
   mpo <- pmin(mpo, 120)
   
   return(mpo)
+}
+
+#' Prescribe Compression Settings based on Hearing Loss
+#'
+#' @description
+#' Provides recommendations for compression speed (fast vs slow acting) and
+#' compression ratio/release times based on the four-frequency Pure Tone Average (PTA4).
+#'
+#' @param freq A numeric vector of frequencies.
+#' @param threshold A numeric vector of hearing thresholds.
+#' @param module The operating module ("standard", "cin", "mhl").
+#' @return A list containing compression recommendations.
+#' @export
+prescribe_compression <- function(freq, threshold, module = "standard") {
+  # Calculate 4-frequency Pure Tone Average (PTA4)
+  pta_freqs <- c(500, 1000, 2000, 4000)
+  if (all(pta_freqs %in% freq)) {
+    pta_thresh <- threshold[match(pta_freqs, freq)]
+  } else {
+    pta_thresh <- approx(x = log10(freq), y = threshold, xout = log10(pta_freqs), rule = 2)$y
+  }
+  pta4 <- mean(pta_thresh, na.rm = TRUE)
+  
+  if (pta4 >= 35) {
+    speed <- "Slow-acting"
+    release_time <- "> 500 ms"
+    speed_reason <- sprintf("PTA4 \u2265 35 dB HL (%.1f dB HL)", pta4)
+  } else {
+    speed <- "Fast-acting"
+    release_time <- "< 200 ms"
+    speed_reason <- sprintf("PTA4 < 35 dB HL (%.1f dB HL)", pta4)
+  }
+  
+  ratio_note <- "Target \u2264 2:1. If CR \u2265 3:1 is necessary, use longer release time (e.g., 1000 ms) to preserve clarity."
+  if (module == "cin") {
+    ratio_note <- "Comfort in Noise (CIN): Prescribing lower compression (linear to 1.5:1) for high-level noise."
+  }
+  
+  return(list(
+    pta4 = pta4,
+    speed = speed,
+    release_time = release_time,
+    speed_reason = speed_reason,
+    ratio_note = ratio_note
+  ))
 }
