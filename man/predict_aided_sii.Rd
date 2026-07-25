@@ -8,7 +8,8 @@
   tone averages (PTA).
 }
 \usage{
-predict_aided_sii(freq, threshold, age = c("adult", "pediatric"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE)
+predict_aided_sii(freq, threshold, age = c("adult", "pediatric"), 
+                  prescription = c("NAL-NL2", "DSL"), desensitized = FALSE)
 }
 \arguments{
   \item{freq}{A numeric vector of frequencies (in Hz) corresponding to the \code{threshold} values.}

@@ -1,0 +1,767 @@
+\nonstopmode{}
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `SII'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {SII: Calculate ANSI S3.5-1997 Speech Intelligibility Index}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {Gregory R. Warnes; Mark Shaver}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Calculate ANSI S3.5-1997 Speech Intelligibility Index}
+\item[Version]\AsIs{1.1.0}
+\item[Date]\AsIs{2026-07-19}
+\item[Description]\AsIs{
+Calculates ANSI S3.5-1997 Speech Intelligibility Index
+('SII'), a standard method for computing the intelligibility of
+speech from acoustical measurements of speech, noise, and hearing
+thresholds. This package includes data frames corresponding to
+Tables 1 - 4 in the ANSI standard as well as a function utilizing
+these tables and user-provided hearing threshold and noise level
+measurements to compute the SII score.  The methods implemented
+here extend the standard computations to allow calculation of SII
+when the measured frequencies do not match those required by the
+standard by applying interpolation to obtain values for the
+required frequencies
+-- 
+Development of this package was funded by the Center for 'Bioscience'
+Education and Technology ('CBET') of the Rochester Institute of
+Technology ('RIT').}
+\item[Suggests]\AsIs{splines, readxl, xtable, gdata, shiny, bslib}
+\item[License]\AsIs{GPL-2}
+\item[LazyLoad]\AsIs{yes}
+\item[NeedsCompilation]\AsIs{no}
+\item[Repository]\AsIs{CRAN}
+\item[Date/Publication]\AsIs{2018-11-18 09:56:48 UTC}
+\item[Author]\AsIs{Gregory R. Warnes [aut],
+Mark Shaver [cre, aut]}
+\item[Maintainer]\AsIs{Mark Shaver }\email{mark.shaver@posteo.net}\AsIs{}
+\end{description}
+\Rdcontents{Contents}
+\HeaderA{SII-package}{Calculate ANSI S3.5-1997 Speech Intelligibility Index}{SII.Rdash.package}
+\aliasA{SII}{SII-package}{SII}
+\keyword{package}{SII-package}
+%
+\begin{Description}
+This package calculates ANSI S3.5-1997 Speech Intelligibility Index
+(SII), a standard method for computing the intelligibility of
+speech from acoustical measurements of speech, noise, and hearing
+thresholds. This package includes data frames corresponding to
+Tables 1 - 4 in the ANSI standard as well as a function utilizing
+these tables and user-provided hearing threshold and noise level
+measurements to compute the SII score.  The methods implemented
+here extend the standard computations to allow calculation of SII
+when the measured frequencies do not match those required by the
+standard by applying interpolation to obtain values for the
+required frequencies.
+\end{Description}
+%
+\begin{Author}
+Gregory R. Warnes \email{greg@warnes.net}
+\end{Author}
+%
+\begin{References}
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National Stan- 
+dards Institute, New York.
+
+Other software programs for calculating SII are available from
+\url{https://sii.to/html/programs.html}.
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Example C.1 from ANSI S3.5-1997 Annex C
+sii.C1 <- sii(
+              speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
+              noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
+              threshold= c( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),
+              method="octave"
+	      )
+sii.C1                        # rounded to 2 digits by default
+print(sii.C1$sii, digits=20)  # full precision
+summary(sii.C1)               # full details
+plot(sii.C1)                  # plot
+## The value given in the Standard is $0.504$.
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{calculate\_loudness}{Calculate Loudness (Sones)}{calculate.Rul.loudness}
+%
+\begin{Description}
+Calculates the estimated loudness in sones for a given Speech Intelligibility Index (SII) object.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+calculate_loudness(x)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] An object of class \code{SII}, representing the output of the \code{sii()} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns a numeric value representing the total loudness in sones.
+\end{Value}
+%
+\begin{Author}
+Mark Shaver
+\end{Author}
+%
+\begin{Examples}
+\begin{ExampleCode}
+sii.res <- sii(speech=c(50, 40, 40, 30, 20, 0), threshold=rep(0,6), method="octave")
+calculate_loudness(sii.res)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{critical}{Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)}{critical}
+\aliasA{equal}{critical}{equal}
+\aliasA{octave}{critical}{octave}
+\aliasA{onethird}{critical}{onethird}
+\aliasA{overall.spl}{critical}{overall.spl}
+\keyword{datasets}{critical}
+%
+\begin{Description}
+Tables of constants for ANSI S3.5-1997 Speech Intelligibility Index
+(SII) 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(critical)
+data(equal)
+data(onethird)
+data(octave)
+data(overall.spl)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+Each data frames has 6-21 observations and a subset of the following
+variables: 
+\begin{description}
+
+\item[\code{fi}] Center frequency of SII band, Hz
+\item[\code{li}] Lower limit of frequency band, Hz
+\item[\code{hi}] Upper limit of frequency band, Hz
+\item[\code{Deltai}] Band width adjustment, dB
+\item[\code{Ii}] Band importance function
+\item[\code{normal}, \code{raised}, \code{loud} and
+\code{shout}] Standard spectrum levels for vocal effort levels
+"normal", "raised", "loud", and "shout", respectively, dB
+\item[\code{Xi}] Spectrum level of internal noise, dB
+\item[\code{Fi}] Band importance function (weight)
+
+\end{description}
+
+\end{Format}
+%
+\begin{Details}
+These data objects provide constant tables 1 -- 4 from the ANSI
+S3.5-1997.
+\begin{description}
+
+\item[\code{critical}] Table 1: Critical band SII procedure
+constants
+\item[\code{equal}] Table 2:Equally contributing (17 band) critical
+band SII
+\item[\code{onethird}] Table 3: One-third octave band SII procedure
+constants
+\item[\code{octave}] Table 4: Octave band SII procedure constants
+\item[\code{overall.spl}] Overall sound pressure level (SPL) for the
+for  vocal effort levels "normal", "raised", "loud", and "shout",
+in dB
+
+\end{description}
+
+\end{Details}
+%
+\begin{Source}
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National
+Standards Institute, New York. 
+\end{Source}
+%
+\begin{References}
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National
+Standards Institute, New York. 
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(critical)
+critical # show entire table
+
+data(equal)
+names(equal)
+equal$fi # extract just the frequency band centers
+
+data(onethird)
+barplot(onethird$Ii) # plot band importance function (weights)
+
+data(octave)
+round(octave, digits=2) # just 2 digits
+
+data(overall.spl)
+overall.spl
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{launch\_app}{Launch the SII Interactive Dashboard}{launch.Rul.app}
+\keyword{misc}{launch\_app}
+%
+\begin{Description}
+Launches a local Shiny web application that provides an interactive graphical interface to the SII calculation engine and plotting utilities.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+launch_app()
+\end{verbatim}
+\end{Usage}
+%
+\begin{Details}
+The interactive dashboard allows you to dynamically adjust hearing thresholds across standard clinical frequencies (250 Hz - 8000 Hz) using sliders. It provides real-time visualization of the Clinical SPLogram and the Insertion Gain / Compression plot based on the selected prescriptive rationale (e.g., Unaided, NAL-R, Open-NL) and desensitization settings.
+
+Note: This function requires the \code{shiny} and \code{bslib} packages to be installed.
+\end{Details}
+%
+\begin{Author}
+Gregory R. Warnes \email{greg@warnes.net}, Mark Shaver \email{mark.shaver@posteo.net}
+\end{Author}
+%
+\begin{SeeAlso}
+\code{\LinkA{sii}{sii}}, \code{\LinkA{plot.SII}{plot.SII}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+  # Launch the interactive SII dashboard in your web browser
+  launch_app()
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{predict\_aided\_sii}{Predict Aided Speech Intelligibility Index (SII)}{predict.Rul.aided.Rul.sii}
+%
+\begin{Description}
+Uses multiple linear regression equations from Johnson (2013) to accurately predict 
+the aided Speech Intelligibility Index (SII) for a 65 dB SPL average speech input. 
+The predictions approximate the full 2,160-step ANSI S3.5 calculation based on pure 
+tone averages (PTA).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+predict_aided_sii(freq, threshold, age = c("adult", "pediatric"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{freq}] A numeric vector of frequencies (in Hz) corresponding to the \code{threshold} values.
+\item[\code{threshold}] A numeric vector of hearing thresholds (in dB HL).
+\item[\code{age}] A character string specifying the patient age group. Must be either \code{"adult"} (default) or \code{"pediatric"} (modeled on 3-year-olds).
+\item[\code{prescription}] A character string specifying the prescriptive rationale to predict. Must be either \code{"NAL-NL2"} (default) or \code{"DSL"} (DSL m[i/o] v5.0).
+\item[\code{desensitized}] Logical flag. If \code{TRUE}, predicts the effective SII incorporating hearing loss desensitization. If \code{FALSE} (default), predicts the traditional ANSI SII.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A numeric value representing the predicted SII (constrained between 0.0 and 1.0).
+\end{Value}
+%
+\begin{Author}
+Maintainer
+\end{Author}
+%
+\begin{References}
+Johnson, E. E. (2013). Modern prescription theory and application: realistic expectations for speech recognition with hearing aids. Trends in Amplification, 17(3/4), 143-170.
+\end{References}
+\HeaderA{sic.critical}{Alternative ANSI S3.5-1997 SII Transfer Function Weights}{sic.critical}
+\aliasA{sic.octave}{sic.critical}{sic.octave}
+\aliasA{sic.onethird}{sic.critical}{sic.onethird}
+\keyword{datasets}{sic.critical}
+%
+\begin{Description}
+Alternative ANSI S3.5-1997 Speech Intelligibility Index (SII) transfer
+function weights for for various types of speech material.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(sic.critical)
+data(sic.onethird)
+data(sic.octave)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+Each data frame  contains the following 8 variables, each
+corresponding the the transfer function weights for a specific type of
+speech material:
+\begin{description}
+
+\item[\code{fi}] Center frequency, Hz
+\item[\code{SII}] Standard SII transfer function (weights)
+\item[\code{NNS}] NNS (various nonsense syllable tests where
+most of the English phonems occur equally often)
+\item[\code{CID22}] CID-W22 (PB-words)
+\item[\code{NU6}] NU6 monosyllables
+\item[\code{DRT}] DRT (Diagnostic Rhyme Test)
+\item[\code{ShortPassage}] short passages of easy reading material
+\item[\code{SPIN}] SPIN monosyllables
+\item[\code{CST}] Connected Speech Test
+
+\end{description}
+
+\end{Format}
+%
+\begin{Details}
+\begin{description}
+
+\item[\code{sic.critical}] provides alternative weights for the
+critical band SII procedure.
+\item[\code{sic.threeoctave}] provides alternative weights for the
+one-third octave frequency band SII procedure.
+\item[\code{octave}] provides alternative weights for the
+octave frequency band SII procedure.
+
+\end{description}
+
+\end{Details}
+%
+\begin{Section}{note}
+There is no table of alternative weights for the
+equally-weighted SII band procedure as the weights for this method are
+(by definition) constant across all bands.
+
+\end{Section}
+%
+\begin{Source}
+All values except the \code{CST} columns are from:
+
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National
+Standards Institute, New York. 
+
+Values in the \code{CST} columns are from the original Connected Speech Test (CST) dataset.
+\end{Source}
+%
+\begin{References}
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National
+Standards Institute, New York. 
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Load the alternative weights for the critical band method
+data(sic.critical)
+
+## display the weights
+round(sic.critical,3)
+
+## draw a comparison plot
+ngroup <- ncol(sic.critical)
+matplot(x=sic.critical[,1], y=sic.critical[,-1],
+        type="o",
+        xlab="Frequency, Hz",
+        ylab="Weight",
+        log="x",
+        lty=1:ngroup,
+        col=rainbow(ngroup)
+)
+legend(
+       "topright",
+       legend=names(sic.critical)[-1],
+       pch=as.character(1:ngroup),
+       lty=1:ngroup,
+       col=rainbow(ngroup)
+       )
+
+data(threeoctave)
+data(octave)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{sii}{Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)}{sii}
+\aliasA{plot.SII}{sii}{plot.SII}
+\aliasA{print.SII}{sii}{print.SII}
+\aliasA{summary.SII}{sii}{summary.SII}
+\keyword{math}{sii}
+%
+\begin{Description}
+Compute the Speech Intelligibility Index (SII) described by ANSI
+specification S3.5-1997, including extensions for conductive
+hearing loss. Optionally apply interpolation obtain values for the
+required frequencies.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+sii(speech = c("normal", "raised", "loud", "shout"),
+    noise, threshold, loss, freq, 
+    method = c("critical", "equal-contributing",
+               "one-third octave", "octave"),
+    importance = c("SII", "NNS", "CID22", "NU6", "DRT",
+                   "ShortPassage", "SPIN", "CST"),
+    interpolate=FALSE,
+    prescription=NULL,
+    desensitization=FALSE,
+    ldl=NULL,
+    gender="male",
+    experience="experienced",
+    config="bilateral",
+    age="adult",
+    age_years=NULL,
+    age_months=NULL,
+    coupling="custom_occluded",
+    module="standard",
+    transducer="inserts",
+    custom_gain=NULL)
+## S3 method for class 'SII'
+print(x, digits=3, ...)
+## S3 method for class 'SII'
+plot(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
+## S3 method for class 'SII'
+summary(object, digits=2, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{speech}] Either a numeric vector providing \eqn{E'_i}{}, the
+equivalent speech spectrum level (in dB) at each frequency, or a
+character string indicating the stated vocal effort corresponding to
+one of the standard standard speech spectrum levels ("normal",
+"raised", "loud", "shout"). Defaults to \code{speech="normal"}
+correspoding to the normal level of stated vocal effort. 
+\item[\code{noise}] A numeric vector providing \eqn{N'_i}{}, the
+equivalent noise spectrum level (in dB) at each frequency.  If
+missing, defaults to -50 dB for each frequency.
+\item[\code{threshold}] A numeric vector providing \eqn{T'_i}{}, the
+equivalent hearing threshold level (in dB) at each frequency.  If
+missing, defaults to 0 dB for each frequency.
+\item[\code{loss}] A numeric vector providing \eqn{J'_i}{}, the
+conductive hearing loss level (in dB) at each frequency.  If
+missing, defaults to 0 dB for each frequency.
+\item[\code{freq}] Vector of frequencies for which \code{speech},
+\code{noise}, \code{threshold}, and/or \code{loss} are specified.
+If \code{interpolate=TRUE}, \code{freq} must be specified.
+Otherwise, it must either match the required value for SII
+calculation method given by argument \code{method}, or be missing,
+in which case it will default to the values required for the
+specified method.
+\item[\code{method}] A character string specifying the SII calculation
+method ("critical", "one-third octave", "equal-contributing",
+"octave")
+\item[\code{importance}] Either a numeric vector providing \eqn{F_i}{},
+the transfer function (importance weights) at each frequency, or a
+character string indicating which transfer function to employ
+("SII", "NNS", "CID22", "NU6", "DRT", "ShortPassage", "SPIN",
+"CST"). Defaults to the standard SII transfer function,
+\code{importance="SII"}.
+\item[\code{interpolate}] Logical flag indicating whether to interpolate 
+from the provide measurement values and frequencies to those 
+required by the specified method via linear interpolation on the log
+scale.
+\item[\code{prescription}] A character string (e.g. \code{"NAL-R"}, \code{"Open-NL"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.
+\item[\code{desensitization}] Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).
+\item[\code{ldl}] Numeric vector specifying Loudness Discomfort Levels (LDL) in dB HL for each frequency. If \code{NULL}, limits are estimated based on hearing thresholds.
+\item[\code{gender}] Character string specifying patient gender ("male" or "female"). Used for prescriptive algorithms. Defaults to "male".
+\item[\code{experience}] Character string specifying user hearing aid experience ("experienced", "new", "power"). Defaults to "experienced".
+\item[\code{config}] Character string for fitting configuration ("bilateral" or "unilateral"). Defaults to "bilateral".
+\item[\code{age}] Character string for patient age group (e.g., "adult", "child\_0\_5", "child\_6\_11", "child\_12\_23", "child\_24\_35", "child\_36\_59"). Used for RECD corrections and pediatric prescriptive modifications.
+\item[\code{age\_years}] Optional. Integer specifying exact age in years, overriding the categorical `age` bin if provided.
+\item[\code{age\_months}] Optional. Integer specifying exact age in months. Only applies to pediatric RECD scaling.
+\item[\code{coupling}] Character string specifying the acoustic coupling / vent ("custom\_occluded", "double\_dome", "tulip\_dome", "open\_dome", "vent\_1mm\_solid", "vent\_2mm\_solid", "vent\_3mm\_solid", "vent\_1mm\_hollow", "vent\_2mm\_hollow", "vent\_3mm\_hollow"). Modifies low-frequency leakage and insertion gain targets.
+\item[\code{module}] Character string for hearing aid module ("standard" or other specific module constraints).
+\item[\code{transducer}] Character string specifying the audiometric transducer used for testing ("inserts" or "supra\_aural"). Determines RETSPL and RECD corrections for SPLogram plots.
+\item[\code{custom\_gain}] Numeric vector specifying a custom insertion gain array (in dB) for each frequency. If provided along with \code{prescription="Custom"}, this gain is explicitly applied.
+\item[\code{object}, \code{x}] SII object
+\item[\code{digits}] Number of digits to display
+\item[\code{clinical}] Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area. If \code{FALSE} (the default), the behavior depends on whether the object is aided or unaided. For unaided objects, it plots a diagnostic interpolation graph. For aided objects (when a prescription was used), it automatically generates a 3-line Insertion Gain plot for 55, 65, and 75 dB SPL input levels (dynamically loading and scaling the true Normal and Loud LTASS spectra).
+\item[\code{legend}] Logical flag. If \code{TRUE} (the default), draws a legend on the plot.
+\item[\code{legend\_only}] Logical flag. If \code{TRUE}, suppresses the main plot and only draws the legend in the center of the plotting window. Useful for multi-plot layouts.
+\item[\code{...}] Optional arguments to \code{print}, \code{summary}, and
+\code{plot} methods
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+American National Standard ANSI S3.5-1997 ("Methods for Calculation of
+the Speech Intelligibility Index") defines a method for computing a
+physical measure that is highly correlated with the intelligibility
+of speech as evaluated by speech perception tests given a group of
+talkers and listeners. This measure is called the Speech
+Intelligibility Index, or SII. The SII is calculated from acoustical
+measurements of speech and noise.
+
+The \code{sii} function implements ANSI S3.5-1997 as described in
+the standard, without any attempt to optimize the performance. The
+implementation does, however, include the extension for handling
+conductive hearing loss from Annex A (utilizing the optional
+\code{loss} argument), and for utilizing alternative band weights
+(i.e. transfer function) appropriate for differing message contents
+(e.g. types of speech) as described in Annex B or user-specified
+band weights (utilizing the optional argument \code{importance}).
+
+Further, this implementation provides a mechanism for
+interpolating/extrapolating available measurements to those required
+for the specified calculation procedure.  When
+\code{interpolate=TRUE}, required values for \code{speech},
+\code{noise}, \code{threshold}, and \code{loss} will be computed 
+using linear interpolation (of the log-scaled data).  In this case,
+missing values may be provided and will be appropriately
+interpolated.
+
+%
+\begin{SubSection}{Prescriptive Fitting Rationales}
+If the \code{prescription} argument is provided, the function will dynamically calculate a frequency-specific hearing aid insertion gain and apply it to the speech and noise spectrum, calculating an Aided SII. The following rationales are supported:
+
+\begin{itemize}
+
+\item{} \code{"NAL-R"}: A classic linear fitting rationale designed by the National Acoustic Laboratories to maximize speech intelligibility for mild-to-moderate losses. Gain is a linear function of the pure-tone average (PTA) and frequency-specific thresholds.
+\item{} \code{"Open-NL"}: A completely transparent, open-source non-linear fitting algorithm developed specifically for this package. It was designed to serve as an open-source alternative to proprietary modern non-linear clinical targets (such as NAL-NL2 and DSL v5.0). The algorithm calculates insertion gain using the following explicit mathematical steps:
+\begin{enumerate}
+
+\item{} \strong{Conductive Component Separation}: If an Air-Bone Gap is present, the purely sensorineural component is isolated for WDRC compression. Linear gain representing 75\% of the conductive loss is added at the end (consistent with NAL-NL2/Johnson).
+\item{} \strong{Dynamic Base Gain}: The base gain relies on a dynamic multiplier (ranging from 0.43 to 0.48) determined by user experience, combined with empirical NAL-R shaping constants. Severe losses receive a booster, while steep slopes receive a low-frequency penalty to avoid upward spread of masking.
+\item{} \strong{Dead Region Roll-offs}: High-frequency or low-frequency dead regions trigger a steep 30 dB/octave penalty beyond the viable boundaries to prevent acoustic distortion and feedback.
+\item{} \strong{Wide Dynamic Range Compression (WDRC)}: A dynamic compression ratio (ranging from 1.0 to 3.0) is applied symmetrically around a 65 dB SPL pivot point. The ratio scales dynamically based on the sensorineural threshold and measured Loudness Discomfort Levels (LDLs).
+\item{} \strong{Bandwidth Roll-off}: Empirical bandwidth roll-offs are applied to limit unnecessary low/high frequency amplification, with separate curves for adults vs. infants.
+\item{} \strong{Acoustic Coupling}: Adjustments are applied to the low frequencies depending on the specified venting, dome type, and acoustic seal.
+\item{} \strong{MPO Limits}: Output is capped by predictive NAL-SSPL90 limits, adjusting for conductive attenuation, with an absolute safety hard cap at 120 dB SPL at the cochlea and a hardware output limit of 135 dB SPL.
+
+\end{enumerate}
+
+
+\end{itemize}
+
+
+\end{SubSection}
+
+\end{Details}
+%
+\begin{Value}
+The return value is an object of class SII, containing the following
+components:
+\begin{ldescription}
+\item[\code{call}] Function call used to generate the SII object
+\item[\code{orig}] List containing original (pre-extrapolation) values for
+\code{freq}, \code{speech}, \code{noise}, \code{threshold}, and
+\code{loss}.
+\item[\code{speech}, \code{noise}, \code{threshold}, \code{loss}, \code{and freq}] Values used in
+calculations (extrapolated if necessary)
+\item[\code{unaided\_speech}] Original speech array before applying any prescriptive gain
+\item[\code{vocal\_effort}] String representing the stated vocal effort
+\item[\code{gain}] Insertion gain array added to speech and noise when a prescription is used
+\item[\code{prescription}] The fitting rationale used (if any)
+\item[\code{unaided\_sii}] Calculated SII value before applying the prescriptive gain (if a prescription was used)
+\item[\code{table}] SII calculation worksheet, containing columns
+corresponding to both Table C.1 and C.2 in Annex C of the
+standard. Table columns are
+\begin{description}
+
+\item[Fi] Center frequency of SII band, Hz
+\item[E'i] Spectrum level of equivalent speech, dB
+\item[N'i] Spectrum level of equivalent noise, dB
+\item[T'i] Equivalent hearing threshold level, dB
+\item[Vi] Spectrum level for self-speech masking, dB
+\item[Bi] Larger of the specrum levels for equivalent noise and
+self-speech masking, dB
+\item[Ci] Slope per octave (doubling of frequency) of the upward
+spread of masking, dB/octave
+\item[Zi] Spectrum level for equivalent masking, dB
+\item[Xi] Spectrum level of internal noise, dB
+\item[X'i] Spectrum level of equivalent internal noise, dB
+\item[Di] Spectrum level for equivalent disturbance, dB
+\item[Ui] Spectrum level of standard speech for normal vocal
+effort, dB
+\item[Ji] Equivalent hearing threshold due to conductive hearing
+loss, dB
+\item[Li] Speech level distortion factor, dB
+\item[Ki] Temporary variable used in the calculation of the band
+auditability function
+\item[Ai] Band auditability function
+\item[Ii] Band importance function
+\item[IiAi] Product of the band importance function (Ii), and band
+auditability function(Ai)
+
+\end{description}
+
+
+\item[\code{sii}] Calculated SII value
+\end{ldescription}
+\end{Value}
+%
+\begin{Section}{Open-NL Prescription Rationale}
+\strong{DISCLAIMER:} \code{Open-NL} is an untested, experimental fitting rationale. It is designed to mimic aspects of other generic non-linear fitting rationales (such as NAL-NL2 and DSL v5.0) strictly to promote open research, algorithmic transparency, and rapid iteration within the audiology community. It is not intended for clinical use.
+
+When \code{prescription = "Open-NL"} is selected, the function calculates and applies this WDRC-optimized rationale to maximize the aided Speech Intelligibility Index.
+
+The mathematical algorithm consists of:
+\begin{enumerate}
+
+\item{} \strong{Minimal Hearing Loss (MHL) Bypass:} If \code{module == "mhl"} and \eqn{PTA_{.5,1,2,4k} \le 25}{} dB HL, WDRC is bypassed. Applies flat linear gain interpolated from \eqn{(f, G) = \{(250,0), (500,0), (1k,3), (2k,5), (4k,5), (8k,5)\}}{} dB, with a 1.5 compression ratio for loud inputs.
+\item{} \strong{Base Anchor (65 dB SPL Input):} \eqn{g_{65} = \max(0, m \times HTL + C)}{}, where \eqn{m \in \{0.40, 0.45, 0.50\}}{} depending on \code{experience}, and \eqn{C}{} interpolates arrays such as \eqn{\{-8, -1, +3, +1, 0, 0, 0, 0\}}{} dB evaluated at standard audiometric frequencies.
+\item{} \strong{Audiometric Profile Corrections:}
+\begin{itemize}
+
+\item{} \emph{Steep Slope Knee:} For slopes \eqn{>30}{} dB/octave, penalizes the "knee" (500-1500 Hz) by up to 6 dB, and boosts frequencies \eqn{\ge 2000}{} Hz by up to 6 dB.
+\item{} \emph{Severe-Loss Booster (SLB):} Adds \eqn{\min(15, \max(0, HTL - 60) \times 0.5)}{} dB. Tapered heavily in mid-frequencies and disabled in dead regions.
+
+\end{itemize}
+
+\item{} \strong{High-Frequency Desensitization:} To prevent distortion, excess gain above a limit is compressed at a 2:1 ratio.
+\begin{itemize}
+
+\item{} Adult \eqn{Limit = 30 + 0.4 \times \max(0, HTL - 60)}{}
+\item{} Child \eqn{Limit = 40 + 0.5 \times \max(0, HTL - 60)}{}
+
+\end{itemize}
+
+\item{} \strong{Roll-offs and Dead Regions:}
+\begin{itemize}
+
+\item{} \emph{Bandwidth Roll-off:} Multiplies \eqn{g_{65}}{}. Adults: interpolates \eqn{\{(250Hz, 0.7), (500, 1.0), ..., (6k, 0.8), (8k, 0.5)\}}{}. Children: 1.0 across all frequencies.
+\item{} \emph{Dead Regions:} Identifies HF Dead Regions (\eqn{HTL \ge 90}{} at \eqn{f \ge 1k}{}) and LF Dead Regions (\eqn{HTL \ge 80}{} at \eqn{f \le 1k}{}). Applies a 30 dB/octave penalty beyond viable boundaries (\eqn{1.7 \times f_{e}}{} for HF, \eqn{0.57 \times f_{e}}{} for LF).
+
+\end{itemize}
+
+\item{} \strong{Bi-directional WDRC:}
+\begin{itemize}
+
+\item{} \emph{Compression Ratio (CR):} \eqn{CR_{base} = 1 + \max(0, HTL - 20) / 40}{}. For \eqn{HTL > 65}{}, CR reduces toward 1.0 in low frequencies. Overall bounded strictly to \eqn{\le 1.5}{} for low frequencies (\eqn{\le 500}{} Hz) and up to \eqn{2.4}{} for high frequencies (\eqn{\ge 3000}{} Hz).
+\item{} \emph{Compression Threshold (CT):} Interpolated from \eqn{(HTL, CT)}{}. Adult: \eqn{\{(20HL, 30SPL), ..., (100, 45)\}}{}. Child: \eqn{\{(20, 25), ..., (100, 40)\}}{}.
+\item{} \emph{Aggressive MPO Defense:} For steeply sloping losses (\eqn{>15}{} dB difference) with low LDLs (\eqn{<100}{} dB SPL), the formula proactively defends against MPO collision. The \eqn{CT}{} is aggressively lowered by up to 10 dB, and the \eqn{CR}{} is forced up by an additional 0.05 per dB of LDL penalty.
+\item{} \emph{I/O Computation:} Calculates gain at CT (\eqn{G_{CT}}{}) scaling back from 65 dB SPL pivot. Applies linear gain below CT, and WDRC above CT.
+
+\end{itemize}
+
+\item{} \strong{Empirical Adjustments and Smoothing:}
+\begin{itemize}
+
+\item{} \emph{Demographic Boosts:} Child Boost: Interpolates \eqn{(HTL, Boost) = \{(20, 5), (50, 5), (80, 2), (100, 1)\}}{} dB. Gender: Female \eqn{= -1.5}{} dB. Config: Unilateral \eqn{= +3.0}{} dB. Experience: New users with \eqn{PTA > 40}{} get up to \eqn{-6.0}{} dB penalty.
+\item{} \emph{LDL Dynamic Range Mapping:} If \code{ldl} is provided, dynamic range is evaluated. For every 1 dB the measured LDL is lower than predicted, \eqn{g_{65}}{} is reduced by 0.2 dB and \eqn{CR_{base}}{} is increased by 0.02.
+\item{} \emph{Acoustic Coupling:} Subtracts vent leakage (e.g., Open Dome \eqn{= \{-35, -28, -15, -2, 0, 0\}}{} dB).
+\item{} Applies a 3-point moving average to the final gain array.
+
+\end{itemize}
+
+\item{} \strong{SSPL90 MPO Limiting:} 
+\begin{itemize}
+
+\item{} \eqn{MPO_{heuristic} = 100 + 0.5 \times \max(0, HTL - 40)}{}.
+\item{} \eqn{MPO_{safe} = LDL_{spl} - 5}{}.
+\item{} \eqn{PTS_{safe\_limit} = 105 + 0.5 \times \max(0, HTL - 50)}{} (110 for Children).
+\item{} \eqn{MPO_{final} = \min(120, MPO_{heuristic}, MPO_{safe}, PTS_{safe\_limit})}{}.
+
+\end{itemize}
+
+
+\end{enumerate}
+
+\end{Section}
+%
+\begin{Author}
+Gregory R. Warnes \email{greg@warnes.net}
+\end{Author}
+%
+\begin{References}
+ANSI S3.5-1997, "American National Standard Methods for 
+Calculation of the Speech Intelligibility Index" American National
+Standards Institute, New York. 
+
+Other software programs for calculating SII are available from
+\url{https://sii.to/html/programs.html}.
+
+\end{References}
+%
+\begin{SeeAlso}
+ SII Constants: \code{\LinkA{critical}{critical}}, and
+\code{\LinkA{sic.critical}{sic.critical}} 
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+
+## Example C.1 from ANSI S3.5-1997 Annex C
+sii.C1 <- sii(
+              speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
+              noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
+              threshold= c( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),
+              method="octave"
+	      )
+sii.C1                        # rounded to 2 digits by default
+print(sii.C1$sii, digits=20)  # full precision
+summary(sii.C1)               # full details
+plot(sii.C1)                  # plot
+plot(sii.C1, clinical=TRUE)   # clinical SPLogram plot
+## The value given in the Standard is $0.504$.
+
+
+	      
+## Same calculation, but manually specify the frequencies
+## and importance function, and use default for threshold
+
+sii.C1 <- sii(
+              speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
+              noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
+              method="octave",
+              freq=c(250, 500, 1000, 2000, 4000, 8000),
+	      importance=c(0.0617, 0.1671, 0.2373, 0.2648, 0.2142, 0.0549)
+	      )
+sii.C1	     
+
+## Now perform the calculation using frequency weights for the Connected
+## Speech Test (CST)
+sii.CST <- sii(
+               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
+               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
+               method="octave",
+	       importance="CST"
+	      )
+round(sii.CST$table[,-c(5:7,13)],2)
+sii.CST$sii
+
+## Example C.2 from ANSI S3.5-1997 Annex C
+
+sii.C2 <- sii(
+              speech   = rep(54.0, 18),
+              noise    = c(40.0, 30.0, 20.0, rep(0, 18-3) ),
+              threshold= rep(0.0,  18),
+              method="one-third"
+              )
+sii.C2$table[1:3,1:8]
+sii.C2
+
+## Interpolation example, for 8 frequencies using NU6 importance
+## weight, default values for noise.
+sii.left <- sii(
+                speech="raised",
+                threshold=c(25,25,30,35,45,45,55,60),
+                freq=c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000),
+                method="critical",
+                importance="NU6",
+                interpolate=TRUE
+                )
+sii.left
+
+
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}

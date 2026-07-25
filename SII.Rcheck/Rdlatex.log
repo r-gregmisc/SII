@@ -1,0 +1,352 @@
+Converting parsed Rd's to LaTeX 
+Creating pdf output from LaTeX ...
+Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+  texi2dvi script/program not available, using emulation
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file Rd2.aux.
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
+No file Rd2.toc.
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
+Overfull \hbox (25.8077pt too wide) in paragraph at lines 40--42
+[]\T1/ptm/m/n/10 Other soft-ware pro-grams for cal-cu-lat-ing SII are avail-abl
+e from [][]$\T1/pcr/m/n/10 https : / / sii . to / html / programs .
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
+dist/fonts/enc/dvips/base/8r.enc}]
+Overfull \hbox (58.38037pt too wide) in paragraph at lines 88--88
+ []\T1/pcr/m/n/9 sii.res <- sii(speech=c(50, 40, 40, 30, 20, 0), threshold=rep(
+0,6), method="octave") 
+[2]
+Overfull \hbox (4.09724pt too wide) in paragraph at lines 146--149
+[]\T1/ptm/m/n/10 Overall sound pres-sure level (SPL) for the for vo-cal ef-fort
+ lev-els "nor-mal", "raised",
+[3] [4]
+Overfull \hbox (342.78088pt too wide) in paragraph at lines 232--232
+ []\T1/pcr/m/n/10 predict_aided_sii(freq, threshold, age = c("adult", "pediatri
+c"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE) 
+[5] [6] [7] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [8]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 453--454
+\T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
+nt_2mm_solid",
+
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 453--454
+\T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
+m_hollow").
+[9] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [10] [11]
+Overfull \hbox (1.68791pt too wide) in paragraph at lines 577--578
+[]\T1/ptm/m/n/10 When []\T1/pcr/m/n/10 prescription = "Open-NL" []\T1/ptm/m/n/1
+0 is se-lected, the func-tion cal-cu-lates and ap-plies this WDRC-
+
+Overfull \hbox (135.95131pt too wide) in paragraph at lines 582--583
+\T1/ptm/m/n/10 HL, WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-late
+d from $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n
+/10 f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 
+; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \
+OT1/cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/
+m/n/10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
+10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 583--584
+[]\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
+r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
+OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
+ML/cmm/m/it/10 m \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cm
+r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
+0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
+S/cmsy/m/n/10 g$
+
+Overfull \hbox (73.56828pt too wide) in paragraph at lines 603--604
+[]\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
+t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
+/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
+10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
+1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
+\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
+mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
+it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
+[12]
+Overfull \hbox (58.21927pt too wide) in paragraph at lines 612--613
+[]\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
+rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
+. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
+n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
+n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
+0 .
+
+Overfull \hbox (49.09967pt too wide) in paragraph at lines 621--622
+[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
+es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
+/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
+ ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
+OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 623--624
+[]\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
+e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
+cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
+y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
+/n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
+\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (25.8077pt too wide) in paragraph at lines 652--654
+[]\T1/ptm/m/n/10 Other soft-ware pro-grams for cal-cu-lat-ing SII are avail-abl
+e from [][]$\T1/pcr/m/n/10 https : / / sii . to / html / programs .
+[13]
+Underfull \vbox (badness 3803) has occurred while \output is active [14]
+[15] (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
+a.pfb>
+Output written on Rd2.pdf (15 pages, 179443 bytes).
+Transcript written on Rd2.log.
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (./Rd2.out) (./Rd2.out)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd) (./Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd))
+Overfull \hbox (25.8077pt too wide) in paragraph at lines 40--42
+[]\T1/ptm/m/n/10 Other soft-ware pro-grams for cal-cu-lat-ing SII are avail-abl
+e from [][]$\T1/pcr/m/n/10 https : / / sii . to / html / programs .
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
+dist/fonts/enc/dvips/base/8r.enc}]
+Overfull \hbox (58.38037pt too wide) in paragraph at lines 88--88
+ []\T1/pcr/m/n/9 sii.res <- sii(speech=c(50, 40, 40, 30, 20, 0), threshold=rep(
+0,6), method="octave") 
+[2]
+Overfull \hbox (4.09724pt too wide) in paragraph at lines 146--149
+[]\T1/ptm/m/n/10 Overall sound pres-sure level (SPL) for the for vo-cal ef-fort
+ lev-els "nor-mal", "raised",
+[3] [4]
+Overfull \hbox (342.78088pt too wide) in paragraph at lines 232--232
+ []\T1/pcr/m/n/10 predict_aided_sii(freq, threshold, age = c("adult", "pediatri
+c"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE) 
+[5] [6] [7] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [8]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 453--454
+\T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
+nt_2mm_solid",
+
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 453--454
+\T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
+m_hollow").
+[9] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [10] [11]
+Overfull \hbox (1.68791pt too wide) in paragraph at lines 577--578
+[]\T1/ptm/m/n/10 When []\T1/pcr/m/n/10 prescription = "Open-NL" []\T1/ptm/m/n/1
+0 is se-lected, the func-tion cal-cu-lates and ap-plies this WDRC-
+
+Overfull \hbox (135.95131pt too wide) in paragraph at lines 582--583
+\T1/ptm/m/n/10 HL, WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-late
+d from $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n
+/10 f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 
+; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \
+OT1/cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/
+m/n/10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
+10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 583--584
+[]\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
+r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
+OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
+ML/cmm/m/it/10 m \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cm
+r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
+0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
+S/cmsy/m/n/10 g$
+
+Overfull \hbox (73.56828pt too wide) in paragraph at lines 603--604
+[]\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
+t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
+/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
+10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
+1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
+\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
+mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
+it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
+[12]
+Overfull \hbox (58.21927pt too wide) in paragraph at lines 612--613
+[]\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
+rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
+. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
+n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
+n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
+0 .
+
+Overfull \hbox (49.09967pt too wide) in paragraph at lines 621--622
+[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
+es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
+/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
+ ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
+OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 623--624
+[]\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
+e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
+cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
+y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
+/n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
+\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (25.8077pt too wide) in paragraph at lines 652--654
+[]\T1/ptm/m/n/10 Other soft-ware pro-grams for cal-cu-lat-ing SII are avail-abl
+e from [][]$\T1/pcr/m/n/10 https : / / sii . to / html / programs .
+[13]
+Underfull \vbox (badness 3803) has occurred while \output is active [14]
+[15] (./Rd2.aux) )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
+a.pfb>
+Output written on Rd2.pdf (15 pages, 180342 bytes).
+Transcript written on Rd2.log.
+Saving output to ‘SII-manual.pdf’ ...
+Done
+You may want to clean up by 'rm -Rf /tmp/RtmpOTLzy1/Rd2pdf179c037c497f1'

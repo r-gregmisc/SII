@@ -1,0 +1,17 @@
+SII-package	SII-package
+calculate_loudness	calculate_loudness
+critical	critical
+equal	critical
+launch_app	launch_app
+octave	critical
+onethird	critical
+overall.spl	critical
+plot.SII	sii
+predict_aided_sii	predict_aided_sii
+print.SII	sii
+sic.critical	sic.critical
+sic.octave	sic.critical
+sic.onethird	sic.critical
+SII	SII-package
+sii	sii
+summary.SII	sii

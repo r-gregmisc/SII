@@ -18,7 +18,9 @@
 #' Johnson, E. E. (2013). Modern prescription theory and application: realistic expectations for speech recognition with hearing aids. Trends in Amplification, 17(3/4), 143-170.
 #'
 #' @export
-predict_aided_sii <- function(freq, threshold, age = c("adult", "pediatric"), prescription = c("NAL-NL2", "DSL"), desensitized = FALSE) {
+predict_aided_sii <- function(freq, threshold, age = c("adult", "pediatric"), 
+                              prescription = c("NAL-NL2", "DSL"), 
+                              desensitized = FALSE) {
   age <- match.arg(age)
   prescription <- match.arg(prescription)
   

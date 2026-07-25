@@ -1,0 +1,415 @@
+
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "SII"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('SII')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("SII-package")
+> ### * SII-package
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: SII-package
+> ### Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
+> ### Aliases: SII-package SII
+> ### Keywords: package
+> 
+> ### ** Examples
+> 
+> ## Example C.1 from ANSI S3.5-1997 Annex C
+> sii.C1 <- sii(
++               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
++               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
++               threshold= c( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),
++               method="octave"
++ 	      )
+[1] "DEBUG: method argument is: octave"
+> sii.C1                        # rounded to 2 digits by default
+
+SII: 0.504 
+
+> print(sii.C1$sii, digits=20)  # full precision
+[1] 0.5039555062499999627
+> summary(sii.C1)               # full details
+
+Speech Intellibility Index
+--------------------------
+
+Call:
+
+sii(speech = c(50, 40, 40, 30, 20, 0), noise = c(70, 65, 45, 
+    25, 1, -15), threshold = c(0, 0, 0, 0, 0, 0), method = "octave")
+
+Method: Octave band SII procedure 
+
+Calculation table:
+
+    Fi E'i N'i T'i Vi Bi Ci  Zi    Xi   X'i   Di   Ui Ji   Li   Ki   Ai    Ii
+1  250  50  70   0 NA NA NA  70  -3.9  -3.9 70.0 34.8  0 0.97 0.00 0.00 0.062
+2  500  40  65   0 NA NA NA  65  -9.7  -9.7 65.0 34.3  0 1.00 0.00 0.00 0.167
+3 1000  40  45   0 NA NA NA  45 -12.5 -12.5 45.0 25.0  0 0.97 0.33 0.32 0.237
+4 2000  30  25   0 NA NA NA  25 -17.7 -17.7 25.0 17.3  0 0.98 0.67 0.66 0.265
+5 4000  20   1   0 NA NA NA   1 -25.9 -25.9  1.0  9.3  0 1.00 1.00 1.00 0.214
+6 8000   0 -15   0 NA NA NA -15  -7.1  -7.1 -7.1  1.1  0 1.00 0.74 0.74 0.055
+   IiAi
+1 0.000
+2 0.000
+3 0.077
+4 0.174
+5 0.213
+6 0.040
+
+SII: 0.5 
+
+> plot(sii.C1)                  # plot
+> ## The value given in the Standard is $0.504$.
+> 
+> 
+> 
+> cleanEx()
+> nameEx("calculate_loudness")
+> ### * calculate_loudness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: calculate_loudness
+> ### Title: Calculate Loudness (Sones)
+> ### Aliases: calculate_loudness
+> 
+> ### ** Examples
+> 
+> sii.res <- sii(speech=c(50, 40, 40, 30, 20, 0), threshold=rep(0,6), method="octave")
+[1] "DEBUG: method argument is: octave"
+> calculate_loudness(sii.res)
+[1] 16.10836
+> 
+> 
+> 
+> cleanEx()
+> nameEx("critical")
+> ### * critical
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: critical
+> ### Title: Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index
+> ###   (SII)
+> ### Aliases: critical equal onethird octave overall.spl
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> data(critical)
+> critical # show entire table
+     fi   li   hi     Ii normal raised  loud shout    Xi   Fi
+1   150  100  200 0.0103  31.44  34.06 34.21 28.69   1.5  0.6
+2   250  200  300 0.0261  34.75  38.98 41.55 42.50  -3.9  1.0
+3   350  300  400 0.0419  34.14  38.62 43.68 47.14  -7.2  1.4
+4   450  400  510 0.0577  34.58  39.84 44.08 48.46  -8.9  1.4
+5   570  510  630 0.0577  33.17  39.44 45.34 50.17 -10.3  1.9
+6   700  630  770 0.0577  30.64  37.99 45.22 51.68 -11.4  2.8
+7   840  770  920 0.0577  27.59  35.85 43.60 51.43 -12.0  3.0
+8  1000  920 1080 0.0577  25.01  33.86 42.16 51.31 -12.5  2.6
+9  1170 1080 1270 0.0577  23.52  32.56 41.07 49.40 -13.2  2.6
+10 1370 1270 1480 0.0577  22.28  30.91 39.68 49.03 -14.0  3.6
+11 1600 1480 1720 0.0577  20.15  28.58 37.70 47.65 -15.4  6.1
+12 1850 1720 2000 0.0577  18.29  26.37 35.62 45.47 -16.9 10.5
+13 2150 2000 2320 0.0577  16.37  24.34 33.17 43.13 -18.8 13.8
+14 2500 2320 2700 0.0577  13.80  22.35 30.98 40.80 -21.2 16.8
+15 2900 2700 3150 0.0577  12.21  21.04 29.01 39.15 -23.2 15.8
+16 3400 3150 3700 0.0577  11.09  19.56 27.71 37.30 -24.9 14.9
+17 4000 3700 4400 0.0577   9.33  16.78 25.41 34.41 -25.9 14.3
+18 4800 4400 5300 0.0460   5.84  12.14 19.20 29.01 -24.2 12.4
+19 5800 5300 6400 0.0343   3.47   9.04 15.37 25.17 -19.0  7.9
+20 7000 6400 7700 0.0226   1.78   6.36 12.61 22.08 -11.7  4.3
+21 8500 7700 9500 0.0110  -0.14   3.44  9.62 18.76  -6.0  0.5
+> 
+> data(equal)
+> names(equal)
+ [1] "fi"     "li"     "hi"     "Ii"     "normal" "raised" "loud"   "shout" 
+ [9] "Xi"     "Fi"    
+> equal$fi # extract just the frequency band centers
+ [1]  350  450  570  700  840 1000 1170 1370 1600 1850 2150 2500 2900 3400 4000
+[16] 4800 5800
+> 
+> data(onethird)
+> barplot(onethird$Ii) # plot band importance function (weights)
+> 
+> data(octave)
+> round(octave, digits=2) # just 2 digits
+    fi Deltai   Ii normal raised  loud shout    Xi   Fi
+1  250  22.48 0.06  34.75  38.98 41.55 42.50  -3.9  1.0
+2  500  25.48 0.17  34.27  40.15 44.85 49.24  -9.7  1.8
+3 1000  28.48 0.24  25.01  33.86 42.16 51.31 -12.5  2.6
+4 2000  31.48 0.26  17.32  25.32 34.39 44.32 -17.7 12.0
+5 4000  34.48 0.21   9.33  16.78 25.41 34.41 -25.9 14.3
+6 8000  37.48 0.05   1.13   5.07 11.39 20.72  -7.1  1.8
+> 
+> data(overall.spl)
+> overall.spl
+normal raised   loud  shout 
+ 62.35  68.34  74.85  82.30 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("launch_app")
+> ### * launch_app
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: launch_app
+> ### Title: Launch the SII Interactive Dashboard
+> ### Aliases: launch_app
+> ### Keywords: misc
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D   # Launch the interactive SII dashboard in your web browser
+> ##D   launch_app()
+> ## End(Not run)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("sic.critical")
+> ### * sic.critical
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: sic.critical
+> ### Title: Alternative ANSI S3.5-1997 SII Transfer Function Weights
+> ### Aliases: sic.critical sic.onethird sic.octave
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Load the alternative weights for the critical band method
+> data(sic.critical)
+> 
+> ## display the weights
+> round(sic.critical,3)
+     fi   SII   NNS CID22   NU6   DRT ShortPassage  SPIN   CST
+1   150 0.010 0.000 0.051 0.023 0.012        0.019 0.013 0.065
+2   250 0.026 0.023 0.068 0.037 0.055        0.031 0.048 0.060
+3   350 0.042 0.038 0.064 0.052 0.058        0.093 0.045 0.071
+4   450 0.058 0.041 0.055 0.067 0.067        0.103 0.047 0.056
+5   570 0.058 0.043 0.047 0.064 0.068        0.074 0.052 0.040
+6   700 0.058 0.047 0.047 0.057 0.067        0.061 0.059 0.030
+7   840 0.058 0.047 0.047 0.050 0.059        0.050 0.059 0.031
+8  1000 0.058 0.047 0.050 0.046 0.055        0.044 0.050 0.049
+9  1170 0.058 0.052 0.059 0.054 0.056        0.044 0.050 0.057
+10 1370 0.058 0.054 0.059 0.058 0.058        0.049 0.056 0.068
+11 1600 0.058 0.058 0.059 0.064 0.062        0.049 0.070 0.067
+12 1850 0.058 0.068 0.061 0.074 0.060        0.049 0.062 0.064
+13 2150 0.058 0.074 0.060 0.071 0.056        0.049 0.060 0.061
+14 2500 0.058 0.075 0.062 0.062 0.052        0.055 0.068 0.053
+15 2900 0.058 0.068 0.050 0.055 0.048        0.056 0.064 0.049
+16 3400 0.058 0.066 0.044 0.051 0.044        0.049 0.060 0.045
+17 4000 0.058 0.064 0.037 0.042 0.036        0.036 0.053 0.038
+18 4800 0.046 0.061 0.027 0.029 0.028        0.039 0.039 0.032
+19 5800 0.034 0.051 0.020 0.019 0.024        0.026 0.029 0.026
+20 7000 0.023 0.022 0.019 0.014 0.020        0.022 0.013 0.023
+21 8500 0.011 0.000 0.016 0.011 0.015        0.004 0.000 0.015
+> 
+> ## draw a comparison plot
+> ngroup <- ncol(sic.critical)
+> matplot(x=sic.critical[,1], y=sic.critical[,-1],
++         type="o",
++         xlab="Frequency, Hz",
++         ylab="Weight",
++         log="x",
++         lty=1:ngroup,
++         col=rainbow(ngroup)
++ )
+> legend(
++        "topright",
++        legend=names(sic.critical)[-1],
++        pch=as.character(1:ngroup),
++        lty=1:ngroup,
++        col=rainbow(ngroup)
++        )
+> 
+> data(threeoctave)
+Warning in data(threeoctave) : data set ‘threeoctave’ not found
+> data(octave)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("sii")
+> ### * sii
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: sii
+> ### Title: Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)
+> ### Aliases: sii print.SII plot.SII summary.SII
+> ### Keywords: math
+> 
+> ### ** Examples
+> 
+> 
+> ## Example C.1 from ANSI S3.5-1997 Annex C
+> sii.C1 <- sii(
++               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
++               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
++               threshold= c( 0.0,  0.0,  0.0,  0.0,  0.0,  0.0),
++               method="octave"
++ 	      )
+[1] "DEBUG: method argument is: octave"
+> sii.C1                        # rounded to 2 digits by default
+
+SII: 0.504 
+
+> print(sii.C1$sii, digits=20)  # full precision
+[1] 0.5039555062499999627
+> summary(sii.C1)               # full details
+
+Speech Intellibility Index
+--------------------------
+
+Call:
+
+sii(speech = c(50, 40, 40, 30, 20, 0), noise = c(70, 65, 45, 
+    25, 1, -15), threshold = c(0, 0, 0, 0, 0, 0), method = "octave")
+
+Method: Octave band SII procedure 
+
+Calculation table:
+
+    Fi E'i N'i T'i Vi Bi Ci  Zi    Xi   X'i   Di   Ui Ji   Li   Ki   Ai    Ii
+1  250  50  70   0 NA NA NA  70  -3.9  -3.9 70.0 34.8  0 0.97 0.00 0.00 0.062
+2  500  40  65   0 NA NA NA  65  -9.7  -9.7 65.0 34.3  0 1.00 0.00 0.00 0.167
+3 1000  40  45   0 NA NA NA  45 -12.5 -12.5 45.0 25.0  0 0.97 0.33 0.32 0.237
+4 2000  30  25   0 NA NA NA  25 -17.7 -17.7 25.0 17.3  0 0.98 0.67 0.66 0.265
+5 4000  20   1   0 NA NA NA   1 -25.9 -25.9  1.0  9.3  0 1.00 1.00 1.00 0.214
+6 8000   0 -15   0 NA NA NA -15  -7.1  -7.1 -7.1  1.1  0 1.00 0.74 0.74 0.055
+   IiAi
+1 0.000
+2 0.000
+3 0.077
+4 0.174
+5 0.213
+6 0.040
+
+SII: 0.5 
+
+> plot(sii.C1)                  # plot
+> plot(sii.C1, clinical=TRUE)   # clinical SPLogram plot
+> ## The value given in the Standard is $0.504$.
+> 
+> 
+> 	      
+> ## Same calculation, but manually specify the frequencies
+> ## and importance function, and use default for threshold
+> 
+> sii.C1 <- sii(
++               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
++               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
++               method="octave",
++               freq=c(250, 500, 1000, 2000, 4000, 8000),
++ 	      importance=c(0.0617, 0.1671, 0.2373, 0.2648, 0.2142, 0.0549)
++ 	      )
+[1] "DEBUG: method argument is: octave"
+> sii.C1	     
+
+SII: 0.504 
+
+> 
+> ## Now perform the calculation using frequency weights for the Connected
+> ## Speech Test (CST)
+> sii.CST <- sii(
++                speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
++                noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
++                method="octave",
++ 	       importance="CST"
++ 	      )
+[1] "DEBUG: method argument is: octave"
+> round(sii.CST$table[,-c(5:7,13)],2)
+    Fi E'i N'i T'i  Zi    Xi   X'i   Di    Ui   Li   Ki   Ai   Ii IiAi
+1  250  50  70   0  70  -3.9  -3.9 70.0 34.75 0.97 0.00 0.00 0.09 0.00
+2  500  40  65   0  65  -9.7  -9.7 65.0 34.27 1.00 0.00 0.00 0.19 0.00
+3 1000  40  45   0  45 -12.5 -12.5 45.0 25.01 0.97 0.33 0.32 0.16 0.05
+4 2000  30  25   0  25 -17.7 -17.7 25.0 17.32 0.98 0.67 0.66 0.30 0.20
+5 4000  20   1   0   1 -25.9 -25.9  1.0  9.33 1.00 1.00 1.00 0.18 0.18
+6 8000   0 -15   0 -15  -7.1  -7.1 -7.1  1.13 1.00 0.74 0.74 0.08 0.06
+> sii.CST$sii
+[1] 0.4873175
+> 
+> ## Example C.2 from ANSI S3.5-1997 Annex C
+> 
+> sii.C2 <- sii(
++               speech   = rep(54.0, 18),
++               noise    = c(40.0, 30.0, 20.0, rep(0, 18-3) ),
++               threshold= rep(0.0,  18),
++               method="one-third"
++               )
+[1] "DEBUG: method argument is: one-third"
+> sii.C2$table[1:3,1:8]
+   Fi E'i N'i T'i Vi Bi        Ci       Zi
+1 160  54  40   0 30 40 -46.58708 40.00000
+2 200  54  30   0 30 30 -52.00562 34.65765
+3 250  54  20   0 30 30 -51.42416 25.04683
+> sii.C2
+
+SII: 0.851 
+
+> 
+> ## Interpolation example, for 8 frequencies using NU6 importance
+> ## weight, default values for noise.
+> sii.left <- sii(
++                 speech="raised",
++                 threshold=c(25,25,30,35,45,45,55,60),
++                 freq=c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000),
++                 method="critical",
++                 importance="NU6",
++                 interpolate=TRUE
++                 )
+[1] "DEBUG: method argument is: critical"
+> sii.left
+
+SII: 0.77 
+
+> 
+> 
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.155 0.025 0.181 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

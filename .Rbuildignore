@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^data-raw$
+^fix_app\.R$
+^test_critical\.R$
+^test_sii_a1\.R$

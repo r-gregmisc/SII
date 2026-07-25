@@ -31,7 +31,36 @@ calculate_nalr_gain <- function(freq, threshold) {
   return(ig)
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, loss = NULL) {
+get_recd_diff <- function(age, age_months = NULL) {
+  recd_f <- c(250, 500, 1000, 2000, 4000, 8000)
+  adult_recd <- c(2, 3, 5, 8, 10, 6)
+  
+  # If age is a string like "child_6_11", parse the months
+  if (is.null(age_months) && !is.null(age) && substr(age, 1, 5) == "child") {
+    if (age == "child_0_5") age_months <- 3
+    else if (age == "child_6_11") age_months <- 9
+    else if (age == "child_12_23") age_months <- 18
+    else if (age == "child_24_35") age_months <- 30
+    else if (age == "child_36_59") age_months <- 48
+    else age_months <- 60
+  }
+  
+  if (is.null(age) || age == "adult" || is.null(age_months)) {
+    infant_recd <- adult_recd
+  } else if (age_months <= 6) {
+    infant_recd <- c(6, 8, 12, 15, 17, 14)
+  } else if (age_months <= 12) {
+    infant_recd <- c(5, 7, 10, 13, 15, 12)
+  } else if (age_months <= 24) {
+    infant_recd <- c(4, 6, 8, 11, 13, 10)
+  } else {
+    infant_recd <- c(3, 4, 6, 9, 11, 8)
+  }
+  
+  return(list(f = recd_f, diff = infant_recd - adult_recd))
+}
+
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL) {
   # 0. Conductive Component Separation
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))
@@ -49,7 +78,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
                        y = c(0, 0, 3, 5, 5, 5), xout = freq, rule = 2)$y
                        
     # Linear amplification for speech inputs up to 65 dB SPL
-    data("critical", package="SII")
+    data("critical", package="SII", envir = environment())
     pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
     ct_band <- pivot + 5 # Set CT slightly above normal speech
     
@@ -94,8 +123,6 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # because they assume typical sloping losses where low frequencies are normal.
   # For reverse slope losses, this over-penalizes and results in 0 dB gain.
   # We neutralize this negative penalty so the low frequencies become audible.
-  low_thresh_mean <- mean(threshold[freq <= 1000], na.rm = TRUE)
-  high_thresh_mean <- mean(threshold[freq >= 2000], na.rm = TRUE)
   low_thresh_mean <- mean(sn_threshold[freq <= 1000], na.rm = TRUE)
   high_thresh_mean <- mean(sn_threshold[freq >= 2000], na.rm = TRUE)
   
@@ -239,7 +266,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 2. Multi-channel WDRC Pivot
   # We pivot WDRC around the expected band level for normal speech (65 dB overall)
-  data("critical", package="SII")
+  data("critical", package="SII", envir = environment())
   pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
   
 
@@ -341,8 +368,17 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   ig <- ifelse(input_level <= ct_band,
                g_ct,
                g_ct - (input_level - ct_band) * (1 - 1/cr_loud))
+               
+  # 5. Apply Infant/Toddler RECD Correction
+  # Infants have smaller ear canals, meaning the same hearing aid output produces a higher SPL at the eardrum.
+  # To achieve the same target SPL at the eardrum, the prescribed insertion gain must be reduced 
+  # by the difference between the infant RECD and the adult RECD.
+  recd_data <- get_recd_diff(age, age_months)
+  recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
   
-  # 5. Apply Empirical Demographic Adjustments (Keidser et al., 2012)
+  ig <- ig - recd_diff
+  
+  # 6. Apply Empirical Demographic Adjustments (Keidser et al., 2012)
   adjustment <- 0
   
   # Gender: Females prefer ~1.5 dB less gain
@@ -375,7 +411,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   ig <- ig + adjustment
   
-  # 6. Apply Acoustic Coupling / Vent Effect (Caporali et al., 2019)
+  # 7. Apply Acoustic Coupling / Vent Effect (Caporali et al., 2019)
   # Simulated Real-Ear Aided Response (REAR) by subtracting leakage.
   if (coupling != "custom_occluded") {
     ve_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
@@ -405,12 +441,12 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     ig <- ig + ve_interp
   }
   
-  # 7. Conductive Component Correction
+  # 8. Conductive Component Correction
   # Restore 75% of the Air-Bone Gap as linear gain, as specified by NAL-NL2 / Johnson (2013).
   abg_gain <- 0.75 * loss
   ig <- ig + abg_gain
   
-  # 7. Final Cross-Channel Frequency Smoothing
+  # 9. Final Cross-Channel Frequency Smoothing
   # Atypical audiograms (like "cookie-bites") can produce jagged, V-shaped frequency responses
   # that cause distortion across channels. We apply a 3-point moving average to smooth the final curve.
   if (length(ig) > 2) {
@@ -426,7 +462,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   return(ig)
 }
 
-calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", loss = NULL) {
+calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age_months = NULL, loss = NULL, freq = c(250, 500, 1000, 2000, 4000, 8000)) {
   # 0. Separate Sensorineural component
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))
@@ -470,9 +506,12 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", los
   mpo <- pmin(mpo, pts_safe_limit)
   
   # ABSOLUTE CLINICAL HARD CAP: NEVER exceed 120 dB SPL (at the cochlea)
-  # The conductive loss attenuates the signal before it reaches the cochlea, 
-  # so the hard cap must be raised by the conductive component.
-  mpo <- pmin(mpo, 120 + loss)
+  # Infants require lower limits due to smaller ear canal volumes (RECDs)
+  recd_data <- get_recd_diff(age, age_months)
+  recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
+  
+  max_cochlear <- 120 + loss - recd_diff
+  mpo <- pmin(mpo, max_cochlear)
   
   # ABSOLUTE HARDWARE LIMIT: Acoustic hearing aids max out around 135 dB SPL.
   mpo <- pmin(mpo, 135)

@@ -80,7 +80,7 @@ It also includes constant tables for alternative transfer functions
 corresponding to different types of message content, tables B.1 --
 B.3.  These tables have been augmented with the corresponding values
 for the Connected Speech Test (CST) as given by
-\url{http://www.sii.to/CSTdata.txt}. These tables can be loaded via:
+\url{https://sii.to/CSTdata.txt}. These tables can be loaded via:
 <<load.alternative.data>>=
 ## Table B.1: Critical band importance functions for various speech tests.
 data(sic.critical)
@@ -625,22 +625,10 @@ I also defined a utility function to nicely print the output.
 
 @ 
 
-In order to make it easy to maintain the SII contants.  A single
+In order to make it easy to maintain the SII constants, a single
 Microsoft Excel file, \verb+\data\SII_Constants.xls+ is included in the
-SII \verb+data+ directory containing the complete set of SII contants,
+SII \verb+data+ directory containing the complete set of SII constants,
 where each tab corresponds to one Table from the standard.
-
-<<show.reload.constants>>= 
-SII:::reload.constants 
-@
-
-The package mainainer may use it as :
-<<run.reload.constants, eval=FALSE>>=
-SII:::reload.constants(xls.path="./SII/extdata")
-@ 
-
-The SII package must then be rebuilt and reinstalled for the updated
-contants to become available.
 
 
 \section{Tests}
