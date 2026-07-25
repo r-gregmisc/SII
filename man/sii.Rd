@@ -122,13 +122,15 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     
     \itemize{
       \item \code{"NAL-R"}: A classic linear fitting rationale designed by the National Acoustic Laboratories to maximize speech intelligibility for mild-to-moderate losses. Gain is a linear function of the pure-tone average (PTA) and frequency-specific thresholds.
-      \item \code{"Open-NL"}: A completely transparent, open-source non-linear fitting algorithm developed specifically for this package. It was designed to serve as an open-source alternative to proprietary modern non-linear clinical targets (such as DSL v5.0). The algorithm calculates insertion gain using the following explicit mathematical steps:
+      \item \code{"Open-NL"}: A completely transparent, open-source non-linear fitting algorithm developed specifically for this package. It was designed to serve as an open-source alternative to proprietary modern non-linear clinical targets (such as NAL-NL2 and DSL v5.0). The algorithm calculates insertion gain using the following explicit mathematical steps:
       \enumerate{
-        \item \strong{Linear Base Gain}: Starts with the classic NAL-R linear target: \eqn{G_{base} = X + 0.31 \times HTL + C}, where \eqn{X = 0.15 \times PTA}.
-        \item \strong{Boosters}: Adds a High-Frequency Booster (up to +6 dB from 4-8 kHz) and a Severe-Loss Booster (\eqn{+0.5 \times (HTL - 60)} for thresholds > 60 dB HL) to maximize audibility.
-        \item \strong{Wide Dynamic Range Compression (WDRC)}: A dynamic compression ratio is applied relative to a "pivot point" (the equivalent speech spectrum level of normal 65 dB SPL conversational speech). 
-        \item \strong{Compression Ratios (CR)}: For sounds softer than the pivot, \eqn{CR_{soft} = 1 + (HTL / 100)}. For sounds louder than the pivot, \eqn{CR_{loud} = 1 + (HTL / 50)}. The maximum CR is strictly capped at 3.0 to prevent acoustic distortion.
-        \item \strong{MPO Limits}: The final aided output is strictly capped by the predictive NAL-SSPL90 limits (\eqn{MPO = 90 + 0.25 \times HTL}) to ensure the prescribed gain never causes the output to exceed uncomfortable loudness levels.
+        \item \strong{Conductive Component Separation}: If an Air-Bone Gap is present, the purely sensorineural component is isolated for WDRC compression. Linear gain representing 75\% of the conductive loss is added at the end (consistent with NAL-NL2/Johnson).
+        \item \strong{Dynamic Base Gain}: The base gain relies on a dynamic multiplier (ranging from 0.43 to 0.48) determined by user experience, combined with empirical NAL-R shaping constants. Severe losses receive a booster, while steep slopes receive a low-frequency penalty to avoid upward spread of masking.
+        \item \strong{Dead Region Roll-offs}: High-frequency or low-frequency dead regions trigger a steep 30 dB/octave penalty beyond the viable boundaries to prevent acoustic distortion and feedback.
+        \item \strong{Wide Dynamic Range Compression (WDRC)}: A dynamic compression ratio (ranging from 1.0 to 3.0) is applied symmetrically around a 65 dB SPL pivot point. The ratio scales dynamically based on the sensorineural threshold and measured Loudness Discomfort Levels (LDLs).
+        \item \strong{Bandwidth Roll-off}: Empirical bandwidth roll-offs are applied to limit unnecessary low/high frequency amplification, with separate curves for adults vs. infants.
+        \item \strong{Acoustic Coupling}: Adjustments are applied to the low frequencies depending on the specified venting, dome type, and acoustic seal.
+        \item \strong{MPO Limits}: Output is capped by predictive NAL-SSPL90 limits, adjusting for conductive attenuation, with an absolute safety hard cap at 120 dB SPL at the cochlea and a hardware output limit of 135 dB SPL.
       }
     }
     }

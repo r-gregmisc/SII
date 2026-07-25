@@ -41,6 +41,18 @@ ui <- page_sidebar(
         sliderInput("htl8000", "8000 Hz", min = 0, max = 120, value = 80, step = 5)
       ),
       accordion_panel(
+        "Bone Conduction (dB HL)",
+        checkboxInput("use_bc", "Include Bone Conduction (Air-Bone Gap)?", value = FALSE),
+        conditionalPanel(
+          condition = "input.use_bc == true",
+          sliderInput("bc250", "250 Hz", min = -10, max = 120, value = 20, step = 5),
+          sliderInput("bc500", "500 Hz", min = -10, max = 120, value = 30, step = 5),
+          sliderInput("bc1000", "1000 Hz", min = -10, max = 120, value = 45, step = 5),
+          sliderInput("bc2000", "2000 Hz", min = -10, max = 120, value = 60, step = 5),
+          sliderInput("bc4000", "4000 Hz", min = -10, max = 120, value = 75, step = 5)
+        )
+      ),
+      accordion_panel(
         "Loudness Discomfort (dB HL)",
         checkboxInput("use_ldl", "Use Measured LDLs?", value = FALSE),
         conditionalPanel(
@@ -87,6 +99,7 @@ ui <- page_sidebar(
                     choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
                     selected = "experienced"),
         selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "bilateral"),
+
         selectInput("coupling", "Acoustic Coupling / Vent:", 
                     choices = list(
                       "Solid Earmolds" = c("Unvented Earmold (Custom Occluded)" = "custom_occluded",
@@ -105,6 +118,14 @@ ui <- page_sidebar(
                     choices = c("Insert Earphones (ER-3A)" = "inserts", 
                                 "Supra-aural Headphones (TDH-39)" = "supra_aural"),
                     selected = "inserts")
+      ),
+      accordion_panel(
+        "Advanced Research Options",
+        conditionalPanel(
+          condition = "input.config == 'bilateral'",
+          sliderInput("alpha_b", "Binaural Inhibition Factor (\u03b1_B):", 
+                      min = -0.5, max = 0.5, value = -0.25, step = 0.05)
+        )
       )
     )
   ),
@@ -142,11 +163,19 @@ ui <- page_sidebar(
 )
 
 # Helper to estimate Loudness for complex non-linear prescriptions
-estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii) {
+estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii, config, alpha_b) {
   if (is.na(target_sii)) return(NA)
   
+  calc_loudness <- function(obj) {
+    if (config == "bilateral") {
+      calculate_binaural_loudness(obj, obj, alpha_b = alpha_b)
+    } else {
+      calculate_loudness(obj)
+    }
+  }
+  
   if (abs(target_sii - base_obj$sii) < 0.001) {
-    return(calculate_loudness(base_obj))
+    return(calc_loudness(base_obj))
   }
   
   sii_error <- function(shift_dB) {
@@ -170,9 +199,9 @@ estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii) {
     }, silent = TRUE)
   } else {
     sii_diff <- base_obj$sii - unaided_obj$sii
-    sone_diff <- calculate_loudness(base_obj) - calculate_loudness(unaided_obj)
+    sone_diff <- calc_loudness(base_obj) - calc_loudness(unaided_obj)
     if (sii_diff != 0) {
-      return(calculate_loudness(unaided_obj) + sone_diff * (target_sii - unaided_obj$sii) / sii_diff)
+      return(calc_loudness(unaided_obj) + sone_diff * (target_sii - unaided_obj$sii) / sii_diff)
     }
   }
   
@@ -183,7 +212,7 @@ estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii) {
                    prescription = NULL, 
                    desensitization = base_obj$desensitization)
                    
-  return(calculate_loudness(proxy_obj))
+  return(calc_loudness(proxy_obj))
 }
 
 # Define the Application Logic
@@ -202,6 +231,7 @@ server <- function(input, output, session) {
   # Handle Presets
   observeEvent(input$preset, {
     if (input$preset == "a1") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 15)
       updateSliderInput(session, "htl500", value = 20)
       updateSliderInput(session, "htl1000", value = 30)
@@ -209,6 +239,7 @@ server <- function(input, output, session) {
       updateSliderInput(session, "htl4000", value = 50)
       updateSliderInput(session, "htl8000", value = 60)
     } else if (input$preset == "a2") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 60)
       updateSliderInput(session, "htl500", value = 50)
       updateSliderInput(session, "htl1000", value = 40)
@@ -216,6 +247,7 @@ server <- function(input, output, session) {
       updateSliderInput(session, "htl4000", value = 20)
       updateSliderInput(session, "htl8000", value = 15)
     } else if (input$preset == "a3") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 10)
       updateSliderInput(session, "htl500", value = 20)
       updateSliderInput(session, "htl1000", value = 40)
@@ -223,6 +255,7 @@ server <- function(input, output, session) {
       updateSliderInput(session, "htl4000", value = 55)
       updateSliderInput(session, "htl8000", value = 60)
     } else if (input$preset == "a4") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 0)
       updateSliderInput(session, "htl500", value = 0)
       updateSliderInput(session, "htl1000", value = 10)
@@ -230,6 +263,7 @@ server <- function(input, output, session) {
       updateSliderInput(session, "htl4000", value = 70)
       updateSliderInput(session, "htl8000", value = 80)
     } else if (input$preset == "a5") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 10)
       updateSliderInput(session, "htl500", value = 10)
       updateSliderInput(session, "htl1000", value = 20)
@@ -237,20 +271,42 @@ server <- function(input, output, session) {
       updateSliderInput(session, "htl4000", value = 80)
       updateSliderInput(session, "htl8000", value = 100)
     } else if (input$preset == "a6") {
+      updateCheckboxInput(session, "use_bc", value = TRUE)
       updateSliderInput(session, "htl250", value = 50)
       updateSliderInput(session, "htl500", value = 55)
       updateSliderInput(session, "htl1000", value = 60)
       updateSliderInput(session, "htl2000", value = 65)
       updateSliderInput(session, "htl4000", value = 75)
       updateSliderInput(session, "htl8000", value = 80)
+      updateSliderInput(session, "bc250", value = 20)
+      updateSliderInput(session, "bc500", value = 25)
+      updateSliderInput(session, "bc1000", value = 30)
+      updateSliderInput(session, "bc2000", value = 35)
+      updateSliderInput(session, "bc4000", value = 45)
     } else if (input$preset == "a7") {
+      updateCheckboxInput(session, "use_bc", value = TRUE)
       updateSliderInput(session, "htl250", value = 50)
       updateSliderInput(session, "htl500", value = 50)
       updateSliderInput(session, "htl1000", value = 50)
       updateSliderInput(session, "htl2000", value = 50)
       updateSliderInput(session, "htl4000", value = 50)
       updateSliderInput(session, "htl8000", value = 50)
+      updateSliderInput(session, "bc250", value = 0)
+      updateSliderInput(session, "bc500", value = 0)
+      updateSliderInput(session, "bc1000", value = 0)
+      updateSliderInput(session, "bc2000", value = 0)
+      updateSliderInput(session, "bc4000", value = 0)
     }
+  })
+  
+  # Ensure BC <= AC (Air-Bone Gap cannot be negative)
+  observe({
+    req(input$use_bc)
+    if (input$bc250 > input$htl250) updateSliderInput(session, "bc250", value = input$htl250)
+    if (input$bc500 > input$htl500) updateSliderInput(session, "bc500", value = input$htl500)
+    if (input$bc1000 > input$htl1000) updateSliderInput(session, "bc1000", value = input$htl1000)
+    if (input$bc2000 > input$htl2000) updateSliderInput(session, "bc2000", value = input$htl2000)
+    if (input$bc4000 > input$htl4000) updateSliderInput(session, "bc4000", value = input$htl4000)
   })
   
   # Reactive SII Calculation triggers every time a slider is moved
@@ -282,10 +338,24 @@ server <- function(input, output, session) {
     target_level <- as.numeric(input$speech_level)
     speech_input <- d$normal_spectrum + (target_level - d$overall_normal)
     
+    # 3.9 Handle Bone Conduction / Air-Bone Gap
+    if (isTRUE(input$use_bc)) {
+      bc_f <- c(250, 500, 1000, 2000, 4000)
+      bc_input <- c(input$bc250, input$bc500, input$bc1000, 
+                    input$bc2000, input$bc4000)
+      ac_at_bc_f <- threshold[1:5]
+      bc_input <- pmin(bc_input, ac_at_bc_f) # Enforce BC <= AC mathematically
+      bc_21 <- approx(x = log10(bc_f), y = bc_input, xout = log10(d$f_21), rule = 2)$y
+      loss_21 <- pmax(0, htl_21 - bc_21)
+    } else {
+      loss_21 <- rep(0, length(htl_21))
+    }
+    
     # 4. Run the robust SII calculation engine
     obj <- sii(speech = speech_input, 
         threshold = htl_21, 
         freq = d$f_21, 
+        loss = loss_21,
         prescription = presc, 
         desensitization = input$desensitization,
         ldl = ldl_21,
@@ -381,16 +451,29 @@ server <- function(input, output, session) {
     target_level <- as.numeric(input$speech_level)
     speech_input <- d$normal_spectrum + (target_level - d$overall_normal)
     
+    # Calculate Bone Conduction / Air-Bone Gap
+    if (isTRUE(input$use_bc)) {
+      bc_f <- c(250, 500, 1000, 2000, 4000)
+      bc_input <- c(input$bc250, input$bc500, input$bc1000, 
+                    input$bc2000, input$bc4000)
+      ac_at_bc_f <- threshold[1:5]
+      bc_input <- pmin(bc_input, ac_at_bc_f)
+      bc_21 <- approx(x = log10(bc_f), y = bc_input, xout = log10(d$f_21), rule = 2)$y
+      loss_21 <- pmax(0, htl_21 - bc_21)
+    } else {
+      loss_21 <- rep(0, length(htl_21))
+    }
+    
     # Calculate Unaided
-    obj_unaided <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = NULL, 
+    obj_unaided <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = NULL, 
                        desensitization = input$desensitization, transducer = input$transducer)
     
     # Calculate NAL-R
-    obj_nalr <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "NAL-R", 
+    obj_nalr <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "NAL-R", 
                     desensitization = input$desensitization, transducer = input$transducer)
     
     # Calculate Open-NL
-    obj_opennl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, prescription = "Open-NL", 
+    obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "Open-NL", 
                       desensitization = input$desensitization, 
                       gender = input$gender, experience = input$experience, 
                       config = input$config, age = input$age, age_years = input$adult_age, 
@@ -419,23 +502,31 @@ server <- function(input, output, session) {
       val_dsl_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
       val_cameq2_sii <- NA
       
-      val_nalnl2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_nalnl2_sii)
-      val_dsl_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_dsl_sii)
-      val_cameq2_sones <- NA
+      val_nalnl2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_nalnl2_sii, input$config, input$alpha_b)
+      val_dsl_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_dsl_sii, input$config, input$alpha_b)
+      val_cameq2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_cameq2_sii, input$config, input$alpha_b)
       
       name_nalnl2 <- "NAL-NL2 (Predicted)"
       name_dsl <- "DSL v5.0 (Predicted)"
       name_cameq2 <- "CAMEQ2-HF (Predicted)"
     }
     
+    calc_loudness <- function(obj) {
+      if (input$config == "bilateral") {
+        calculate_binaural_loudness(obj, obj, alpha_b = input$alpha_b)
+      } else {
+        calculate_loudness(obj)
+      }
+    }
+    
     data.frame(
       Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl, name_cameq2),
       SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii, val_cameq2_sii)),
-      Sones = c(sprintf("%.1f", calculate_loudness(obj_unaided)), 
-                sprintf("%.1f", calculate_loudness(obj_nalr)), 
-                sprintf("%.1f", calculate_loudness(obj_opennl)), 
+      Sones = c(sprintf("%.1f", calc_loudness(obj_unaided)), 
+                sprintf("%.1f", calc_loudness(obj_nalr)), 
+                sprintf("%.1f", calc_loudness(obj_opennl)), 
                 sprintf("%.1f", val_nalnl2_sones), 
-                sprintf("%.1f", val_dsl_sones),
+                sprintf("%.1f", val_dsl_sones), 
                 sprintf("%.1f", val_cameq2_sones))
     )
   }, align = "c")

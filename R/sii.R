@@ -232,12 +232,12 @@ sii <- function(
   } else if (!is.null(prescription) && prescription == "Open-NL") {
     # Calculate dynamic WDRC gain independently for each frequency band
     # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years)
+    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years, loss)
     
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
     # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold, gain, ldl, age)
+    mpo <- calculate_nal_sspl90(threshold, gain, ldl, age, loss)
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     
@@ -524,8 +524,8 @@ sii <- function(
 #' 
 #' @param x An object of class \code{SII}.
 #' @return A numeric value representing the total loudness in Sones.
-#' @export
-calculate_loudness <- function(x) {
+# Internal helper to calculate monaural specific loudness per critical band
+get_specific_loudness <- function(x) {
   if (!inherits(x, "SII")) {
     stop("Input must be an object of class 'SII'")
   }
@@ -536,7 +536,6 @@ calculate_loudness <- function(x) {
   T_prime <- x$table[, "T'i"]
   
   # Predict Uncomfortable Loudness Level (UCL) in dB SPL
-  # Normal UCL is ~100 dB SPL. It increases slightly with hearing loss.
   UCL_spl <- 100 + 0.25 * pmax(0, T_prime - 20, na.rm = TRUE)
   
   # Patient's Dynamic Range (Threshold to UCL in SPL)
@@ -547,7 +546,6 @@ calculate_loudness <- function(x) {
   SL <- pmax(0, peak_level - X_prime, na.rm = TRUE)
   
   # Normalize to a 100-Phon scale to model recruitment
-  # E.g., if SL equals the full Dynamic Range, perceived loudness is 100 Phons
   phons <- (SL / DR) * 100 
   
   # Stevens' Power Law (1 Sone = 40 Phons. Sones double every 10 Phons)
@@ -555,6 +553,13 @@ calculate_loudness <- function(x) {
                        2^((phons - 40) / 10),
                        (phons / 40)^2.5)
                        
+  return(sones_band)
+}
+
+#' @export
+calculate_loudness <- function(x) {
+  sones_band <- get_specific_loudness(x)
+  
   # Sum specific loudness across all critical bands to get Total Loudness (Sones)
   # We apply a broadband integration calibration factor of 0.25 (calibrated for 21 bands) to empirically 
   # match standard Moore-Glasberg broadband loudness models for speech. We scale this factor
@@ -563,5 +568,38 @@ calculate_loudness <- function(x) {
   calibration_factor <- 0.25 * (21 / num_bands)
   total_sones <- sum(sones_band, na.rm = TRUE) * calibration_factor
   
+  return(total_sones)
+}
+
+#' Calculate Psychoacoustic Binaural Loudness (Sones)
+#'
+#' @description
+#' Calculates the total perceived binaural loudness based on the Pieper et al. (2021) 
+#' and Moore et al. (2016) binaural summation models.
+#' 
+#' @param x_left An object of class `SII` for the left ear.
+#' @param x_right Optional. An object of class `SII` for the right ear. If NULL, assumes a perfectly symmetric bilateral fitting (`x_left == x_right`).
+#' @param alpha_b Numeric. The binaural inhibition factor. Default is -0.25, reflecting classical normal-hearing binaural inhibition.
+#' @return A numeric value representing the total binaural loudness in Sones.
+#' @export
+calculate_binaural_loudness <- function(x_left, x_right = NULL, alpha_b = -0.25) {
+  if (is.null(x_right)) {
+    x_right <- x_left
+  }
+  
+  s_left <- get_specific_loudness(x_left)
+  s_right <- get_specific_loudness(x_right)
+  
+  sum_s <- s_left + s_right
+  # Avoid division by zero: if there is no loudness in either ear, V_B = 1 (but it doesn't matter since sum is 0)
+  v_b <- ifelse(sum_s == 0, 1, 1 - (abs(s_left - s_right) / sum_s))
+  
+  # Pieper et al. (2021) simplified binaural stage
+  s_binaural <- (1 + alpha_b * v_b) * sum_s
+  
+  num_bands <- nrow(x_left$table)
+  calibration_factor <- 0.25 * (21 / num_bands)
+  
+  total_sones <- sum(s_binaural, na.rm = TRUE) * calibration_factor
   return(total_sones)
 }
