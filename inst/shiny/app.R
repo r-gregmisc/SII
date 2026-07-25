@@ -7,7 +7,6 @@ tryCatch({
   source("/home/mark/Development/SII for R/SII/R/sii.R")
   source("/home/mark/Development/SII for R/SII/R/nalr.R")
   source("/home/mark/Development/SII for R/SII/R/plot.SII.R")
-  source("/home/mark/Development/SII for R/SII/R/predict_aided_sii.R")
   source("/home/mark/Development/SII for R/SII/R/benchmark_targets.R")
 }, error = function(e) print(paste("Error sourcing absolute paths:", e$message)))
 
@@ -68,7 +67,7 @@ ui <- page_sidebar(
       accordion_panel(
         "Configuration",
         radioButtons("speech_level", "Speech Input Level (SPLogram):", 
-                     choices = c("55 dB SPL (Soft)" = "55", "65 dB SPL (Average)" = "65", "75 dB SPL (Loud)" = "75"),
+                     choices = c("50 dB SPL (Soft)" = "50", "65 dB SPL (Average)" = "65", "80 dB SPL (Loud)" = "80"),
                      selected = "65"),
         selectInput("prescription", "Fitting Rationale:", 
                     choices = c("Unaided" = "none", "NAL-R" = "NAL-R", "Open-NL" = "Open-NL"),
@@ -163,59 +162,6 @@ ui <- page_sidebar(
     )
   )
 )
-
-# Helper to estimate Loudness for complex non-linear prescriptions
-estimate_proxy_loudness <- function(base_obj, unaided_obj, target_sii, config, alpha_b) {
-  if (is.na(target_sii)) return(NA)
-  
-  calc_loudness <- function(obj) {
-    if (config == "bilateral") {
-      calculate_binaural_loudness(obj, obj, alpha_b = alpha_b)
-    } else {
-      calculate_loudness(obj)
-    }
-  }
-  
-  if (abs(target_sii - base_obj$sii) < 0.001) {
-    return(calc_loudness(base_obj))
-  }
-  
-  sii_error <- function(shift_dB) {
-    shifted_speech <- base_obj$speech + shift_dB
-    temp_obj <- sii(speech = shifted_speech, 
-                    threshold = base_obj$threshold,
-                    freq = base_obj$freq,
-                    prescription = NULL,
-                    desensitization = base_obj$desensitization)
-    return(temp_obj$sii - target_sii)
-  }
-  
-  shift_dB <- 0
-  lower_val <- sii_error(-60)
-  upper_val <- sii_error(60)
-  
-  if (lower_val * upper_val <= 0) {
-    try({
-      res <- uniroot(sii_error, lower = -60, upper = 60)
-      shift_dB <- res$root
-    }, silent = TRUE)
-  } else {
-    sii_diff <- base_obj$sii - unaided_obj$sii
-    sone_diff <- calc_loudness(base_obj) - calc_loudness(unaided_obj)
-    if (sii_diff != 0) {
-      return(calc_loudness(unaided_obj) + sone_diff * (target_sii - unaided_obj$sii) / sii_diff)
-    }
-  }
-  
-  shifted_speech <- base_obj$speech + shift_dB
-  proxy_obj <- sii(speech = shifted_speech, 
-                   threshold = base_obj$threshold,
-                   freq = base_obj$freq,
-                   prescription = NULL, 
-                   desensitization = base_obj$desensitization)
-                   
-  return(calc_loudness(proxy_obj))
-}
 
 # Define the Application Logic
 server <- function(input, output, session) {
@@ -412,9 +358,9 @@ server <- function(input, output, session) {
     
     df_oct <- data.frame(
       Frequency = octaves,
-      `Soft (55 dB)` = approx(x = log10(df$Frequency), y = df$Gain_55, xout = log10(octaves), rule = 2)$y,
+      `Soft (50 dB)` = approx(x = log10(df$Frequency), y = df$Gain_50, xout = log10(octaves), rule = 2)$y,
       `Avg (65 dB)` = approx(x = log10(df$Frequency), y = df$Gain_65, xout = log10(octaves), rule = 2)$y,
-      `Loud (75 dB)` = approx(x = log10(df$Frequency), y = df$Gain_75, xout = log10(octaves), rule = 2)$y,
+      `Loud (80 dB)` = approx(x = log10(df$Frequency), y = df$Gain_80, xout = log10(octaves), rule = 2)$y,
       `MPO` = approx(x = log10(df$Frequency), y = df$MPO, xout = log10(octaves), rule = 2)$y,
       check.names = FALSE
     )
@@ -492,24 +438,21 @@ server <- function(input, output, session) {
       val_nalnl2_sii <- obj_nalnl2$sii
       val_dsl_sii <- obj_dsl$sii
       val_cameq2_sii <- obj_cameq2$sii
-      val_nalnl2_sones <- calculate_loudness(obj_nalnl2)
-      val_dsl_sones <- calculate_loudness(obj_dsl)
-      val_cameq2_sones <- calculate_loudness(obj_cameq2)
       name_nalnl2 <- "NAL-NL2 (JD2011)"
       name_dsl <- "DSL v5.0 (JD2011)"
       name_cameq2 <- "CAMEQ2-HF (JD2011)"
     } else {
-      val_nalnl2_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "NAL-NL2", desensitized = input$desensitization)
-      val_dsl_sii <- predict_aided_sii(freq = f_htl, threshold = threshold, prescription = "DSL", desensitized = input$desensitization)
+      val_nalnl2_sii <- NA
+      val_dsl_sii <- NA
       val_cameq2_sii <- NA
       
-      val_nalnl2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_nalnl2_sii, input$config, input$alpha_b)
-      val_dsl_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_dsl_sii, input$config, input$alpha_b)
-      val_cameq2_sones <- estimate_proxy_loudness(obj_opennl, obj_unaided, val_cameq2_sii, input$config, input$alpha_b)
+      val_nalnl2_sones <- NA
+      val_dsl_sones <- NA
+      val_cameq2_sones <- NA
       
-      name_nalnl2 <- "NAL-NL2 (Predicted)"
-      name_dsl <- "DSL v5.0 (Predicted)"
-      name_cameq2 <- "CAMEQ2-HF (Predicted)"
+      name_nalnl2 <- "NAL-NL2 (N/A for Custom)"
+      name_dsl <- "DSL v5.0 (N/A for Custom)"
+      name_cameq2 <- "CAMEQ2-HF (N/A for Custom)"
     }
     
     calc_loudness <- function(obj) {
@@ -523,12 +466,12 @@ server <- function(input, output, session) {
     data.frame(
       Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl, name_cameq2),
       SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii, val_cameq2_sii)),
-      Sones = c(sprintf("%.1f", calc_loudness(obj_unaided)), 
-                sprintf("%.1f", calc_loudness(obj_nalr)), 
-                sprintf("%.1f", calc_loudness(obj_opennl)), 
-                sprintf("%.1f", val_nalnl2_sones), 
-                sprintf("%.1f", val_dsl_sones),
-                sprintf("%.1f", val_cameq2_sones))
+      Sones = c(sprintf("%.1f", calc_loudness(obj_unaided)),
+                sprintf("%.1f", calc_loudness(obj_nalr)),
+                sprintf("%.1f", calc_loudness(obj_opennl)),
+                ifelse(is.na(val_nalnl2_sii), "NA", sprintf("%.1f", calc_loudness(obj_nalnl2))),
+                ifelse(is.na(val_dsl_sii), "NA", sprintf("%.1f", calc_loudness(obj_dsl))),
+                ifelse(is.na(val_cameq2_sii), "NA", sprintf("%.1f", calc_loudness(obj_cameq2))))
     )
   }, align = "c")
   
