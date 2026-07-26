@@ -1,16 +1,3 @@
-VERSION 1.1.0 (2026-07-23)
---------------------------
-
-- Added an interactive Shiny dashboard (`launch_app()`) to visualize the Speech Intelligibility Index (SII), Clinical SPLograms, and prescriptive insertion gains.
-- Implemented a fully open-source "Open-NL" dynamic compression proxy prescription, modeling modern WDRC hearing aids.
-- Included target insertion gain benchmark data (NAL-NL2, DSL v5.0a, CAMEQ2-HF) extrapolated from Johnson & Dillon (2011) for comparison.
-- Added support for demographic variables (`age`, `gender`, `experience`, `config`, `coupling`, `transducer`, `ldl`) to accurately calculate pediatric RECD corrections and age-appropriate compression targets.
-- Fixed a bug where overall normal SPL was incorrectly calculated by summing spectrum levels directly (resulting in 39.96 dB SPL) instead of integrating over critical bandwidths (62.35 dB SPL), preventing massive over-amplification in aided SII calculations.
-- Fixed a bug causing the insertion gain table in the Shiny app to crash due to missing unaided noise arrays.
-- Fixed reactivity issues in the Shiny app so insertion gain charts properly update when adult patient age is changed.
-- Improved the Shiny app UI by placing the insertion gain targets inside a collapsible accordion panel.
-
-
 VERSION 1.0.3 (2013-12-06)
 --------------------------
 
@@ -29,7 +16,7 @@ VERSION 1.0.2 (2011-09-01)
 VERSION 1.0.0 (2010-07-22)
 --------------------------
 
-- Initial public release.
+Initial public release.
 
-- No known bugs.
+No known bugs.
 

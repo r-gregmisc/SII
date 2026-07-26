@@ -608,14 +608,14 @@ calculate_binaural_loudness <- function(x_left, x_right = NULL, alpha_b = -0.25)
   return(total_sones)
 }
 
-#' Export prescribed insertion gains for 55, 65, and 75 dB SPL input levels
+#' Export prescribed insertion gains for 50, 65, and 80 dB SPL input levels
 #'
 #' @param x An object of class `SII`
 #' @return A data.frame containing frequency and the prescribed insertion gains
 #' @export
 export_gains <- function(x) {
   if (is.null(x$prescription)) {
-    return(data.frame(Frequency = x$freq, Gain_55 = NA, Gain_65 = NA, Gain_75 = NA))
+    return(data.frame(Frequency = x$freq, Gain_50 = NA, Gain_65 = NA, Gain_80 = NA))
   }
   
   n_bands <- length(x$freq)
@@ -639,15 +639,15 @@ export_gains <- function(x) {
   desens <- if (!is.null(x$desensitization)) x$desensitization else FALSE
   unaided_noise <- x$noise - x$gain
   
-  res55 <- sii(speech = tbl$normal + (55 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
+  res50 <- sii(speech = tbl$normal + (50 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
   res65 <- sii(speech = tbl$normal + (65 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
-  res75 <- sii(speech = tbl$normal + (75 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
+  res80 <- sii(speech = tbl$normal + (80 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
   
   data.frame(
     Frequency = x$freq,
-    Gain_55 = round(res55$gain, 2),
+    Gain_50 = round(res50$gain, 2),
     Gain_65 = round(res65$gain, 2),
-    Gain_75 = round(res75$gain, 2),
+    Gain_80 = round(res80$gain, 2),
     MPO = round(res65$mpo, 2)
   )
 }

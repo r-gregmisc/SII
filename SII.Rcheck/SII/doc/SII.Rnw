@@ -79,8 +79,7 @@ overall.spl
 It also includes constant tables for alternative transfer functions
 corresponding to different types of message content, tables B.1 --
 B.3.  These tables have been augmented with the corresponding values
-for the Connected Speech Test (CST) as given by
-\url{http://www.sii.to/CSTdata.txt}. These tables can be loaded via:
+for the Connected Speech Test (CST) as originally provided by the author's website. These tables can be loaded via:
 <<load.alternative.data>>=
 ## Table B.1: Critical band importance functions for various speech tests.
 data(sic.critical)

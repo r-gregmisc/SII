@@ -289,8 +289,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
         # Recover unaided noise
         unaided_noise <- x$noise - x$gain
         
-        # Dynamically recalculate SII for 55 dB SPL (using Normal LTASS scaled down)
-        res55 <- sii(speech = tbl$normal + (55 - overall_normal),
+        # Dynamically recalculate SII for 50 dB SPL (using Normal LTASS scaled down)
+        res50 <- sii(speech = tbl$normal + (50 - overall_normal),
                      noise = unaided_noise,
                      threshold = x$threshold,
                      loss = x$loss,
@@ -323,8 +323,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      coupling = x$coupling,
                      module = x$module)
         
-        # Dynamically recalculate SII for 75 dB SPL (using Normal LTASS scaled to 75)
-        res75 <- sii(speech = tbl$normal + (75 - overall_normal),
+        # Dynamically recalculate SII for 80 dB SPL (using Normal LTASS scaled up)
+        res80 <- sii(speech = tbl$normal + (80 - overall_normal),
                      noise = unaided_noise,
                      threshold = x$threshold,
                      loss = x$loss,
@@ -341,7 +341,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      module = x$module)
         
         # Call the insertion gain plotting function
-        plot_gain(res55, res65, res75, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_cameq2 = x$target_cameq2, target_level = x$target_level, ...)
+        plot_gain(res50, res65, res80, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_cameq2 = x$target_cameq2, target_level = x$target_level, ...)
         
       } else {
         # Original interpolation diagnostic plot for unaided objects
@@ -377,8 +377,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
     }
   }
 
-plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NULL, target_cameq2 = NULL, target_level = NULL, ...) {
-  if (!inherits(res55, "SII") || !inherits(res65, "SII") || !inherits(res75, "SII")) {
+plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NULL, target_cameq2 = NULL, target_level = NULL, ...) {
+  if (!inherits(res50, "SII") || !inherits(res65, "SII") || !inherits(res80, "SII")) {
     stop("All inputs must be objects of class 'SII'")
   }
   
@@ -388,16 +388,16 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
   
   # Calculate insertion gain (Aided Speech - Unaided Speech) for each input level
   # Adding robust max(0, x) to ensure we don't plot negative insertion gain curves
-  g55 <- pmax(0, res55$table[, "E'i"] - res55$unaided_speech)
+  g50 <- pmax(0, res50$table[, "E'i"] - res50$unaided_speech)
   g65 <- pmax(0, res65$table[, "E'i"] - res65$unaided_speech)
-  g75 <- pmax(0, res75$table[, "E'i"] - res75$unaided_speech)
+  g80 <- pmax(0, res80$table[, "E'i"] - res80$unaided_speech)
   
   # Keep standard margins
   old_par <- par(no.readonly = TRUE)
   on.exit(par(old_par))
   
   # Determine bounds
-  y_max <- max(c(g55, g65, g75, target_nalnl2, target_dsl, target_cameq2), na.rm=TRUE) + 5
+  y_max <- max(c(g50, g65, g80, target_nalnl2, target_dsl, target_cameq2), na.rm=TRUE) + 5
   if (y_max < 20) y_max <- 20
   
   # Setup standard margins, increase bottom margin for CR values
@@ -430,14 +430,14 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
     t_level <- target_level
     if (is.null(t_level)) t_level <- 65
     
-    if (t_level == 55) {
-      lines(x = freq, y = g55, col = "blue", lwd = 3, lty = 3)
-      leg_names <- c(paste(prescription, "(55 dB SPL)"))
+    if (t_level == 50) {
+      lines(x = freq, y = g50, col = "blue", lwd = 3, lty = 3)
+      leg_names <- c(paste(prescription, "(50 dB SPL)"))
       leg_cols <- c("blue")
       leg_lty <- c(3)
-    } else if (t_level == 75) {
-      lines(x = freq, y = g75, col = "red", lwd = 3, lty = 2)
-      leg_names <- c(paste(prescription, "(75 dB SPL)"))
+    } else if (t_level == 80) {
+      lines(x = freq, y = g80, col = "red", lwd = 3, lty = 3)
+      leg_names <- c(paste(prescription, "(80 dB SPL)"))
       leg_cols <- c("red")
       leg_lty <- c(2)
     } else {
@@ -448,11 +448,11 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
     }
   } else {
     # Standard Mode: Plot all 3 compression curves
-    lines(x = freq, y = g55, col = "blue", lwd = 2, lty = 3) # Dotted for 55 (Soft)
-    lines(x = freq, y = g65, col = "black", lwd = 3, lty = 1) # Solid for 65 (Average)
-    lines(x = freq, y = g75, col = "red", lwd = 2, lty = 2) # Dashed for 75 (Loud)
+    lines(x = freq, y = g50, col = "blue", lwd = 2, lty = 3) # Dotted for 50 (Soft)
+    lines(x = freq, y = g65, col = "forestgreen", lwd = 2, lty = 1) # Solid for 65 (Avg)
+    lines(x = freq, y = g80, col = "red", lwd = 2, lty = 3) # Dotted for 80 (Loud)
     
-    leg_names <- c("55 dB SPL (Soft)", "65 dB SPL (Avg)", "75 dB SPL (Loud)")
+    leg_names <- c("50 dB SPL (Soft)", "65 dB SPL (Avg)", "80 dB SPL (Loud)")
     leg_cols <- c("blue", "black", "red")
     leg_lty <- c(3, 1, 2)
   }
@@ -490,12 +490,12 @@ plot_gain <- function(res55, res65, res75, target_nalnl2 = NULL, target_dsl = NU
          box.col = "lightgray"
     )
     
-  # Calculate and display Compression Ratios (between 55 and 75 dB SPL)
-  octave_g55 <- approx(x = log10(freq), y = g55, xout = log10(octaves), rule = 2)$y
-  octave_g75 <- approx(x = log10(freq), y = g75, xout = log10(octaves), rule = 2)$y
+  # Calculate and display Compression Ratios (between 50 and 80 dB SPL)
+  octave_g50 <- approx(x = log10(freq), y = g50, xout = log10(octaves), rule = 2)$y
+  octave_g80 <- approx(x = log10(freq), y = g80, xout = log10(octaves), rule = 2)$y
   
-  delta_out <- 20 + octave_g75 - octave_g55
-  cr_vals <- 20 / pmax(delta_out, 0.01) # avoid div by zero
+  delta_out <- 30 + octave_g80 - octave_g50
+  cr_vals <- 30 / pmax(delta_out, 0.01) # avoid div by zero
   cr_strs <- sprintf("%.1f", cr_vals)
   
   mtext("CR:", side = 1, line = 4, at = 150, cex = 0.9, font = 2)

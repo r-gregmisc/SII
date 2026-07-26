@@ -4,8 +4,6 @@ calculate_loudness      Calculate Loudness (Sones)
 critical                Constants Tables for ANSI S3.5-1997 Speech
                         Intelligibility Index (SII)
 launch_app              Launch the SII Interactive Dashboard
-predict_aided_sii       Predict Aided Speech Intelligibility Index
-                        (SII)
 sic.critical            Alternative ANSI S3.5-1997 SII Transfer
                         Function Weights
 sii                     Compute ANSI S3.5-1997 Speech Intelligibility

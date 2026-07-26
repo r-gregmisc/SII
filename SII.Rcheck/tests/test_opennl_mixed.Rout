@@ -115,4 +115,4 @@ In 120 + loss - recd_diff :
 > 
 > proc.time()
    user  system elapsed 
-  1.645   0.071   0.273 
+  1.679   0.063   0.257 

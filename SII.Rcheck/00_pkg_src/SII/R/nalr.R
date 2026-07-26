@@ -78,7 +78,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
                        y = c(0, 0, 3, 5, 5, 5), xout = freq, rule = 2)$y
                        
     # Linear amplification for speech inputs up to 65 dB SPL
-    data("critical", package="SII")
+    data("critical", package="SII", envir = environment())
     pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
     ct_band <- pivot + 5 # Set CT slightly above normal speech
     
@@ -146,21 +146,20 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   if (steep_slope_diff > 30) {
     steep_factor <- pmin(1, (steep_slope_diff - 30) / 30)
     
-    # Penalize around the knee (500 - 1500 Hz) to prevent masking
-    knee_penalty <- steep_factor * 6 # Up to 6 dB reduction
-    # Bell curve weighting around 1000 Hz
-    knee_weight <- pmax(0, 1 - abs(log10(freq) - log10(1000)) / log10(2))
+    # 1. Aggressive Low-Frequency Penalty (up to -20 dB) to kill the loudness dominance of the normal lows
+    lf_penalty <- steep_factor * 20
+    lf_weight <- pmax(0, pmin(1, 1 - (log10(freq) - log10(250)) / log10(2000/250))) # Tapers off at 2000 Hz
     
-    # Boost the highs (>= 2000 Hz) to pull them out of the steep slope and restore audibility
-    high_boost <- steep_factor * 6 # Up to 6 dB boost
-    # Disable the high boost if the frequency is inside a true high-frequency dead region
-    high_boost_vec <- ifelse(freq >= f_e_hf, 0, high_boost)
+    # 2. Targeted Mid-Frequency Salvage Boost (+8 dB) exactly at the knee (1500-2000 Hz) to pierce the threshold
+    mid_boost <- steep_factor * 8
+    mid_weight <- pmax(0, pmin(1, 1 - abs(log10(freq) - log10(2000)) / log10(4000/2000))) 
     
-    # Fades in from 1500 Hz upwards
-    high_weight <- pmax(0, pmin(1, (log10(freq) - log10(1500)) / log10(2.5)))
+    # Disable the mid boost if the frequency is inside a true high-frequency dead region
+    mid_boost_vec <- ifelse(freq >= f_e_hf, 0, mid_boost)
     
-    c_interp <- c_interp - (knee_penalty * knee_weight) + (high_boost_vec * high_weight)
+    c_interp <- c_interp - (lf_penalty * lf_weight) + (mid_boost_vec * mid_weight)
   }
+
   
   # Use the dynamically selected base multiplier based on user experience.
   # This globally sets the 65 dB SPL anchor to match user comfort vs audibility needs.
@@ -248,10 +247,16 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # High-Frequency Dead Region (HFDR)
   if (length(hf_dead_idx) > 0) {
-    hf_cutoff <- 1.7 * f_e_hf
+    if (steep_slope_diff > 30) {
+      # If the slope is steep, we roll off immediately to kill loudness bloat.
+      hf_cutoff <- f_e_hf
+      hf_dr_penalty <- pmax(0, log2(freq / hf_cutoff)) * 40
+    } else {
+      # Otherwise, we use Moore's 1.7x basal spread allowance.
+      hf_cutoff <- 1.7 * f_e_hf
+      hf_dr_penalty <- pmax(0, log2(freq / hf_cutoff)) * 30
+    }
     
-    # Apply a steep penalty of 30 dB per octave above the cutoff
-    hf_dr_penalty <- pmax(0, log2(freq / hf_cutoff)) * 30
     g_65 <- g_65 - hf_dr_penalty
   }
   
@@ -266,7 +271,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 2. Multi-channel WDRC Pivot
   # We pivot WDRC around the expected band level for normal speech (65 dB overall)
-  data("critical", package="SII")
+  data("critical", package="SII", envir = environment())
   pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
   
 

@@ -30,7 +30,10 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     coupling="custom_occluded",
     module="standard",
     transducer="inserts",
-    custom_gain=NULL)
+    custom_gain=NULL,
+    measured_wrs=NULL,
+    wrs_level=NULL,
+    distortion_category=NULL)
 \method{print}{SII}(x, digits=3, ...)
 \method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
@@ -84,6 +87,9 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   \item{module}{Character string for hearing aid module ("standard" or other specific module constraints).}
   \item{transducer}{Character string specifying the audiometric transducer used for testing ("inserts" or "supra_aural"). Determines RETSPL and RECD corrections for SPLogram plots.}
   \item{custom_gain}{Numeric vector specifying a custom insertion gain array (in dB) for each frequency. If provided along with \code{prescription="Custom"}, this gain is explicitly applied.}
+  \item{measured_wrs}{Numeric value specifying the clinical Word Recognition Score (WRS) in percent (0-100). When provided, invokes the Margolis (2025) speech distortion model.}
+  \item{wrs_level}{Numeric value specifying the presentation level (in dB HL or SPL) of the clinical WRS test.}
+  \item{distortion_category}{Character string ("Mild", "Moderate", or "Severe") specifying the degree of speech distortion. If \code{NULL}, it is estimated based on \code{measured_wrs} and \code{wrs_level}.}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
   \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area. If \code{FALSE} (the default), the behavior depends on whether the object is aided or unaided. For unaided objects, it plots a diagnostic interpolation graph. For aided objects (when a prescription was used), it automatically generates a 3-line Insertion Gain plot for 55, 65, and 75 dB SPL input levels (dynamically loading and scaling the true Normal and Loud LTASS spectra).}

@@ -36,7 +36,10 @@ sii <- function(
                 coupling="custom_occluded",
                 module="standard",
                 transducer="inserts",
-                custom_gain=NULL
+                custom_gain=NULL,
+                measured_wrs=NULL,
+                wrs_level=NULL,
+                distortion_category=NULL
                 )
 {
   ## Assumptions:
@@ -220,6 +223,40 @@ sii <- function(
     }
       
   #########
+  ## Predict WRS and Determine Distortion Category (Margolis et al., 2025)
+  #########
+  predicted_wrs <- NULL
+  
+  if (!is.null(measured_wrs) && !is.null(wrs_level) && is.null(distortion_category)) {
+    # Estimate speech spectrum at wrs_level
+    if ("hi" %in% names(table) && "li" %in% names(table)) {
+      overall_normal <- 10 * log10(sum((10^(table$normal / 10)) * (table$hi - table$li), na.rm = TRUE))
+    } else {
+      overall_normal <- 62.35
+    }
+    wrs_speech <- table$normal + (wrs_level - overall_normal)
+    
+    # Recursive call for unaided SII at wrs_level
+    wrs_sii_obj <- sii(speech = wrs_speech, noise = rep(-50, length(freq)), threshold = threshold, loss = loss, freq = freq, method = method, importance = importance, interpolate = FALSE, desensitization = FALSE)
+    
+    # Predicted WRS using standard NU-6 transfer function (Studebaker)
+    predicted_wrs <- 100 * (1 - 10^(-(wrs_sii_obj$sii * 3.28)))
+    
+    diff_pct <- measured_wrs - predicted_wrs
+    
+    # Margolis (2025) UM Ranges (Normal: > -2.7, Low: -2.8 to -13.5, Moderate: -13.6 to -24.3, High: < -24.3)
+    if (diff_pct > -2.7) {
+      distortion_category <- "Normal"
+    } else if (diff_pct >= -13.5) {
+      distortion_category <- "Low"
+    } else if (diff_pct >= -24.3) {
+      distortion_category <- "Moderate"
+    } else {
+      distortion_category <- "High"
+    }
+  }
+
+  #########
   ## Calculate Prescription Gain if requested
   #########
   mpo <- NULL
@@ -236,12 +273,12 @@ sii <- function(
   } else if (!is.null(prescription) && prescription == "Open-NL") {
     # Calculate dynamic WDRC gain independently for each frequency band
     # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss)
+    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category)
     
     # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
     # Instead of hard peak clipping, we use a high compression ratio (10:1) 
     # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold, gain, ldl, age, loss)
+    mpo <- calculate_nal_sspl90(threshold = threshold, gain = gain, ldl = ldl, age = age, age_months = age_months, loss = loss, freq = freq)
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     
@@ -482,6 +519,9 @@ sii <- function(
   retval$module    <- module
   retval$age       <- age
   retval$age_years <- age_years
+  retval$measured_wrs <- measured_wrs
+  retval$predicted_wrs <- predicted_wrs
+  retval$distortion_category <- distortion_category
   
   class(retval) <- "SII"
   
@@ -639,9 +679,9 @@ export_gains <- function(x) {
   desens <- if (!is.null(x$desensitization)) x$desensitization else FALSE
   unaided_noise <- x$noise - x$gain
   
-  res50 <- sii(speech = tbl$normal + (50 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
-  res65 <- sii(speech = tbl$normal + (65 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
-  res80 <- sii(speech = tbl$normal + (80 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module)
+  res50 <- sii(speech = tbl$normal + (50 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
+  res65 <- sii(speech = tbl$normal + (65 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
+  res80 <- sii(speech = tbl$normal + (80 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
   
   data.frame(
     Frequency = x$freq,

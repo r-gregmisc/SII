@@ -328,7 +328,7 @@ sii.C1$sii
 
 
 ###################################################
-### code chunk number 22: SII.Rnw:439-480
+### code chunk number 22: SII.Rnw:438-479
 ###################################################
 latexhelp <- function(topics, package=NULL)
   {

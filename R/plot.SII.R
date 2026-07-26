@@ -304,7 +304,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Dynamically recalculate SII for 65 dB SPL (using Normal LTASS scaled to 65)
         res65 <- sii(speech = tbl$normal + (65 - overall_normal),
@@ -321,7 +322,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Dynamically recalculate SII for 80 dB SPL (using Normal LTASS scaled up)
         res80 <- sii(speech = tbl$normal + (80 - overall_normal),
@@ -338,7 +340,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Call the insertion gain plotting function
         plot_gain(res50, res65, res80, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_cameq2 = x$target_cameq2, target_level = x$target_level, ...)

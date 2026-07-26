@@ -36,7 +36,7 @@ get_recd_diff <- function(age, age_months = NULL) {
   adult_recd <- c(2, 3, 5, 8, 10, 6)
   
   # If age is a string like "child_6_11", parse the months
-  if (is.null(age_months) && !is.null(age) && substr(age, 1, 5) == "child") {
+  if (is.null(age_months) && !is.null(age) && substr(age[1], 1, 5) == "child") {
     if (age == "child_0_5") age_months <- 3
     else if (age == "child_6_11") age_months <- 9
     else if (age == "child_12_23") age_months <- 18
@@ -60,7 +60,7 @@ get_recd_diff <- function(age, age_months = NULL) {
   return(list(f = recd_f, diff = infant_recd - adult_recd))
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL) {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL) {
   # 0. Conductive Component Separation
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))
@@ -152,6 +152,12 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     
     # 2. Targeted Mid-Frequency Salvage Boost (+8 dB) exactly at the knee (1500-2000 Hz) to pierce the threshold
     mid_boost <- steep_factor * 8
+    
+    # If the patient has severe distortion, do not attempt the mid-frequency boost (it will just cause distortion/annoyance)
+    if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High") && (is.null(age) || substr(age[1], 1, 5) != "child")) {
+      mid_boost <- 0
+    }
+    
     mid_weight <- pmax(0, pmin(1, 1 - abs(log10(freq) - log10(2000)) / log10(4000/2000))) 
     
     # Disable the mid boost if the frequency is inside a true high-frequency dead region
@@ -198,13 +204,18 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # We dynamically scale the gain limit so severe losses can still get the amplification they need.
   # Lifted base limit from 25 to 30 dB to prevent underamplification of steep slopes
-  if (!is.null(age) && substr(age, 1, 5) == "child") {
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     gain_limit <- 40 + pmax(0, sn_threshold - 60) * 0.5
   } else if (experience == "power") {
     gain_limit <- 40 + pmax(0, sn_threshold - 60) * 0.5
   } else {
     gain_limit <- 30 + pmax(0, sn_threshold - 60) * 0.4
   }
+  
+  if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High") && (is.null(age) || substr(age[1], 1, 5) != "child")) {
+    gain_limit <- gain_limit - 10 # Increase soft compression significantly for distorted ears
+  }
+  
   excess_gain <- pmax(0, g_65 - gain_limit)
   
   # Compress the excess (2:1 ratio instead of 4:1 to allow more gain through)
@@ -230,7 +241,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 1e. NAL-NL3 Bandwidth Roll-off
   # Reduced emphasis on using low-frequency (<= 250 Hz) and very high-frequency (>= 6 kHz) gain
-  if (!is.null(age) && substr(age, 1, 5) == "child") {
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
                          y = c(0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0), xout = freq, rule = 2)$y
   } else {
@@ -244,6 +255,19 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Based on Moore (2001, 2004) and Vickers et al. (2001).
   # If a dead region is detected, amplifying beyond its viable boundary provides no speech 
   # intelligibility benefit and causes distortion/feedback.
+  
+  # Margolis et al. (2025) Distortion Categorization Roll-off
+  if (!is.null(distortion_category) && (is.null(age) || substr(age[1], 1, 5) != "child")) {
+    if (distortion_category == "Moderate") {
+      # Roll off -5 dB per octave above 2000 Hz
+      dist_roll <- pmax(0, log2(freq / 2000)) * 5
+      g_65 <- g_65 - dist_roll
+    } else if (distortion_category == "High") {
+      # Roll off -10 dB per octave above 1500 Hz
+      dist_roll <- pmax(0, log2(freq / 1500)) * 10
+      g_65 <- g_65 - dist_roll
+    }
+  }
   
   # High-Frequency Dead Region (HFDR)
   if (length(hf_dead_idx) > 0) {
@@ -319,7 +343,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # A lower CT ensures WDRC kicks in earlier, applying more gain to soft speech (55 dB SPL).
   # This restores audibility for soft sounds and dramatically reduces listening effort,
   # especially when using our lower-gain comfort multipliers (e.g. 0.40 / 0.45).
-  if (!is.null(age) && substr(age, 1, 5) == "child") {
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
   } else if (experience == "power") {
     ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
@@ -393,7 +417,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Age / Acquired-Loss Penalty (DSL v5.0a Philosophy)
   # Adults prefer less gain than children, particularly for mild-to-moderate losses.
   # This difference shrinks as the hearing loss becomes more severe.
-  if (!is.null(age) && substr(age, 1, 5) == "child") {
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     # We apply a dynamic boost for children relative to the adult baseline.
     # ~5 dB for mild/moderate losses, tapering to ~1 dB for severe losses.
     child_boost <- approx(x = c(20, 50, 80, 100), y = c(5, 5, 2, 1), xout = sn_threshold, rule = 2)$y
@@ -503,7 +527,7 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age
   
   # Absolute ceiling (Johnson 2017 PTS Safety Limits)
   # Limit output based on threshold to avoid permanent threshold shift.
-  if (!is.null(age) && substr(age, 1, 5) == "child") {
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     pts_safe_limit <- 110 + pmax(0, sn_threshold - 50) * 0.5 + loss
   } else {
     pts_safe_limit <- 105 + pmax(0, sn_threshold - 50) * 0.5 + loss

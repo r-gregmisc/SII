@@ -7,7 +7,6 @@ octave	critical
 onethird	critical
 overall.spl	critical
 plot.SII	sii
-predict_aided_sii	predict_aided_sii
 print.SII	sii
 sic.critical	sic.critical
 sic.octave	sic.critical

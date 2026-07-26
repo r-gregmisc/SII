@@ -1,6 +1,6 @@
 Package: SII
 Type: Package
-Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
+Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index ('SII')
 Version: 1.1.0
 Date: 2026-07-19
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = "aut"),
@@ -10,26 +10,28 @@ Description:
    ('SII'), a standard method for computing the intelligibility of
    speech from acoustical measurements of speech, noise, and hearing
    thresholds. This package includes data frames corresponding to
-   Tables 1 - 4 in the ANSI standard as well as a function utilizing
+   Tables 1 - 4 in the ANSI standard as well as functions utilizing
    these tables and user-provided hearing threshold and noise level
-   measurements to compute the SII score.  The methods implemented
-   here extend the standard computations to allow calculation of SII
+   measurements to compute the 'SII' score. The methods implemented
+   here extend the standard computations to allow calculation of 'SII'
    when the measured frequencies do not match those required by the
-   standard by applying interpolation to obtain values for the
-   required frequencies
-   -- 
-   Development of this package was funded by the Center for 'Bioscience'
-   Education and Technology ('CBET') of the Rochester Institute of
-   Technology ('RIT').
+   standard by applying interpolation. Furthermore, the package now
+   includes advanced clinical methods to predict aided 'SII' based on
+   hearing aid prescriptive rationales (such as 'NAL-NL2' and 'DSL'),
+   calculate real-ear insertion gains, estimate maximum power output
+   ('SSPL90'), and prescribe dynamic range compression settings.
+   Development of this package was originally funded by the Center for
+   'Bioscience' Education and Technology ('CBET') of the Rochester
+   Institute of Technology ('RIT').
 Depends:
 Suggests: splines, readxl, xtable, gdata, shiny, bslib
 License: GPL-2
 LazyLoad: yes
-Packaged: 2026-07-25 14:36:16 UTC; mark
+Packaged: 2026-07-25 21:41:51 UTC; mark
 NeedsCompilation: no
 Repository: CRAN
 Date/Publication: 2018-11-18 09:56:48 UTC
 Author: Gregory R. Warnes [aut],
   Mark Shaver [cre, aut]
 Maintainer: Mark Shaver <mark.shaver@posteo.net>
-Built: R 4.5.2; ; 2026-07-25 14:36:18 UTC; unix
+Built: R 4.5.2; ; 2026-07-25 21:48:15 UTC; unix

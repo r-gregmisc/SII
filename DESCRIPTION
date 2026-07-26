@@ -1,25 +1,29 @@
 Package: SII
 Type: Package
-Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index ('SII')
-Version: 1.1.0
-Date: 2026-07-19
+Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
+Version: 1.1.5
+Date: 2026-07-26
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = "aut"),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description:
-   Calculates ANSI S3.5-1997 Speech Intelligibility Index
-   ('SII'), a standard method for computing the intelligibility of
-   speech from acoustical measurements of speech, noise, and hearing
-   thresholds. This package includes data frames corresponding to
-   Tables 1 - 4 in the ANSI standard as well as functions utilizing
-   these tables and user-provided hearing threshold and noise level
-   measurements to compute the 'SII' score. The methods implemented
-   here extend the standard computations to allow calculation of 'SII'
-   when the measured frequencies do not match those required by the
-   standard by applying interpolation. Furthermore, the package now
-   includes advanced clinical methods to predict aided 'SII' based on
-   hearing aid prescriptive rationales (such as 'NAL-NL2' and 'DSL'),
-   calculate real-ear insertion gains, estimate maximum power output
-   ('SSPL90'), and prescribe dynamic range compression settings.
+   Calculates the American National Standards Institute ('ANSI')
+   S3.5-1997 Speech Intelligibility Index ('SII'), a standard method
+   for computing the intelligibility of speech from acoustical
+   measurements of speech, noise, and hearing thresholds. This package
+   includes data frames corresponding to Tables 1 - 4 in the 'ANSI'
+   standard as well as functions utilizing these tables and user-provided
+   hearing threshold and noise level measurements to compute the 'SII'
+   score. The methods implemented here extend the standard computations
+   to allow calculation of 'SII' when the measured frequencies do not
+   match those required by the standard by applying interpolation.
+   Furthermore, the package now includes advanced clinical methods to
+   predict aided 'SII' based on hearing aid prescriptive rationales.
+   This includes 'Open-NL' (Open Non-Linear), a novel theoretical
+   rationale inspired by 'NAL-NL2' (National Acoustic Laboratories
+   Non-Linear 2) and 'DSL' (Desired Sensation Level), as well as
+   functions to calculate real-ear insertion gains, estimate maximum
+   power output ('SSPL90' or Saturation Sound Pressure Level for a
+   90 dB input), and prescribe dynamic range compression.
    Development of this package was originally funded by the Center for
    'Bioscience' Education and Technology ('CBET') of the Rochester
    Institute of Technology ('RIT').

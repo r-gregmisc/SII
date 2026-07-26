@@ -119,11 +119,25 @@ ui <- page_sidebar(
                     selected = "inserts")
       ),
       accordion_panel(
-        "Advanced Research Options",
+        "Advanced Parameters",
         conditionalPanel(
           condition = "input.config == 'bilateral'",
-          sliderInput("alpha_b", "Binaural Inhibition Factor (\u03b1_B):", 
-                      min = -0.5, max = 0.5, value = -0.25, step = 0.05)
+          tooltip(
+            sliderInput("alpha_b", "Binaural Inhibition Factor (\u03b1_B):", 
+                        min = -0.5, max = 0.5, value = -0.25, step = 0.05),
+            "Adjusts the degree of binaural inhibition/summation. -0.25 reflects normal hearing inhibition."
+          )
+        ),
+        tags$div(class = "mt-3"),
+        tags$strong("Word Recognition & Distortion"),
+        tags$i(class = "fa fa-info-circle text-muted", title = "Distortion penalties (HF roll-off & soft-compression) are only applied for Adults. Pediatric targets prioritize maximum audibility.", "data-toggle" = "tooltip", style = "margin-left: 5px; cursor: help;"),
+        tooltip(
+          numericInput("measured_wrs", "Measured Word Rec (%):", value = NA, min = 0, max = 100),
+          "The patient's clinical NU-6 score. Used to categorize cochlear distortion (Margolis et al., 2025)."
+        ),
+        tooltip(
+          numericInput("wrs_level", "Word Rec Level (dB SPL):", value = 80, min = 0, max = 120),
+          "The presentation level of the clinical word recognition test."
         )
       )
     )
@@ -299,6 +313,9 @@ server <- function(input, output, session) {
       loss_21 <- rep(0, length(htl_21))
     }
     
+    meas_wrs <- input$measured_wrs
+    if (!is.null(meas_wrs) && is.na(meas_wrs)) meas_wrs <- NULL
+    
     # 4. Run the robust SII calculation engine
     obj <- sii(speech = speech_input, 
         threshold = htl_21, 
@@ -314,7 +331,9 @@ server <- function(input, output, session) {
         age_years = input$adult_age,
         coupling = input$coupling,
         module = input$module,
-        transducer = input$transducer)
+        transducer = input$transducer,
+        measured_wrs = meas_wrs,
+        wrs_level = input$wrs_level)
         
     # Append JD2011 targets for plotting if a preset is selected
     preset <- input$preset
@@ -419,12 +438,16 @@ server <- function(input, output, session) {
     obj_nalr <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "NAL-R", 
                     desensitization = input$desensitization, transducer = input$transducer)
     
+    meas_wrs <- input$measured_wrs
+    if (!is.null(meas_wrs) && is.na(meas_wrs)) meas_wrs <- NULL
+    
     # Calculate Open-NL
     obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "Open-NL", 
                       desensitization = input$desensitization, 
                       gender = input$gender, experience = input$experience, 
                       config = input$config, age = input$age, age_years = input$adult_age, 
-                      coupling = input$coupling, module = input$module, transducer = input$transducer)
+                      coupling = input$coupling, module = input$module, transducer = input$transducer,
+                      measured_wrs = meas_wrs, wrs_level = input$wrs_level)
     
     # Predict NAL-NL2 and DSL v5.0
     preset <- input$preset
@@ -485,13 +508,20 @@ server <- function(input, output, session) {
     # Calculate prescription
     comp_presc <- prescribe_compression(freq = f_htl, threshold = threshold, module = input$module)
     
+    obj <- sii_obj()
+    dist_text <- ""
+    if (!is.null(obj$distortion_category)) {
+      dist_text <- p(strong("Distortion Category: "), span(class = "badge bg-warning", obj$distortion_category), " ", em(sprintf("(Predicted Score: %.1f%%)", obj$predicted_wrs)))
+    }
+    
     div(
       class = "p-3 bg-light rounded",
       h5(class = "text-primary", "Recommended Settings based on Patient Hearing"),
       p(strong("4-Frequency Average (PTA4): "), sprintf("%.1f dB HL", comp_presc$pta4)),
       p(strong("Compression Speed: "), span(class = "badge bg-info", comp_presc$speed), " ", em(comp_presc$speed_reason)),
       p(strong("Suggested Release Time: "), comp_presc$release_time),
-      p(strong("Compression Ratio Note: "), comp_presc$ratio_note)
+      p(strong("Compression Ratio Note: "), comp_presc$ratio_note),
+      dist_text
     )
   })
 }
