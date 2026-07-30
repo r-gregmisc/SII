@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Calculate ANSI S3.5-1997 Speech Intelligibility Index}
+% \VignetteIndexEntry{Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index}
 % \VignetteDepends{SII, gdata, xtable, splines} 
 % \VignetteKeyword{Speech Intelligibility Index} 
 %
@@ -54,7 +54,7 @@ library(SII)
 
 \section{SII constant tables}
 
-The R package includes constant tables 1 -- 4 from the ANSI S3.5-1997
+The R package includes constant tables 1 -- 4 from the ANSI/ASA S3.5-1997 (R2024)
 text.  These can be loaded via
 <<load.data>>=
 ## Table 1: Critical band SII procedure constants
@@ -117,7 +117,7 @@ legend(
 
 \section{Calculating SII}
 
-The \code{sii} function implements ANSI S3.5-1997 as described in the
+The \code{sii} function implements ANSI/ASA S3.5-1997 (R2024) as described in the
 standard, without any attempt to optimize the performance. The
 implementation does, however, include the extension for handling
 conductive hearing loss from Annex A (utilizing the optional
@@ -161,7 +161,7 @@ Where the arguments are:
 For a detailed description of the arguments see the \Rfunction{sii}
 manual page in appendix \ref{man.pages}.
 
-\subsection{Example C.1 from ANSI S3.5-1997 Annex C}
+\subsection{Example C.1 from ANSI/ASA S3.5-1997 (R2024) Annex C}
 
 <<ExampleC.1>>=
 sii.C1 <- sii(
@@ -179,7 +179,7 @@ sii.C1$sii
 
 The value given in the Standard is $0.504$.
 
-\subsection{Example C.2 from ANSI S3.5-1997 Annex C}
+\subsection{Example C.2 from ANSI/ASA S3.5-1997 (R2024) Annex C}
 
 <<ExampleC.1>>=
 sii.C2 <- sii(
@@ -606,7 +606,7 @@ code into R:
 args(SII:::sii.excel)
 @
 
-\subsection{R code written from the ANSI S3.5-1997}
+\subsection{R code written from the ANSI/ASA S3.5-1997 (R2024)}
 
 
 Second, I implemented the SII calculation following the text of the

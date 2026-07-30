@@ -37,18 +37,24 @@ ui <- page_sidebar(
         sliderInput("htl1000", "1000 Hz", min = 0, max = 120, value = 45, step = 5),
         sliderInput("htl2000", "2000 Hz", min = 0, max = 120, value = 60, step = 5),
         sliderInput("htl4000", "4000 Hz", min = 0, max = 120, value = 75, step = 5),
-        sliderInput("htl8000", "8000 Hz", min = 0, max = 120, value = 80, step = 5)
+        sliderInput("htl8000", "8000 Hz", min = 0, max = 120, value = 80, step = 5),
+        checkboxGroupInput("nr_air", "No Response (Air):", 
+                           choices = c("250", "500", "1000", "2000", "4000", "8000"), 
+                           inline = TRUE)
       ),
       accordion_panel(
         "Bone Conduction (dB HL)",
         checkboxInput("use_bc", "Include Bone Conduction (Air-Bone Gap)?", value = FALSE),
         conditionalPanel(
           condition = "input.use_bc == true",
-          sliderInput("bc250", "250 Hz", min = -10, max = 120, value = 20, step = 5),
-          sliderInput("bc500", "500 Hz", min = -10, max = 120, value = 30, step = 5),
-          sliderInput("bc1000", "1000 Hz", min = -10, max = 120, value = 45, step = 5),
-          sliderInput("bc2000", "2000 Hz", min = -10, max = 120, value = 60, step = 5),
-          sliderInput("bc4000", "4000 Hz", min = -10, max = 120, value = 75, step = 5)
+          sliderInput("bc250", "250 Hz", min = -10, max = 55, value = 20, step = 5),
+          sliderInput("bc500", "500 Hz", min = -10, max = 75, value = 30, step = 5),
+          sliderInput("bc1000", "1000 Hz", min = -10, max = 80, value = 45, step = 5),
+          sliderInput("bc2000", "2000 Hz", min = -10, max = 80, value = 60, step = 5),
+          sliderInput("bc4000", "4000 Hz", min = -10, max = 80, value = 75, step = 5),
+          checkboxGroupInput("nr_bone", "No Response (Bone):", 
+                             choices = c("250", "500", "1000", "2000", "4000"), 
+                             inline = TRUE)
         )
       ),
       accordion_panel(
@@ -280,6 +286,17 @@ server <- function(input, output, session) {
     f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
     threshold <- c(input$htl250, input$htl500, input$htl1000, 
                    input$htl2000, input$htl4000, input$htl8000)
+                   
+    # Apply NR overrides for Air
+    nr_a <- input$nr_air
+    if (!is.null(nr_a)) {
+      if ("250" %in% nr_a) threshold[1] <- 120
+      if ("500" %in% nr_a) threshold[2] <- 120
+      if ("1000" %in% nr_a) threshold[3] <- 120
+      if ("2000" %in% nr_a) threshold[4] <- 120
+      if ("4000" %in% nr_a) threshold[5] <- 120
+      if ("8000" %in% nr_a) threshold[6] <- 120
+    }
     
     # 2. Interpolate to 21 critical bands
     htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
@@ -305,7 +322,19 @@ server <- function(input, output, session) {
       bc_f <- c(250, 500, 1000, 2000, 4000)
       bc_input <- c(input$bc250, input$bc500, input$bc1000, 
                     input$bc2000, input$bc4000)
+                    
       ac_at_bc_f <- threshold[1:5]
+      
+      # Apply NR overrides for Bone: set to Air threshold to force 0 ABG
+      nr_b <- input$nr_bone
+      if (!is.null(nr_b)) {
+        if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
+        if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
+        if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
+        if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
+        if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
+      }
+      
       bc_input <- pmin(bc_input, ac_at_bc_f) # Enforce BC <= AC mathematically
       bc_21 <- approx(x = log10(bc_f), y = bc_input, xout = log10(d$f_21), rule = 2)$y
       loss_21 <- pmax(0, htl_21 - bc_21)
@@ -411,6 +440,17 @@ server <- function(input, output, session) {
     f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
     threshold <- c(input$htl250, input$htl500, input$htl1000, 
                    input$htl2000, input$htl4000, input$htl8000)
+                   
+    # Apply NR overrides for Air
+    nr_a <- input$nr_air
+    if (!is.null(nr_a)) {
+      if ("250" %in% nr_a) threshold[1] <- 120
+      if ("500" %in% nr_a) threshold[2] <- 120
+      if ("1000" %in% nr_a) threshold[3] <- 120
+      if ("2000" %in% nr_a) threshold[4] <- 120
+      if ("4000" %in% nr_a) threshold[5] <- 120
+      if ("8000" %in% nr_a) threshold[6] <- 120
+    }
     htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
     
     # Calculate Speech Input at selected level
@@ -422,7 +462,19 @@ server <- function(input, output, session) {
       bc_f <- c(250, 500, 1000, 2000, 4000)
       bc_input <- c(input$bc250, input$bc500, input$bc1000, 
                     input$bc2000, input$bc4000)
+                    
       ac_at_bc_f <- threshold[1:5]
+      
+      # Apply NR overrides for Bone: set to Air threshold to force 0 ABG
+      nr_b <- input$nr_bone
+      if (!is.null(nr_b)) {
+        if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
+        if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
+        if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
+        if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
+        if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
+      }
+      
       bc_input <- pmin(bc_input, ac_at_bc_f)
       bc_21 <- approx(x = log10(bc_f), y = bc_input, xout = log10(d$f_21), rule = 2)$y
       loss_21 <- pmax(0, htl_21 - bc_21)

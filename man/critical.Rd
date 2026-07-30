@@ -5,10 +5,10 @@
 \alias{octave}
 \alias{overall.spl}
 \docType{data}
-\title{Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index
+\title{Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
   (SII)} 
 \description{
-  Tables of constants for ANSI S3.5-1997 Speech Intelligibility Index
+  Tables of constants for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
   (SII) 
 }
 \usage{
@@ -52,12 +52,12 @@ data(overall.spl)
     }
 }
 \source{
-ANSI S3.5-1997, "American National Standard Methods for 
+ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
 Calculation of the Speech Intelligibility Index" American National
 Standards Institute, New York. 
 }
 \references{
-ANSI S3.5-1997, "American National Standard Methods for 
+ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
 Calculation of the Speech Intelligibility Index" American National
 Standards Institute, New York. 
 }

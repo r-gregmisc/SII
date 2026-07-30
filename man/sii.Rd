@@ -3,7 +3,7 @@
 \alias{print.SII}
 \alias{plot.SII}
 \alias{summary.SII}
-\title{Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)}
+\title{Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)}
 \description{
   Compute the Speech Intelligibility Index (SII) described by ANSI
   specification S3.5-1997, including extensions for conductive
@@ -99,7 +99,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     \code{plot} methods} 
 }
 \details{
-    American National Standard ANSI S3.5-1997 ("Methods for Calculation of
+    American National Standard ANSI/ASA S3.5-1997 (R2024) ("Methods for Calculation of
     the Speech Intelligibility Index") defines a method for computing a
     physical measure that is highly correlated with the intelligibility
     of speech as evaluated by speech perception tests given a group of
@@ -107,7 +107,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     Intelligibility Index, or SII. The SII is calculated from acoustical
     measurements of speech and noise.
 
-    The \code{sii} function implements ANSI S3.5-1997 as described in
+    The \code{sii} function implements ANSI/ASA S3.5-1997 (R2024) as described in
     the standard, without any attempt to optimize the performance. The
     implementation does, however, include the extension for handling
     conductive hearing loss from Annex A (utilizing the optional
@@ -237,7 +237,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   }
 }
 \references{
-ANSI S3.5-1997, "American National Standard Methods for 
+ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
 Calculation of the Speech Intelligibility Index" American National
 Standards Institute, New York. 
 
@@ -250,7 +250,7 @@ Other software programs for calculating SII are available from
   \code{\link{sic.critical}} }
 \examples{
 
-## Example C.1 from ANSI S3.5-1997 Annex C
+## Example C.1 from ANSI/ASA S3.5-1997 (R2024) Annex C
 sii.C1 <- sii(
               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
@@ -289,7 +289,7 @@ sii.CST <- sii(
 round(sii.CST$table[,-c(5:7,13)],2)
 sii.CST$sii
 
-## Example C.2 from ANSI S3.5-1997 Annex C
+## Example C.2 from ANSI/ASA S3.5-1997 (R2024) Annex C
 
 sii.C2 <- sii(
               speech   = rep(54.0, 18),

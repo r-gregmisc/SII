@@ -55,7 +55,7 @@ sii <- function(
   ##    in dB will be applied.
   ##
   ## noise: Noise dB at each frequency, defaults to -50 dB at each
-  ##   frequency (as required by ANSI S3.5-1997 section 4.2)
+  ##   frequency (as required by ANSI/ASA S3.5-1997 (R2024) section 4.2)
   ##
   ## threshold: Hearing threshold level in dB at each frequency. If
   ##   missing, assumed to be 0.
@@ -303,7 +303,7 @@ sii <- function(
   }
 
   #########
-  ## Calcuate SII following ANSI S3.5-1997 Section 4
+  ## Calcuate SII following ANSI/ASA S3.5-1997 (R2024) Section 4
   #########
   
   ## Setup: Create worksheet

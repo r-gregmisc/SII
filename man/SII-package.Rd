@@ -3,10 +3,10 @@
 \alias{SII}
 \docType{package}
 \title{
-  Calculate ANSI S3.5-1997 Speech Intelligibility Index
+  Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
 }
 \description{
-   This package calculates ANSI S3.5-1997 Speech Intelligibility Index
+   This package calculates ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
    (SII), a standard method for computing the intelligibility of
    speech from acoustical measurements of speech, noise, and hearing
    thresholds. This package includes data frames corresponding to
@@ -22,7 +22,7 @@
   Gregory R. Warnes \email{greg@warnes.net}
 }
 \references{
-ANSI S3.5-1997, "American National Standard Methods for 
+ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
 Calculation of the Speech Intelligibility Index" American National Stan- 
 dards Institute, New York.
 
@@ -31,7 +31,7 @@ Other software programs for calculating SII are available from
 }
 \keyword{ package }
 \examples{
-## Example C.1 from ANSI S3.5-1997 Annex C
+## Example C.1 from ANSI/ASA S3.5-1997 (R2024) Annex C
 sii.C1 <- sii(
               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
