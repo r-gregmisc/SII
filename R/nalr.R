@@ -101,15 +101,16 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # We have globally bumped these by +2 to +3 dB to resolve under-amplification compared to NAL/DSL.
   if (experience == "new") {
     # New users get a very warm, comfortable profile (less low penalty, more high compression)
-    c_vals <- c(-3, +2, +3, +0, -2, -2, -2, -2)
+    # Steep roll-off above 4000 Hz to prevent harshness.
+    c_vals <- c(+3, +5, +3, +0, -1, -4, -8, -12)
     base_mult <- 0.40
   } else if (experience == "power") {
     # Power users tolerate maximum sharpness for SII efficiency and maximum gain
-    c_vals <- c(-8, -1, +3, +1, +0, +0, +0, +0)
+    c_vals <- c( 0, +3, +3, +1, +1, -2, -6, -10)
     base_mult <- 0.50
   } else {
     # Experienced users prefer a balanced profile with comfortable loudness (0.45 multiplier)
-    c_vals <- c(-8, -1, +3, +1, +0, +0, +0, +0)
+    c_vals <- c( 0, +3, +3, +1, +1, -2, -6, -10)
     base_mult <- 0.45
   }
   
@@ -119,12 +120,26 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   c_interp <- approx(x = log10(c_freqs), y = c_vals, xout = log10(freq), rule = 2)$y
   # 1a. Reverse Slope Correction
-  # Standard linear formulas apply massive low-frequency penalties (c_vals = -17 dB at 250 Hz) 
-  # because they assume typical sloping losses where low frequencies are normal.
-  # For reverse slope losses, this over-penalizes and results in 0 dB gain.
-  # We neutralize this negative penalty so the low frequencies become audible.
+  # For reverse slope losses (where low frequencies are significantly worse than high frequencies),
+  # attempting to fully restore low/mid-frequency audibility causes severe upward spread of masking,
+  # where low-frequency amplification (e.g. vowels, ambient noise) masks the normal high-frequency consonants.
+  # We must apply an additional penalty in the 400-1500 Hz range to prevent this.
   low_thresh_mean <- mean(sn_threshold[freq <= 1000], na.rm = TRUE)
   high_thresh_mean <- mean(sn_threshold[freq >= 2000], na.rm = TRUE)
+  
+  reverse_slope_diff <- pmax(0, low_thresh_mean - high_thresh_mean)
+  
+  if (reverse_slope_diff > 15) {
+    rs_factor <- pmin(1, (reverse_slope_diff - 15) / 20)
+    
+    # NAL-R inherently prescribes a jagged shape (-11 at 250 Hz, 0 at 1000 Hz) because it assumes a sloping loss.
+    # Applying localized penalties to this already jagged shape causes notches (e.g. below 1000 Hz).
+    # To guarantee a perfectly smooth insertion gain response that prevents upward spread of masking,
+    # we dynamically transition the entire c_interp array to a perfectly flat, suppressed target (-10 dB).
+    # This forces the WDRC gain to scale smoothly and linearly with the audiogram thresholds.
+    flat_target <- -10
+    c_interp <- c_interp * (1 - rs_factor) + (flat_target * rs_factor)
+  }
   
   # Base multiplier (Lyregaard's POGO uses 0.5, NAL uses 0.46, DSL varies).
   # We use a slightly more aggressive base for soft sounds to maximize SII.
@@ -146,24 +161,15 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   if (steep_slope_diff > 30) {
     steep_factor <- pmin(1, (steep_slope_diff - 30) / 30)
     
-    # 1. Aggressive Low-Frequency Penalty (up to -20 dB) to kill the loudness dominance of the normal lows
+    # 1. Aggressive Low-Frequency Penalty (up to -20 dB) to kill the loudness dominance of the normal lows.
+    # We taper this penalty linearly (in log-freq space) so it hits 0 exactly at 1000 Hz.
+    # By removing localized, arbitrary boosts (mid/bridge) and letting the natural threshold scaling take over at 1000 Hz,
+    # we mathematically guarantee a perfectly smooth, continuous ramp in insertion gain.
     lf_penalty <- steep_factor * 20
-    lf_weight <- pmax(0, pmin(1, 1 - (log10(freq) - log10(250)) / log10(2000/250))) # Tapers off at 2000 Hz
+    lf_weight <- pmax(0, pmin(1, 1 - (log10(freq) - log10(250)) / log10(1000/250))) 
     
-    # 2. Targeted Mid-Frequency Salvage Boost (+8 dB) exactly at the knee (1500-2000 Hz) to pierce the threshold
-    mid_boost <- steep_factor * 8
-    
-    # If the patient has severe distortion, do not attempt the mid-frequency boost (it will just cause distortion/annoyance)
-    if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High") && (is.null(age) || substr(age[1], 1, 5) != "child")) {
-      mid_boost <- 0
-    }
-    
-    mid_weight <- pmax(0, pmin(1, 1 - abs(log10(freq) - log10(2000)) / log10(4000/2000))) 
-    
-    # Disable the mid boost if the frequency is inside a true high-frequency dead region
-    mid_boost_vec <- ifelse(freq >= f_e_hf, 0, mid_boost)
-    
-    c_interp <- c_interp - (lf_penalty * lf_weight) + (mid_boost_vec * mid_weight)
+    # 2. Apply corrections to c_interp
+    c_interp <- c_interp - (lf_penalty * lf_weight)
   }
 
   
@@ -175,13 +181,18 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Add a Severe-Loss Booster: NAL-R (half-gain) under-amplifies severe losses.
   # For thresholds > 60 dB HL, we increase the gain ratio slightly.
   # Cap the booster to a maximum of 10 dB to prevent mid-frequency spikes.
-  # Taper the booster in the mid frequencies (1000-2000 Hz) for better loudness comfort.
   slb_raw <- pmax(0, sn_threshold - 60) * 0.5
   slb_raw <- pmin(slb_raw, 15) # Cap at 15 dB
   
-  # Disable the Severe Loss Booster for frequencies inside a dead region.
-  # Pumping massive gain into a dead region just causes distortion without benefit.
-  slb_raw[freq >= f_e_hf | freq <= f_e_lf] <- 0
+  # Taper the Severe Loss Booster for frequencies inside a dead region.
+  # Pumping massive gain into a dead region causes distortion without benefit.
+  # However, hard-clipping the gain to 0 instantly at the boundary creates a massive cliff in the 
+  # frequency response (e.g. dropping 10 dB in half an octave), which causes phase distortion
+  # and is technically infeasible for hearing aid receivers. We taper it smoothly over 1 octave.
+  hf_dead_weight <- ifelse(freq >= f_e_hf, pmax(0, 1 - (log10(freq) - log10(f_e_hf)) / log10(2)), 1)
+  lf_dead_weight <- ifelse(freq <= f_e_lf, pmax(0, 1 - (log10(f_e_lf) - log10(freq)) / log10(2)), 1)
+  
+  slb_raw <- slb_raw * hf_dead_weight * lf_dead_weight
   
   # Taper SLB in mid frequencies (1000-2000 Hz)
   mid_taper <- pmax(0, pmin(1, 1 - abs(freq - 1500) / 1000)) # 1 at 1500, 0 at 500 and 2500
@@ -272,9 +283,10 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # High-Frequency Dead Region (HFDR)
   if (length(hf_dead_idx) > 0) {
     if (steep_slope_diff > 30) {
-      # If the slope is steep, we roll off immediately to kill loudness bloat.
-      hf_cutoff <- f_e_hf
-      hf_dr_penalty <- pmax(0, log2(freq / hf_cutoff)) * 40
+      # If the slope is steep, start the roll-off slightly before the dead region boundary (0.85x) 
+      # and apply a technically feasible acoustic roll-off (30 dB/oct) to prevent severe phase distortion.
+      hf_cutoff <- 0.85 * f_e_hf
+      hf_dr_penalty <- pmax(0, log2(freq / hf_cutoff)) * 30 # Graceful, physically achievable roll-off
     } else {
       # Otherwise, we use Moore's 1.7x basal spread allowance.
       hf_cutoff <- 1.7 * f_e_hf
@@ -468,26 +480,24 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     
     ve_interp <- approx(x = log10(ve_freqs), y = ve_loss, xout = log10(freq), rule = 2)$y
     ig <- ig + ve_interp
+  } else {
+    ve_interp <- rep(0, length(freq))
   }
   
   # 8. Conductive Component Correction
   # Restore 75% of the Air-Bone Gap as linear gain, as specified by NAL-NL2 / Johnson (2013).
   abg_gain <- 0.75 * loss
+  
+  # Apply a gentle 6 dB low-frequency taper to the ABG gain (fading out by 1000 Hz)
+  # to prevent upward spread of masking without being overkill or destroying the smooth response.
+  abg_lf_penalty <- ifelse(freq < 1000, 6 * (log10(1000) - log10(freq)) / log10(1000/250), 0)
+  abg_gain <- pmax(0, abg_gain - abg_lf_penalty)
   ig <- ig + abg_gain
   
-  # 9. Final Cross-Channel Frequency Smoothing
-  # Atypical audiograms (like "cookie-bites") can produce jagged, V-shaped frequency responses
-  # that cause distortion across channels. We apply a 3-point moving average to smooth the final curve.
-  if (length(ig) > 2) {
-    ig_smoothed <- ig
-    for (i in 2:(length(ig) - 1)) {
-      ig_smoothed[i] <- (ig[i - 1] + ig[i] + ig[i + 1]) / 3.0
-    }
-    ig <- ig_smoothed
-  }
-  
-  # Ensure gain doesn't go below 0
-  ig <- pmax(ig, 0, na.rm = TRUE)
+  # Ensure the target insertion gain doesn't demand impossible active noise cancellation.
+  # We floor the target at slightly below the physical insertion loss of the vent/coupling.
+  # A hard floor at 0 dB forces the hearing aid to fight open vents, causing massive comb filtering.
+  ig <- pmax(ig, ve_interp - 10, na.rm = TRUE)
   return(ig)
 }
 

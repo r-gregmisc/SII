@@ -2,13 +2,13 @@ library(shiny)
 library(bslib)
 library(SII)
 
-# Force source the absolute paths to ensure the latest code is used (overriding the installed package)
+# Force source the local package files to ensure the latest code is used (overriding the installed package)
 tryCatch({
-  source("/home/mark/Development/SII for R/SII/R/sii.R")
-  source("/home/mark/Development/SII for R/SII/R/nalr.R")
-  source("/home/mark/Development/SII for R/SII/R/plot.SII.R")
-  source("/home/mark/Development/SII for R/SII/R/benchmark_targets.R")
-}, error = function(e) print(paste("Error sourcing absolute paths:", e$message)))
+  source("../../R/sii.R")
+  source("../../R/nalr.R")
+  source("../../R/plot.SII.R")
+  source("../../R/benchmark_targets.R")
+}, error = function(e) print(paste("Error sourcing local paths:", e$message)))
 
 # Define the Modern UI Layout
 ui <- page_sidebar(
