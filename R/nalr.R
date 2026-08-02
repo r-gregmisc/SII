@@ -88,6 +88,12 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     ig <- ifelse(input_level <= ct_band,
                  g_ct,
                  g_ct - (input_level - ct_band) * (1 - 1/cr_loud))
+                 
+    # 0.5 Apply Infant/Toddler RECD Correction before early return
+    recd_data <- get_recd_diff(age, age_months)
+    recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
+    ig <- ig - recd_diff
+    
     return(ig)
   }
   

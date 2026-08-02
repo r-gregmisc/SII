@@ -264,6 +264,14 @@ server <- function(input, output, session) {
       updateSliderInput(session, "bc1000", value = 0)
       updateSliderInput(session, "bc2000", value = 0)
       updateSliderInput(session, "bc4000", value = 0)
+    } else if (input$preset == "custom") {
+      updateCheckboxInput(session, "use_bc", value = FALSE)
+      updateSliderInput(session, "htl250", value = 20)
+      updateSliderInput(session, "htl500", value = 30)
+      updateSliderInput(session, "htl1000", value = 45)
+      updateSliderInput(session, "htl2000", value = 60)
+      updateSliderInput(session, "htl4000", value = 75)
+      updateSliderInput(session, "htl8000", value = 80)
     }
   })
   
