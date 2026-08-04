@@ -1,14 +1,28 @@
 library(shiny)
 library(bslib)
-library(SII)
 
-# Force source the local package files to ensure the latest code is used (overriding the installed package)
-tryCatch({
-  source("../../R/sii.R")
-  source("../../R/nalr.R")
-  source("../../R/plot.SII.R")
-  source("../../R/benchmark_targets.R")
-}, error = function(e) print(paste("Error sourcing local paths:", e$message)))
+  # In shinylive, the R/ folder must be bundled directly inside the app folder
+  r_dir <- "R"
+
+# Source each file individually so one failure doesn't block the rest
+local_files <- c("sii.R", "moore_glasberg.R", "nalr.R", "plot.SII.R", "benchmark_targets.R")
+for (f in local_files) {
+  fp <- file.path(r_dir, f)
+  if (file.exists(fp)) {
+    tryCatch({
+      source(fp, local = FALSE)
+      cat("  OK:", f, "\n")
+    }, error = function(e) cat("  FAILED:", f, "-", e$message, "\n"))
+  } else {
+    cat("  NOT FOUND:", fp, "\n")
+  }
+}
+
+# Fallback: if source didn't work, load the CRAN package
+if (!exists("sii", mode = "function") || !"wrs_level" %in% names(formals(sii))) {
+  cat(">>> WARNING: Local source failed, falling back to installed SII package\n")
+  library(SII)
+}
 
 # Define the Modern UI Layout
 ui <- page_sidebar(
@@ -126,14 +140,6 @@ ui <- page_sidebar(
       ),
       accordion_panel(
         "Advanced Parameters",
-        conditionalPanel(
-          condition = "input.config == 'bilateral'",
-          tooltip(
-            sliderInput("alpha_b", "Binaural Inhibition Factor (\u03b1_B):", 
-                        min = -0.5, max = 0.5, value = -0.25, step = 0.05),
-            "Adjusts the degree of binaural inhibition/summation. -0.25 reflects normal hearing inhibition."
-          )
-        ),
         tags$div(class = "mt-3"),
         tags$strong("Word Recognition & Distortion"),
         tags$i(class = "fa fa-info-circle text-muted", title = "Distortion penalties (HF roll-off & soft-compression) are only applied for Adults. Pediatric targets prioritize maximum audibility.", "data-toggle" = "tooltip", style = "margin-left: 5px; cursor: help;"),
@@ -154,12 +160,12 @@ ui <- page_sidebar(
     card(
       full_screen = TRUE,
       card_header("Clinical SPLogram"),
-      plotOutput("splogram", height = "600px")
+      plotOutput("splogram", height = "750px")
     ),
     card(
       full_screen = TRUE,
       card_header("Insertion Gain / Plot"),
-      plotOutput("gain_plot", height = "600px"),
+      plotOutput("gain_plot", height = "750px"),
       accordion(
         open = FALSE,
         accordion_panel(
@@ -188,7 +194,11 @@ server <- function(input, output, session) {
   
   # Static standard data setup
   setup_data <- reactive({
-    data("critical", package="SII")
+    if (file.exists(file.path("data", "critical.rda"))) {
+      load(file.path("data", "critical.rda"), envir = environment())
+    } else {
+      data("critical", package="SII")
+    }
     f_21 <- critical$fi
     # The ANSI S3.5 normal overall SPL is 62.35 dB SPL. Summing spectrum levels directly without 
     # bandwidth scaling yields incorrect levels, resulting in massive over-amplification!
@@ -515,9 +525,9 @@ server <- function(input, output, session) {
       target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
       target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
       target_cameq2 <- get_jd2011_target(preset, "CAMEQ2-HF", d$f_21, target_level)
-      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
-      obj_dsl <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
-      obj_cameq2 <- sii(speech = speech_input, threshold = htl_21, freq = d$f_21, custom_gain = target_cameq2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      obj_dsl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      obj_cameq2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_cameq2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
       val_nalnl2_sii <- obj_nalnl2$sii
       val_dsl_sii <- obj_dsl$sii
       val_cameq2_sii <- obj_cameq2$sii
@@ -539,10 +549,10 @@ server <- function(input, output, session) {
     }
     
     calc_loudness <- function(obj) {
-      if (input$config == "bilateral") {
-        calculate_binaural_loudness(obj, obj, alpha_b = input$alpha_b)
+      if (input$config == "unilateral") {
+        return(calculate_loudness(obj))
       } else {
-        calculate_loudness(obj)
+        return(calculate_binaural_loudness(obj, obj))
       }
     }
     
