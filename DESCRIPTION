@@ -28,9 +28,9 @@ Description:
    Development of this package was originally funded by the Center for
    'Bioscience' Education and Technology ('CBET') of the Rochester
    Institute of Technology ('RIT').
-Depends:
-Suggests: splines, readxl, xtable, gdata, shiny, bslib
-License: GPL-2
+Depends: R (>= 3.5.0)
+Suggests: splines, readxl, xtable, gdata, shiny, bslib, testthat
+License: GPL-3.0
 LazyLoad: yes
 Packaged: 2018-11-18 09:53:18 UTC; hornik
 NeedsCompilation: no

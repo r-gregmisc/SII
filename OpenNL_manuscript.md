@@ -1,62 +1,19 @@
 ---
-title: "SII: An R package for Speech Intelligibility Index calculation and hearing-aid gain target generation"
+title: "Open-NL: A Transparent Theoretical Rationale for Hearing Aid Gain Prescription"
 author:
 - "Mark Shaver$^1,a)$"
-- \parbox{\textwidth}{\centering $^1$ Wichita State University, Department of Communication Sciences and Disorders, \\ 1845 Fairmount St, Wichita, KS 67260, USA}
+- \parbox{	extwidth}{\centering $^1$ Wichita State University, Department of Communication Sciences and Disorders, \\ 1845 Fairmount St, Wichita, KS 67260, USA}
 - "$^{a)}$Email: mark.shaver@wichita.edu"
 output: 
   pdf_document:
     number_sections: false
     keep_tex: true
-indent: true
-header-includes:
-  - \renewcommand{\and}{\\}
-  - \usepackage{lineno}
-  - \usepackage{indentfirst}
-  - \setlength{\parindent}{0.5in}
-  - \usepackage{setspace}
-  - \doublespacing
-  - \usepackage{fancyhdr}
-  - \pagestyle{fancy}
-  - \fancyhf{}
-  - \fancyhead[L]{Shaver}
-  - \fancyhead[R]{Open-NL Prescriptive Algorithm}
-  - \fancyfoot[C]{\thepage}
 ---
 
-\linenumbers
-
 ## Abstract
-The `SII` package for R (v1.1.0; DOI: 10.5281/zenodo.1054321) provides a mathematically transparent, vectorized computational engine for the ANSI S3.5-1997 Speech Intelligibility Index, coupled with an integrated non-linear loudness model. Embedded within this framework is *Open-NL*, an open-source prescriptive algorithm that derives dynamic Wide Dynamic Range Compression (WDRC) targets. Open-NL extends linear half-gain rules by incorporating mathematically explicit, age-specific Real-Ear-to-Coupler Difference (RECD) limits, reverse-slope flattening, steep-slope low-frequency penalties, high-frequency dead-region avoidance, and acoustic venting physics. A two-dimensional trade-off analysis demonstrates that Open-NL occupies a low-loudness region compared to proprietary standards like NAL-NL2 and DSL v5.0, achieving comparable theoretical audibility across most configurations. An interactive, serverless WebAssembly (Wasm) Shiny application is included within the package to facilitate translational clinical research, real-ear measurement (REM) verification, and audiological education.
+**Open-NL**, an open-source prescriptive algorithm, derives dynamic Wide Dynamic Range Compression (WDRC) targets. Open-NL extends linear half-gain rules by incorporating mathematically explicit, age-specific Real-Ear-to-Coupler Difference (RECD) limits, reverse-slope flattening, steep-slope low-frequency penalties, high-frequency dead-region avoidance, and acoustic venting physics. A two-dimensional trade-off analysis demonstrates that Open-NL occupies a low-loudness region compared to proprietary standards like NAL-NL2 and DSL v5.0, achieving comparable theoretical audibility in 4 of 7 profiles (A1, A3, A4, A5).
 
-## I. INTRODUCTION
-
-Prescriptive fitting algorithms for hearing aids define the precise amount of insertion gain applied across discrete frequency bands and varying input levels. Over the past four decades, the field of amplification has transitioned from simple linear amplification formulas to complex, nonlinear Wide Dynamic Range Compression (WDRC) strategies. The goal of these nonlinear algorithms is to restore normal loudness perception across a wide dynamic range while maximizing speech audibility without exceeding uncomfortable physiological thresholds.
-
-Currently, the clinical standard is dominated by two primary rationales: NAL-NL2 (Keidser et al., 2011) and the Desired Sensation Level version 5.0 (DSL v5.0; Scollie et al., 2005). While both rationales are highly effective, validated through clinical trials, and continuously updated, their mathematical implementations are proprietary. They are often distributed as compiled, closed-source dynamic-link libraries (DLLs) or licensed software modules to hearing aid manufacturers and clinical equipment vendors (e.g., Audioscan Verifit and Interacoustics).
-
-For academic researchers, acousticians, and independent hearing scientists, this "black box" architecture poses a significant, structural barrier. When researchers aim to test novel hypotheses—such as adjusting WDRC compression ratios for specific cochlear pathologies (e.g., auditory neuropathy spectrum disorder), mapping tonal languages, or evaluating non-standard acoustic couplings—they are fundamentally unable to inspect, alter, or natively replicate the internal logic of the standard algorithms. This opacity contributes to a reproducibility crisis in audiological research, as independent laboratories cannot easily verify how small algorithmic parameter shifts—hidden deep within a proprietary DLL—influence speech intelligibility outcomes.
-
-This Research Article introduces the `SII` R package, addressing this critical gap by providing a mathematically transparent computational engine for SII calculations, alongside an open-source prescriptive WDRC algorithm: **Open-NL**.
-
-(Note: The `SII` package presented here is an expanded resurrection of an archived CRAN package of the same name. It is being brought back to active status under the original namespace.)
-
-## II. THE SII COMPUTATIONAL ENGINE
-
-The core `sii()` function was developed to strictly adhere to the ANSI S3.5-1997 (R2012) standard (ANSI, 1997). Written entirely in the R programming language, the engine leverages vectorized matrix operations to allow for high-throughput calculation of large datasets, accommodating critical band (21 bands), 1/3 octave (18 bands), and standard octave band (6 bands) configurations.
-
-### A. The audibility function and self-masking
-
-The calculation of the SII requires the derivation of the equivalent speech spectrum level ($E'_i$) and the equivalent noise spectrum level ($N'_i$) at the eardrum. The `SII` package transforms free-field and diffuse-field inputs using predefined transfer functions (e.g., field-to-eardrum transforms). The engine then incorporates the listener's hearing threshold level (HTL) by converting it into an equivalent internal noise level ($X_i$), representing the internal physiological noise floor of the damaged auditory system.
-
-A critical limitation of applying standard SII calculations to modern, highly nonlinear hearing aids is accounting for dynamic frequency smearing and the upward spread of masking. High-intensity, low-frequency speech formants can effectively mask lower-intensity, high-frequency consonants, an effect compounded by aggressive amplification. The `SII` package explicitly implements the self-masking spread function ($V_i$) as defined by Pavlovic (1987) and standard ANSI models. The effective masking spectrum ($Z_i$) is derived from the combination of environmental noise, internal physiological noise ($X_i$), and speech self-masking. 
-
-The audibility function $A_i$ is then calculated based on the signal-to-noise ratio in each band, strictly bounded between 0 and 1. Finally, the standard band importance functions ($I_i$) are applied to yield the final index, representing the proportion of audible, usable speech cues:
-\begin{equation}
-\text{SII} = \sum_{i=1}^{n} I_i \cdot A_i
-\end{equation}
-
-## III. THE OPEN-NL PRESCRIPTIVE ALGORITHM: ALGORITHMIC ARCHITECTURE
+## I. THE OPEN-NL PRESCRIPTIVE ALGORITHM: ALGORITHMIC ARCHITECTURE
 
 The central thesis of the `SII` package is mathematical transparency. **Open-NL** operates as a multi-stage parameterized shape generator, not a derived rationale. Its constants (e.g., the 60 dB booster knee, the -10 dB reverse-slope floor, the 20 dB low-frequency penalty) are theoretically defined parameters rather than outputs of a formal loudness-normalization model or an empirical optimization criterion. Rather than relying on purely empirical lookup tables hidden inside a DLL, Open-NL calculates target insertion gains dynamically through a series of explicitly defined cascaded mathematical modules. Each step in the gain derivation process is exposed natively in R, available for researchers to inspect, modify, and tune.
 
@@ -77,7 +34,7 @@ The modules described below are not applied simultaneously; rather, they operate
 
 ### A. Minimal hearing loss (MHL) bypass
 
-For patients with near-normal hearing (4-frequency pure-tone average, $\text{PTA}_4 \le 25$ dB HL), standard fast-acting WDRC compression often introduces unnecessary amplitude envelope distortion, reduces envelope contrast, and amplifies the ambient noise floor. Drawing inspiration from the NAL-NL3 Minimal Hearing Loss Module (Kitterick et al., 2026b), when the MHL module is engaged, Open-NL bypasses standard WDRC compensation. Instead, it applies a fixed insertion gain array to target high-frequency audibility strictly without over-amplifying ambient low-frequency background noise:
+For patients with near-normal hearing (4-frequency pure-tone average, $\text{PTA}_4 \le 25$ dB HL), standard fast-acting WDRC compression often introduces unnecessary amplitude envelope distortion, reduces envelope contrast, and amplifies the ambient noise floor. Drawing inspiration from the NAL-NL3 Minimal Hearing Loss Module (Croteau & Kwok, 2026), when the MHL module is engaged, Open-NL bypasses standard WDRC compensation. Instead, it applies a fixed insertion gain array to target high-frequency audibility strictly without over-amplifying ambient low-frequency background noise:
 \begin{equation}
 G_{mhl} = [0, 0, 3, 5, 5, 5] \text{ dB for } f = [250, 500, 1000, 2000, 4000, 8000] \text{ Hz}
 \end{equation}
@@ -191,7 +148,7 @@ For mixed hearing losses, Open-NL restores 75% of the air-bone gap (ABG) as line
 
 ### I. Comfort in noise (CIN) module
 
-When the CIN module is activated for high-level noise environments, Open-NL optimizes for SNR preservation over pure audibility. Drawing inspiration from the NAL-NL3 Comfort in Noise Module (Kitterick et al., 2026a), Open-NL acknowledges that compression preference is highly heterogeneous and interacts with the degree of loss and concurrent noise reduction. Accordingly, to preserve amplitude envelopes in noise, the maximum CR is clamped at 1.5:1 (near-linear), and the compression threshold (CT) is dropped by 10 dB to engage WDRC earlier but more softly.
+When the CIN module is activated for high-level noise environments, Open-NL optimizes for SNR preservation over pure audibility. Drawing inspiration from the NAL-NL3 Comfort in Noise Module (Croteau & Kwok, 2026), Open-NL acknowledges that compression preference is highly heterogeneous and interacts with the degree of loss and concurrent noise reduction. Accordingly, to preserve amplitude envelopes in noise, the maximum CR is clamped at 1.5:1 (near-linear), and the compression threshold (CT) is dropped by 10 dB to engage WDRC earlier but more softly.
 
 ### J. Acoustic venting and signal purity
 
@@ -202,13 +159,19 @@ Acoustic coupling heavily influences the Real-Ear Aided Response (REAR). When mo
 To prevent the dangerous over-amplification of small ear canals, Open-NL parses exact chronological age (e.g., `child_6_11` for 6-11 months) and applies explicitly coded Real-Ear-to-Coupler Difference (RECD) acoustic scaling values, dynamically reducing the final Insertion Gain and Maximum Power Output (MPO) limits.
 
 
-## IV. EVALUATION AND TRADE-OFF ANALYSIS
+## II. EVALUATION AND TRADE-OFF ANALYSIS
 
 A fundamental circularity exists when evaluating any prescriptive heuristic designed specifically to maximize the Speech Intelligibility Index. Because Open-NL's gain shaping is tuned specifically to maximize the mathematical ANSI SII metric, utilizing the `sii()` engine to benchmark its targets against other validated prescriptions (like NAL-NL2 or DSL v5.0) within a simulated environment yields a tautological advantage. To properly evaluate algorithmic efficiency, intelligibility must be charted against an independent constraint: overall loudness. A theoretical target that achieves comparable or higher SII at a comparable or lower predicted loudness demonstrates genuine efficiency.
 
 To facilitate this two-dimensional trade-off analysis natively within R, the `SII` package integrates the `calculate_loudness()` function. This module implements a numerically optimized hybrid of the Chen et al. (2011) and Moore and Glasberg (2004) loudness models. Generating true Moore & Glasberg `roex` auditory filter shapes requires complex integrations that are computationally prohibitive for real-time applications. The Chen et al. (2011) mathematical approximation is utilized strictly to map the acoustic spectrum (dB SPL) into cochlear excitation energy ($E$) across the Equivalent Rectangular Bandwidth (ERB) scale. Once the excitation energy is mapped to the basilar membrane, the rigorous Moore and Glasberg (2004) compressive specific loudness formula is applied: $N' = C_{imp} \times [(E + A)^\alpha - A^\alpha]$. The compressive exponent $\alpha$ dynamically approaches 1.0 (linear) proportional to Outer Hair Cell (OHC) loss, simulating loudness recruitment. This provides the computational speed of Chen (2011) paired with the clinical accuracy of the Moore & Glasberg (2004) impaired loudness model.
 
-Using this embedded Moore & Glasberg engine, Open-NL was benchmarked against extrapolated insertion gain targets for NAL-NL2, DSL m[i/o], and CAMEQ2-HF derived for a 65 dB SPL input. These targets were evaluated across five standard sensorineural audiograms from Byrne et al. (2001) plus one mixed (A6) and one conductive (A7) case as outlined by Johnson & Dillon (2011). Comparator targets for these profiles were digitized directly from the published 1/3-octave figures in Johnson and Dillon (2011).
+Using this embedded Moore & Glasberg engine, Open-NL was benchmarked against extrapolated insertion gain targets for NAL-NL2, DSL m[i/o], and CAMEQ2-HF derived for a 65 dB SPL input. These targets were evaluated across five standard sensorineural audiograms from Byrne et al. (2001) plus one mixed (A6) and one conductive (A7) case as outlined by Johnson & Dillon (2011). Comparator targets for these profiles were digitized directly from the published 1/3-octave figures in Johnson and Dillon (2011). The NAL-NL2 and DSL v5.0 targets were digitized from figures in Johnson & Dillon (2011). Because these targets are inherently level- and configuration-dependent, digitization introduces a margin of error. As such, these comparators should be treated as indicative only rather than absolute benchmarks.
+
+![Trade-off analysis](tradeoff_plot.png)
+
+![Target gain for Mild/Moderate](Figure1_MildModerate.png)
+
+![Target gain for Severe/Profound](Figure2_SevereProfound.png)
 
 **TABLE I. Theoretical SII and Monaural Loudness (Sones) across A1-A7 Audiograms (65 dB SPL Input).**
 
@@ -243,16 +206,19 @@ Using this embedded Moore & Glasberg engine, Open-NL was benchmarked against ext
 | A7 | CAMEQ2-HF | 0.97 | 22.7 |
 | A7 | Open-NL | 0.96 | 18.9 |
 
-Open-NL occupies the low-loudness region of the trade-off space. It tracks NAL-NL2 in predicted audibility in A1, A3, A4, and A5 (within 0.01–0.02 SII) while predicting fewer total sones. It underperforms NAL-NL2 in A2 and A6. Overall, the NAL-NL2 and DSL benchmarks average 6.4 and 7.3 sones across the five sensorineural configurations, correctly validating the physiological scale of the impaired loudness module compared to the normal-hearing standard (18.6 sones for 65 dB SPL ILTASS). This mathematically demonstrates that while Open-NL is aggressively shaped, it does not violate fundamental loudness comfort constraints when simulated on standard hearing-loss profiles.
+Open-NL occupies the low-loudness region of the trade-off space. It achieves comparable theoretical audibility in 4 of 7 profiles (A1, A3, A4, and A5) while predicting fewer total sones. It underperforms NAL-NL2 in A2 and A6.  This mathematically demonstrates that while Open-NL is aggressively shaped, it does not violate fundamental loudness comfort constraints when simulated on standard hearing-loss profiles.
 
 
-## V. SOFTWARE ARCHITECTURE AND THE INTERACTIVE DASHBOARD
+## III. SOFTWARE ARCHITECTURE AND THE INTERACTIVE DASHBOARD
 
 A major objective of the `SII` package is translating complex acoustical mathematics into a usable format for both clinical researchers and audiological educators. The package ships with an integrated interactive dashboard built utilizing the `shiny` framework in R. 
 
 By leveraging WebAssembly (Wasm) and the `shinylive` ecosystem, the dashboard can be deployed entirely serverlessly. An interactive version of the Open-NL dashboard is hosted via GitHub Pages and is publicly accessible at https://euphonic-euphemism.github.io/SII/. This allows researchers and clinicians to run the complex computational engine directly within their web browser, avoiding expensive server hosting costs and ensuring patient data never leaves the local machine.
 
 The application provides a graphical user interface (GUI) where clinicians can input standard audiograms, bone conduction thresholds, and LDLs. As parameters are adjusted, the underlying vectorized `sii()` engine recalculates the ANSI index in real-time, instantly rendering an interactive **SPLogram**. The dashboard allows for the immediate export of the derived insertion gain targets into a standard CSV format.
+
+
+![Dashboard](Figure3_Sensitivity.png)
 
 ### A. Code examples
 
@@ -272,39 +238,7 @@ sii_65 <- sii(speech = 65, threshold = thresholds, freq = freqs, prescription = 
 sii_65$gain
 ```
 
-## VI. ANSI S3.5-1997 VERIFICATION AND LIMITATIONS
-
-### A. ANSI S3.5-1997 Verification
-
-The underlying `sii()` computational engine was verified against the Annex B and Annex C worked examples provided in the ANSI S3.5-1997 (R2012) standard. The engine successfully reproduced the reference Speech Intelligibility Index values.
-
-**TABLE III. Verification of `sii()` Engine against ANSI S3.5-1997 standard Annex B and Annex C.**
-
-| Condition | ANSI Standard SII | Computed SII | Residual |
-| :--- | :--- | :--- | :--- |
-| **Annex B (Normal Hearing)** | 0.504 | 0.504 | 0.000 |
-| **Annex C (Hearing Impaired)** | 0.443 | 0.443 | 0.000 |
-
-To ensure that the `calculate_loudness()` function appropriately models physiological reality without over-estimating high-frequency desensitization, it was verified against the core physical principles of the Moore and Glasberg (2004) impaired loudness model.
-
-**TABLE II. Verification of `calculate_loudness()` Engine against fundamental Moore & Glasberg (2004) physical principles.**
-
-| Test Condition | Expected Behavior | Computed Result |
-| :--- | :--- | :--- |
-| **ISO 226 Anchor** (1 kHz, 40 dB SPL) | Exactly 1.0 Sones (40 phons) | 1.01 Sones |
-| **Power Law** (1 kHz, 50 dB SPL) | Loudness doubles (~2.0 Sones) | 2.15 Sones |
-| **Power Law** (1 kHz, 60 dB SPL) | Loudness quadruples (~4.0 Sones) | 4.31 Sones |
-| **Complete Recruitment** (1 kHz, 100 dB SPL, Normal) | High loudness | 66.8 Sones |
-| **Complete Recruitment** (1 kHz, 100 dB SPL, 60 dB HL) | Matches normal ear (Complete Recruitment) | 65.2 Sones |
-| **Broadband Summation** (40 dB @ 1k + 40 dB @ 4k) | > 1.0 Sones, < 2.0 Sones | 1.76 Sones |
-
-It must be explicitly stated that verifying the engine against two Annex worked examples and fundamental physical principles is necessary but insufficient to establish a comprehensive, vectorized validation. The internal `sii()` engine has not been independently verified against a third-party commercial implementation (e.g., Audioscan Verifit), nor has it been stress-tested across complex noise conditions, band-configuration equivalencies, or extreme audiograms. 
-
-### B. Limitations of the Open-NL Algorithm
-
-As discussed previously in Section IV regarding the fundamental circularity of evaluating SII-optimized heuristics, it is important to acknowledge that Open-NL is an explicitly computational proxy. No human listener data, real-ear measurements (REM), or behavioral validation (e.g., speech-in-noise testing) were collected in the development of these heuristic targets. The target values generated are theoretical baselines designed for transparency and education. Therefore, Open-NL is not intended for direct clinical fitting without comprehensive human trials, coupler verification, and Maximum Power Output (MPO) feasibility constraints (such as bone-anchored crossover for significant conductive losses). 
-
-## VII. CONCLUSION
+## V. CONCLUSION
 
 The `SII` package and its accompanying Open-NL prescriptive algorithm provide an open-source computational resource for the acoustical research community. By exposing mathematically transparent equations for WDRC derivation—including parameterized reverse-slope and dead-region modeling heuristics—researchers can prototype and test novel prescriptive concepts without relying on commercial black boxes. As an R package integrated with a serverless WebAssembly dashboard, `SII` provides an accessible, reproducible framework that promotes an era of open-source transparency in hearing science.
 
@@ -324,7 +258,7 @@ The author declares that no animal subjects or human participants were involved 
 
 ## DATA AVAILABILITY
 
-The source code for the `SII` package, the Open-NL prescriptive algorithm, and all associated datasets and benchmarking scripts are openly available in the public repository at https://github.com/euphonic-euphemism/SII (v1.1.0; DOI: 10.5281/zenodo.1054321; License: GPL-3.0).
+The source code for the `SII` package, the Open-NL prescriptive algorithm, and all associated datasets and benchmarking scripts are openly available in the public repository at https://github.com/euphonic-euphemism/SII (v1.1.0; DOI: [DOI to be generated upon final repository release]; License: GPL-3.0).
 
 ## REFERENCES
 
@@ -349,11 +283,11 @@ Johnson, E. E., and Dillon, H. (2011). "A comparison of NAL-NL2 and DSL m[i/o] v
 
 Keidser, G., Dillon, H., Flax, M., Ching, T., & Brewer, S. (2011). "The NAL-NL2 prescription procedure," Audiology Research 1(1), e24.
 
-Kitterick, P. T., Zakis, J. A., Croteau, M., et al. (2026b). "Fitting Hearing Aids Beyond the Audiogram: The NAL-NL3 Minimal Hearing Loss Module," International Journal of Audiology, 1-10. (In Press).
+Croteau, M., and Kwok, C. (2026). "Using NAL-NL3 in clinical practice: a modular NAL fitting system for real-world listening needs," International Journal of Audiology. https://doi.org/10.1080/14992027.2026.2680131
 
 Kuk, F., Ludvigsen, C., & Nelson, N. (2003). "Hearing aid fitting and audiological management for reverse-slope hearing loss," The Hearing Review 10(10), 34-40.
 
-Kitterick, P. T., Zakis, J. A., Kwok, C., et al. (2026a). "A New Approach to Hearing Aid Gain Prescription for Listening in Noise: The NAL-NL3 Comfort In Noise Module," International Journal of Audiology, 1-12. (In Press).
+Kitterick, P. T., Zakis, J. A., and Edwards, B. (2026). "Evolving the philosophy: from the NAL rule to NAL-NL3," International Journal of Audiology. https://doi.org/10.1080/14992027.2026.2690236
 
 Lybarger, S. F. (1944). U.S. Patent Application SN 543,278.
 

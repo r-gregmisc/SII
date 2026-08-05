@@ -290,23 +290,23 @@ sii <- function(
     # For custom gain benchmarking, we bypass the MPO calculation to test the exact target gain limits
   } else if (!is.null(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
-  } else if (!is.null(prescription) && prescription == "Open-NL") {
-    # Calculate dynamic WDRC gain independently for each frequency band
-    # This acts as a multi-channel compressor, preventing upward spread of masking
-    gain <- calculate_open_nl_gain(freq, threshold, speech, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, ten_edge_hf, ten_edge_lf)
+  } else if (!is.null(prescription) && inherits(prescription, "prescription_target")) {
+    # If the user supplied a pre-calculated prescription_target S3 object
     
-    # Apply NAL-SSPL90 MPO (Maximum Power Output) Limiting
-    # Instead of hard peak clipping, we use a high compression ratio (10:1) 
-    # for the portion of the signal that exceeds the maximum output limit.
-    mpo <- calculate_nal_sspl90(threshold = threshold, gain = gain, ldl = ldl, age = age, age_months = age_months, loss = loss, freq = freq)
+    # Interpolate gain to sii evaluation frequencies
+    if (length(prescription$gain) == length(freq) && all(prescription$freq == freq)) {
+       gain <- prescription$gain
+       mpo <- prescription$mpo
+    } else {
+       gain <- approx(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), rule = 2)$y
+       mpo <- approx(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), rule = 2)$y
+    }
+    
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
-    
     final_output <- pmin(raw_output, mpo) + (overshoot / 10.0)
-    gain <- final_output - speech
+    gain <- pmax(final_output - speech, 0)
     
-    # Ensure no negative gain after MPO restriction
-    gain <- pmax(gain, 0)
   } else {
     gain <- rep(0, length(speech))
   }
@@ -602,7 +602,7 @@ get_specific_loudness <- function(x) {
 }
 
 #' @export
-calculate_loudness <- function(x) {
+calculate_loudness <- function(x, ohc_proportion = 0.65) {
   if (is.null(x$table$"E'i")) {
     return(NA) # Cannot compute loudness without aided equivalent spectrum level
   }
@@ -627,7 +627,7 @@ calculate_loudness <- function(x) {
   # Sensorineural component dictates OHC/IHC damage and recruitment
   sn_htl <- pmax(htl - abg, 0)
   
-  ohc_loss <- pmin(0.9 * sn_htl, 57.6)
+  ohc_loss <- pmin(ohc_proportion * sn_htl, 57.6)
   ihc_loss <- pmax(sn_htl - ohc_loss, 0)
   
   # Create a dense 1 Hz spectrum from the band densities
