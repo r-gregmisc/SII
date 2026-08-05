@@ -1,5 +1,7 @@
 test_that("ANSI S3.5-1997 Annex B - Normal Hearing Validation", {
-  ansib <- read.table(system.file("extdata", "ANSI.B.txt", package="SII"), header=TRUE)
+  fpath <- system.file("extdata", "ANSI.B.txt", package="SII")
+  skip_if_not(file.exists(fpath) && file.size(fpath) > 0, "ANSI.B.txt not found")
+  ansib <- read.table(fpath, header=TRUE)
   
   result <- sii(
     speech = ansib$E.,
@@ -12,7 +14,9 @@ test_that("ANSI S3.5-1997 Annex B - Normal Hearing Validation", {
 })
 
 test_that("ANSI S3.5-1997 Annex C - Impaired Hearing Validation", {
-  ansic <- read.table(system.file("extdata", "ANSI.C.txt", package="SII"), header=TRUE)
+  fpath <- system.file("extdata", "ANSI.C.txt", package="SII")
+  skip_if_not(file.exists(fpath) && file.size(fpath) > 0, "ANSI.C.txt not found")
+  ansic <- read.table(fpath, header=TRUE)
   
   result <- sii(
     speech = ansic$E.,

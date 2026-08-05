@@ -2,7 +2,7 @@ reload.constants <- function(xls.path,rda.path=xls.path)
   {
 
     
-    if(!require("gdata"))
+    if(!requireNamespace("gdata", quietly = TRUE))
       stop("'gdata' package must be installed to run this function.")
 
     read.xls <- gdata::read.xls

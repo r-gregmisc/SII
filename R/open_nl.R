@@ -88,5 +88,5 @@ plot.prescription_target <- function(x, ...) {
        main=paste("Open-NL Target (", x$overall_level, " dB SPL)", sep=""),
        ylim=c(0, max(x$gain) + 10))
   points(x$freq, x$gain, pch=16)
-  grid()
+  graphics::grid()
 }
