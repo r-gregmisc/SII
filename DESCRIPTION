@@ -29,8 +29,8 @@ Description:
    'Bioscience' Education and Technology ('CBET') of the Rochester
    Institute of Technology ('RIT').
 Depends: R (>= 3.5.0)
-Suggests: splines, readxl, xtable, gdata, shiny, bslib, testthat
-License: GPL-3.0
+Suggests: splines, readxl, xtable, shiny, bslib, testthat
+License: GPL-3
 LazyLoad: yes
 Packaged: 2018-11-18 09:53:18 UTC; hornik
 NeedsCompilation: no

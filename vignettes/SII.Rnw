@@ -1,5 +1,5 @@
 % \VignetteIndexEntry{Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index}
-% \VignetteDepends{SII, gdata, xtable, splines} 
+% \VignetteDepends{SII, readxl, xtable, splines} 
 % \VignetteKeyword{Speech Intelligibility Index} 
 %
 \documentclass[letterpaper]{article}
@@ -230,8 +230,8 @@ The value given in the Standard is $0.504$.
 
 First, we need to load the patient information table
 <<LoadData, eval=FALSE>>=
-library(gdata)
-patInfo <- read.xls("../AI subject list.xls")
+library(readxl)
+patInfo <- read_excel("../AI subject list.xls")
 @ 
 
 Check that we got the data properly read in:
@@ -321,8 +321,8 @@ sii.dina <- function(infile, outfile, verbose=TRUE)
     if(verbose)
       cat("\nLoading data file '", infile, "'...\n", sep="")
     ## Load the data
-    library(gdata)
-    patInfo <- read.xls(infile)
+    library(readxl)
+    patInfo <- read_excel(infile)
     
     ## measured frequencies
     freq <- c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000)
