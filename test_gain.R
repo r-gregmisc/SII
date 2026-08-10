@@ -1,5 +1,0 @@
-source("R/nalr.R")
-freq <- c(250, 500, 1000, 2000, 4000, 8000)
-threshold <- c(15, 20, 30, 40, 50, 60)
-gain <- calculate_open_nl_gain(freq, threshold, prescription="DSL v5.0", experience="experienced")
-print(gain)
