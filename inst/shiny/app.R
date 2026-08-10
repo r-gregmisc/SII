@@ -631,36 +631,41 @@ server <- function(input, output, session) {
                         measured_wrs = meas_wrs, wrs_level = input$wrs_level)
     }
     
-    # Predict NAL-NL2
-    preset <- input$preset
-    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7")) {
-      target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
-      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
-      val_nalnl2_sii <- obj_nalnl2$sii
-      name_nalnl2 <- "NAL-NL2 (JD2011)"
-    } else {
-      val_nalnl2_sii <- NA
-      val_nalnl2_sones <- NA
-      name_nalnl2 <- "NAL-NL2 (N/A for Custom)"
-    }
-    
     calc_loudness <- function(obj) {
       if (input$config == "unilateral") {
-        return(calculate_loudness(obj))
+        l_res <- calculate_loudness(obj)
+        return(if (is.list(l_res)) l_res$total else l_res)
       } else {
         return(calculate_binaural_loudness(obj, obj))
       }
     }
     
     label_loudness <- if (input$config == "unilateral") "Unilateral Loudness (sones)" else "Bilateral Loudness (sones)"
+
+    # Predict NAL-NL2
+    preset <- input$preset
+    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7")) {
+      target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
+      obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
+      val_nalnl2_sii <- obj_nalnl2$sii
+      val_nalnl2_loudness <- sprintf("%.1f", calc_loudness(obj_nalnl2))
+      name_nalnl2 <- "NAL-NL2 (JD2011)"
+    } else {
+      val_nalnl2_sii <- NA
+      val_nalnl2_loudness <- "NA"
+      name_nalnl2 <- "NAL-NL2 (N/A for Custom)"
+    }
     
     df <- data.frame(
       Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2),
-      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii)),
+      SII = c(sprintf("%.3f", obj_unaided$sii), 
+              sprintf("%.3f", obj_nalr$sii), 
+              sprintf("%.3f", obj_opennl$sii), 
+              ifelse(is.na(val_nalnl2_sii), "NA", sprintf("%.3f", val_nalnl2_sii))),
       Loudness = c(sprintf("%.1f", calc_loudness(obj_unaided)),
-                sprintf("%.1f", calc_loudness(obj_nalr)),
-                sprintf("%.1f", calc_loudness(obj_opennl)),
-                ifelse(is.na(val_nalnl2_sii), "NA", sprintf("%.1f", calc_loudness(obj_nalnl2))))
+                   sprintf("%.1f", calc_loudness(obj_nalr)),
+                   sprintf("%.1f", calc_loudness(obj_opennl)),
+                   val_nalnl2_loudness)
     )
     names(df)[3] <- label_loudness
     df

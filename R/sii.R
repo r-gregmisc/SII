@@ -697,11 +697,14 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
 #' @return A numeric value representing the total binaural loudness in Sones.
 #' @export
 calculate_binaural_loudness <- function(x_left, x_right = NULL, alpha_b = -0.25) {
-  l_left <- calculate_loudness(x_left)
+  l_left_res <- calculate_loudness(x_left)
+  l_left <- if (is.list(l_left_res)) l_left_res$total else l_left_res
+  
   if (is.null(x_right)) {
     l_right <- l_left
   } else {
-    l_right <- calculate_loudness(x_right)
+    l_right_res <- calculate_loudness(x_right)
+    l_right <- if (is.list(l_right_res)) l_right_res$total else l_right_res
   }
   
   # Pieper et al. (2021) / Moore et al. (2016) binaural inhibition heuristic
