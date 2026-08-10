@@ -1,0 +1,8 @@
+r_files <- list.files("R", pattern = "\\.R$", full.names = TRUE)
+for (f in r_files) source(f)
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+p <- c(20, 25, 40, 60, 75, 80)
+abg <- rep(0, 6)
+t_seed <- open_nl(65, threshold = p, freq = freqs, loss = abg, optimize = FALSE)
+res_seed <- sii(speech = t_seed$speech, noise = rep(-50, length(freqs)), threshold = p, loss = abg, freq = freqs, prescription = t_seed, interpolate = TRUE)
+warnings()

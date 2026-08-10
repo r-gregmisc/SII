@@ -1,0 +1,6 @@
+library(devtools)
+load_all()
+tgt <- open_nl(65, threshold=c(15, 20, 30, 40, 50, 60), freq=c(250, 500, 1000, 2000, 4000, 8000), loss=rep(0,6))
+res <- sii(speech=tgt$speech + tgt$gain, noise=rep(-100,6), threshold=c(15, 20, 30, 40, 50, 60), freq=c(250, 500, 1000, 2000, 4000, 8000), loss=rep(0,6), prescription=NULL, method="octave")
+print(res$sii_loudness_obj$Ldn)
+head(res$sii_loudness_obj$E)

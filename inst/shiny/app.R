@@ -5,7 +5,7 @@ library(bslib)
   r_dir <- "R"
 
 # Source each file individually so one failure doesn't block the rest
-local_files <- c("sii.R", "moore_glasberg.R", "nalr.R", "plot.SII.R", "benchmark_targets.R")
+local_files <- c("sii.R", "moore_glasberg.R", "nalr.R", "plot.SII.R", "benchmark_targets.R", "open_nl.R")
 for (f in local_files) {
   fp <- file.path(r_dir, f)
   if (file.exists(fp)) {
@@ -21,7 +21,9 @@ for (f in local_files) {
 # Fallback: if source didn't work, load the CRAN package
 if (!exists("sii", mode = "function") || !"wrs_level" %in% names(formals(sii))) {
   cat(">>> WARNING: Local source failed, falling back to installed SII package\n")
-  library(SII)
+  # Use require() instead of library() to prevent shinylive from statically
+  # parsing this as a required WebAssembly dependency.
+  require("SII", character.only = TRUE)
 }
 
 # Define the Modern UI Layout
@@ -92,6 +94,14 @@ ui <- page_sidebar(
         selectInput("prescription", "Fitting Rationale:", 
                     choices = c("Unaided" = "none", "NAL-R" = "NAL-R", "Open-NL" = "Open-NL"),
                     selected = "Open-NL"),
+        conditionalPanel(
+          condition = "input.prescription == 'Open-NL'",
+          checkboxInput("optimize_opennl", "Use Formal Optimization (Maximizes SII)", value = FALSE),
+          conditionalPanel(
+            condition = "input.optimize_opennl == true",
+            sliderInput("loudness_cap", "Loudness Cap (Sones):", min = 5, max = 30, value = 10, step = 1)
+          )
+        ),
         selectInput("module", "Operating Module:",
                     choices = c("Standard (Everyday)" = "standard", 
                                 "Comfort in Noise (CIN)" = "cin", 
@@ -117,7 +127,7 @@ ui <- page_sidebar(
         selectInput("experience", "Experience:", 
                     choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
                     selected = "experienced"),
-        selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "bilateral"),
+        selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "unilateral"),
 
         selectInput("coupling", "Acoustic Coupling / Vent:", 
                     choices = list(
@@ -200,14 +210,16 @@ server <- function(input, output, session) {
       data("critical", package="SII")
     }
     f_21 <- critical$fi
-    # The ANSI S3.5 normal overall SPL is 62.35 dB SPL. Summing spectrum levels directly without 
-    # bandwidth scaling yields incorrect levels, resulting in massive over-amplification!
     overall_normal <- 62.35
     list(f_21 = f_21, normal_spectrum = critical$normal, overall_normal = overall_normal)
   })
   
+  is_loading_preset <- reactiveVal(FALSE)
+  
   # Handle Presets
   observeEvent(input$preset, {
+    if (input$preset != "custom") is_loading_preset(TRUE)
+    
     if (input$preset == "a1") {
       updateCheckboxInput(session, "use_bc", value = FALSE)
       updateSliderInput(session, "htl250", value = 15)
@@ -285,6 +297,38 @@ server <- function(input, output, session) {
     }
   })
   
+  observe({
+    req(input$preset)
+    if (input$preset == "custom") return()
+    
+    expected <- list(
+      a1 = c(15, 20, 30, 40, 50, 60),
+      a2 = c(60, 50, 40, 30, 20, 15),
+      a3 = c(10, 20, 40, 50, 55, 60),
+      a4 = c(0, 0, 10, 40, 70, 80),
+      a5 = c(10, 10, 20, 60, 80, 100),
+      a6 = c(50, 55, 60, 65, 75, 80),
+      a7 = c(50, 50, 50, 50, 50, 50)
+    )
+    
+    curr <- c(input$htl250, input$htl500, input$htl1000, input$htl2000, input$htl4000, input$htl8000)
+    
+    # If we are loading a preset, wait until they all match
+    if (is_loading_preset()) {
+      if (isTRUE(all.equal(curr, expected[[input$preset]]))) {
+        is_loading_preset(FALSE)
+      }
+      return()
+    }
+    
+    # If we are NOT loading a preset, and the sliders don't match, the user moved one!
+    if (input$preset %in% names(expected)) {
+      if (!isTRUE(all.equal(curr, expected[[input$preset]]))) {
+        updateSelectInput(session, "preset", selected = "custom")
+      }
+    }
+  })
+  
   # Ensure BC <= AC (Air-Bone Gap cannot be negative)
   observe({
     req(input$use_bc)
@@ -320,7 +364,45 @@ server <- function(input, output, session) {
     htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
     
     # 3. Handle prescription
-    presc <- if (input$prescription == "none") NULL else input$prescription
+    if (input$prescription == "none") {
+      presc <- NULL
+    } else if (input$prescription == "Open-NL" && isTRUE(input$optimize_opennl)) {
+      # Recalculate discrete 6-freq loss array for open_nl
+      if (isTRUE(input$use_bc)) {
+        bc_f <- c(250, 500, 1000, 2000, 4000)
+        bc_input <- c(input$bc250, input$bc500, input$bc1000, input$bc2000, input$bc4000)
+        ac_at_bc_f <- threshold[1:5]
+        nr_b <- input$nr_bone
+        if (!is.null(nr_b)) {
+          if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
+          if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
+          if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
+          if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
+          if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
+        }
+        bc_input <- pmin(bc_input, ac_at_bc_f)
+        bc_6 <- approx(x = log10(bc_f), y = bc_input, xout = log10(f_htl), rule = 2)$y
+        loss_6 <- pmax(0, threshold - bc_6)
+      } else {
+        loss_6 <- rep(0, 6)
+      }
+      
+      presc <- open_nl(speech = as.numeric(input$speech_level), 
+                       threshold = threshold, 
+                       freq = f_htl, 
+                       loss = loss_6,
+                       gender = input$gender,
+                       experience = input$experience,
+                       config = input$config,
+                       age = input$age,
+                       age_years = input$adult_age,
+                       coupling = input$coupling,
+                       module = input$module,
+                       optimize = TRUE, 
+                       loudness_cap = input$loudness_cap)
+    } else {
+      presc <- input$prescription
+    }
     
     # 3.5 Handle LDLs
     if (isTRUE(input$use_ldl)) {
@@ -387,8 +469,6 @@ server <- function(input, output, session) {
     target_level <- as.numeric(input$speech_level)
     if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7") && !is.null(presc) && presc == "Open-NL") {
       obj$target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
-      obj$target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
-      obj$target_cameq2 <- get_jd2011_target(preset, "CAMEQ2-HF", d$f_21, target_level)
     }
     
     obj$target_level <- target_level
@@ -512,40 +592,56 @@ server <- function(input, output, session) {
     if (!is.null(meas_wrs) && is.na(meas_wrs)) meas_wrs <- NULL
     
     # Calculate Open-NL
-    obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "Open-NL", 
-                      desensitization = input$desensitization, 
-                      gender = input$gender, experience = input$experience, 
-                      config = input$config, age = input$age, age_years = input$adult_age, 
-                      coupling = input$coupling, module = input$module, transducer = input$transducer,
-                      measured_wrs = meas_wrs, wrs_level = input$wrs_level)
+    if (isTRUE(input$optimize_opennl)) {
+      if (isTRUE(input$use_bc)) {
+        bc_f <- c(250, 500, 1000, 2000, 4000)
+        bc_input <- c(input$bc250, input$bc500, input$bc1000, input$bc2000, input$bc4000)
+        ac_at_bc_f <- threshold[1:5]
+        nr_b <- input$nr_bone
+        if (!is.null(nr_b)) {
+          if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
+          if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
+          if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
+          if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
+          if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
+        }
+        bc_input <- pmin(bc_input, ac_at_bc_f)
+        bc_6 <- approx(x = log10(bc_f), y = bc_input, xout = log10(f_htl), rule = 2)$y
+        loss_6 <- pmax(0, threshold - bc_6)
+      } else {
+        loss_6 <- rep(0, 6)
+      }
+      
+      target <- open_nl(speech = target_level, 
+                        threshold = threshold, freq = f_htl, loss = loss_6,
+                        gender = input$gender, experience = input$experience, 
+                        config = input$config, age = input$age, age_years = input$adult_age, 
+                        coupling = input$coupling, module = input$module, 
+                        optimize = TRUE, loudness_cap = input$loudness_cap)
+                        
+      obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = target, 
+                        desensitization = input$desensitization, transducer = input$transducer,
+                        measured_wrs = meas_wrs, wrs_level = input$wrs_level)
+    } else {
+      obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "Open-NL", 
+                        desensitization = input$desensitization, 
+                        gender = input$gender, experience = input$experience, 
+                        config = input$config, age = input$age, age_years = input$adult_age, 
+                        coupling = input$coupling, module = input$module, transducer = input$transducer,
+                        measured_wrs = meas_wrs, wrs_level = input$wrs_level)
+    }
     
-    # Predict NAL-NL2 and DSL v5.0
+    # Predict NAL-NL2
     preset <- input$preset
     if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7")) {
       target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
-      target_dsl <- get_jd2011_target(preset, "DSL", d$f_21, target_level)
-      target_cameq2 <- get_jd2011_target(preset, "CAMEQ2-HF", d$f_21, target_level)
       obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
-      obj_dsl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_dsl, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
-      obj_cameq2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_cameq2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
       val_nalnl2_sii <- obj_nalnl2$sii
-      val_dsl_sii <- obj_dsl$sii
-      val_cameq2_sii <- obj_cameq2$sii
       name_nalnl2 <- "NAL-NL2 (JD2011)"
-      name_dsl <- "DSL v5.0 (JD2011)"
-      name_cameq2 <- "CAMEQ2-HF (JD2011)"
     } else {
       val_nalnl2_sii <- NA
-      val_dsl_sii <- NA
-      val_cameq2_sii <- NA
-      
       val_nalnl2_sones <- NA
-      val_dsl_sones <- NA
-      val_cameq2_sones <- NA
-      
       name_nalnl2 <- "NAL-NL2 (N/A for Custom)"
-      name_dsl <- "DSL v5.0 (N/A for Custom)"
-      name_cameq2 <- "CAMEQ2-HF (N/A for Custom)"
     }
     
     calc_loudness <- function(obj) {
@@ -556,16 +652,18 @@ server <- function(input, output, session) {
       }
     }
     
-    data.frame(
-      Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2, name_dsl, name_cameq2),
-      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii, val_dsl_sii, val_cameq2_sii)),
-      Sones = c(sprintf("%.1f", calc_loudness(obj_unaided)),
+    label_loudness <- if (input$config == "unilateral") "Unilateral Loudness (sones)" else "Bilateral Loudness (sones)"
+    
+    df <- data.frame(
+      Prescription = c("Unaided", "NAL-R", "Open-NL", name_nalnl2),
+      SII = sprintf("%.3f", c(obj_unaided$sii, obj_nalr$sii, obj_opennl$sii, val_nalnl2_sii)),
+      Loudness = c(sprintf("%.1f", calc_loudness(obj_unaided)),
                 sprintf("%.1f", calc_loudness(obj_nalr)),
                 sprintf("%.1f", calc_loudness(obj_opennl)),
-                ifelse(is.na(val_nalnl2_sii), "NA", sprintf("%.1f", calc_loudness(obj_nalnl2))),
-                ifelse(is.na(val_dsl_sii), "NA", sprintf("%.1f", calc_loudness(obj_dsl))),
-                ifelse(is.na(val_cameq2_sii), "NA", sprintf("%.1f", calc_loudness(obj_cameq2))))
+                ifelse(is.na(val_nalnl2_sii), "NA", sprintf("%.1f", calc_loudness(obj_nalnl2))))
     )
+    names(df)[3] <- label_loudness
+    df
   }, align = "c")
   
   # Render the Compression Prescription

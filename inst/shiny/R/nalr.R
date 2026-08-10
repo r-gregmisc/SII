@@ -60,147 +60,84 @@ get_recd_diff <- function(age, age_months = NULL) {
   return(list(f = recd_f, diff = infant_recd - adult_recd))
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, ten_edge_hf = NULL, ten_edge_lf = NULL) {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, ten_edge_hf = NULL, ten_edge_lf = NULL, user_cr = NULL) {
   # 0. Conductive Component Separation
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))
   }
   sn_threshold <- pmax(0, threshold - loss)
 
-  # 0. Minimal Hearing Loss (MHL) Module Bypass
-  # If the patient has near-normal hearing (PTA <= 25) and selects the MHL module,
-  # we completely bypass the standard WDRC compensation formula.
-  pta_4 <- mean(sn_threshold[freq %in% c(500, 1000, 2000, 4000)], na.rm = TRUE)
-  if (module == "mhl" && !is.na(pta_4) && pta_4 <= 25) {
-    # MHL applies a flat 3-5 dB insertion gain above 1kHz to access SNR features,
-    # tapering strictly to 0 dB in the low frequencies.
-    mhl_gain <- approx(x = c(250, 500, 1000, 2000, 4000, 8000), 
-                       y = c(0, 0, 3, 5, 5, 5), xout = freq, rule = 2)$y
-                       
-    # Linear amplification for speech inputs up to 65 dB SPL
-  if (file.exists(file.path("data", "critical.rda"))) {
-    load(file.path("data", "critical.rda"), envir = environment())
-  } else {
-    data("critical", package="SII", envir = environment())
-  }
-    pivot <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
-    ct_band <- pivot + 5 # Set CT slightly above normal speech
-    
-    g_ct <- mhl_gain
-    cr_loud <- 1.5 # Gentle compression for loud inputs to prevent discomfort
-    
-    ig <- ifelse(input_level <= ct_band,
-                 g_ct,
-                 g_ct - (input_level - ct_band) * (1 - 1/cr_loud))
-                 
-    # 0.5 Apply Infant/Toddler RECD Correction before early return
-    recd_data <- get_recd_diff(age, age_months)
-    recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
-    ig <- ig - recd_diff
-    
-    return(ig)
-  }
-  
   # 1. Base Anchor (For 65 dB SPL input)
-  # We use a frequency-specific half-gain anchor decoupled from broadband PTA, similar to NAL-NL2 and DSL.
-  # This prevents normal low-frequency hearing from artificially dragging down high-frequency gain.
+  # NAL-style frequency-specific constants to shape the response
   c_freqs <- c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000)
   
-  # Standard NAL-NL2 targets use a ~0.31 multiplier for 65 dB SPL inputs, and DSL uses ~0.40.
-  # We use 0.35 as a balanced baseline for the engine, relying on the WDRC pivot to handle compression.
-  base_mult <- 0.35
-  
   if (experience == "new") {
-    # New users prefer less high-frequency gain and a warmer profile
-    c_vals <- c(0, 0, 0, -1, -3, -5, -8, -10)
-  } else if (experience == "power") {
-    # Power users prefer sharper, louder gain
-    c_vals <- c(-2, 0, 2, 2, 2, 0, -2, -5)
+    c_vals <- c(-3, 2, 3, 0, -2, -2, -2, -2)
   } else {
-    # Experienced users prefer a balanced, evidence-based profile
-    c_vals <- c(-2, 0, 1, 1, 1, -1, -3, -5)
+    c_vals <- c(-8, -1, 3, 1, 0, 0, 0, 0)
   }
-
   
+  if (gender == "female") {
+    c_vals <- c_vals - 1.5
+  }
   c_interp <- approx(x = log10(c_freqs), y = c_vals, xout = log10(freq), rule = 2)$y
-  # 1a. Reverse Slope Correction
-  # For reverse slope losses (where low frequencies are significantly worse than high frequencies),
-  # attempting to fully restore low/mid-frequency audibility causes severe upward spread of masking,
-  # where low-frequency amplification (e.g. vowels, ambient noise) masks the normal high-frequency consonants.
-  # We must apply an additional penalty in the 400-1500 Hz range to prevent this.
-  low_thresh_mean <- mean(sn_threshold[freq <= 1000], na.rm = TRUE)
-  high_thresh_mean <- mean(sn_threshold[freq >= 2000], na.rm = TRUE)
-  
-  reverse_slope_diff <- pmax(0, low_thresh_mean - high_thresh_mean)
-  
-  if (reverse_slope_diff > 15) {
-    rs_factor <- pmin(1, (reverse_slope_diff - 15) / 20)
-    
-    # NAL-R inherently prescribes a jagged shape (-11 at 250 Hz, 0 at 1000 Hz) because it assumes a sloping loss.
-    # Applying localized penalties to this already jagged shape causes notches (e.g. below 1000 Hz).
-    # To guarantee a perfectly smooth insertion gain response that prevents upward spread of masking,
-    # we dynamically transition the entire c_interp array to a perfectly flat, suppressed target (-10 dB).
-    # This forces the WDRC gain to scale smoothly and linearly with the audiogram thresholds.
-    flat_target <- -10
-    c_interp <- c_interp * (1 - rs_factor) + (flat_target * rs_factor)
-  }
-  
-  # Base multiplier (Lyregaard's POGO uses 0.5, NAL uses 0.46, DSL varies).
-  # The base multiplier is now set at the top of the function based on experience level.  
-  # Slope Penalty: If there is a massive difference between high and low thresholds,
-  # standard half-gain will cause too much gain in the low frequencies (upward spread of masking)
-  # and heavily penalize gain there to prevent the low/mid frequencies from masking the highs.
-  # We also boost the high frequencies to pull them out of the slope.
-  steep_slope_diff <- pmax(0, high_thresh_mean - low_thresh_mean)
-  
-  # 1c. Preliminary Dead Region Detection (to prevent over-boosting dead zones)
-  hf_dead_idx <- which(sn_threshold >= 90 & freq >= 1000)
-  f_e_hf <- if (length(hf_dead_idx) > 0) freq[hf_dead_idx[1]] else Inf
-  
-  lf_dead_idx <- which(sn_threshold >= 80 & freq <= 1000)
-  f_e_lf <- if (length(lf_dead_idx) > 0) freq[lf_dead_idx[length(lf_dead_idx)]] else -Inf
-  
-  if (steep_slope_diff > 30) {
-    steep_factor <- pmin(1, (steep_slope_diff - 30) / 30)
-    
-    # 1. Aggressive Low-Frequency Penalty (up to -20 dB) to kill the loudness dominance of the normal lows.
-    # We taper this penalty linearly (in log-freq space) so it hits 0 exactly at 1000 Hz.
-    # By removing localized, arbitrary boosts (mid/bridge) and letting the natural threshold scaling take over at 1000 Hz,
-    # we mathematically guarantee a perfectly smooth, continuous ramp in insertion gain.
-    lf_penalty <- steep_factor * 20
-    lf_weight <- pmax(0, pmin(1, 1 - (log10(freq) - log10(250)) / log10(1000/250))) 
-    
-    # 2. Apply corrections to c_interp
-    c_interp <- c_interp - (lf_penalty * lf_weight)
-  }
 
+  # 2. Loudness-Density Normalization Heuristic (LDN-H)
+  # Instead of arbitrary dynamic base multipliers, we anchor to the theoretically
+  # derived 0.46 half-gain rule (Lyregaard, 1988; NAL-R).
+  g_base <- 0.46 * sn_threshold + c_interp
   
-  # Use the dynamically selected base multiplier based on user experience.
-  # This globally sets the 65 dB SPL anchor to match user comfort vs audibility needs.
-  # We DO NOT bound this to 0 here because normal hearing needs negative insertion gain to shape the response!
-  g_65 <- base_mult * sn_threshold + c_interp
+  # A modest Severe-Loss Booster (0.15 slope) is applied to thresholds > 60 dB HL
+  # to gently assist profound losses without triggering explosive recruitment.
+  g_base <- g_base + 0.15 * pmax(0, sn_threshold - 60)
   
-  # Add a Severe-Loss Booster: NAL-R (half-gain) under-amplifies severe losses.
-  # For thresholds > 60 dB HL, we increase the gain ratio slightly.
-  # Cap the booster to a maximum of 10 dB to prevent mid-frequency spikes.
-  slb_raw <- pmax(0, sn_threshold - 60) * 0.5
-  slb_raw <- pmin(slb_raw, 15) # Cap at 15 dB
+  # 3. Slope-Dependent Loudness Normalization
+  # Because low frequencies dominate overall loudness, scaling severe losses
+  # can cause loudness to explode if the loss is steeply sloping (i.e. normal lows, profound highs).
+  # We calculate the low-frequency and high-frequency PTAs to determine the slope.
+  pta_lf <- mean(sn_threshold[freq <= 1000], na.rm = TRUE)
+  pta_hf <- mean(sn_threshold[freq >= 2000], na.rm = TRUE)
+  if (is.na(pta_lf)) pta_lf <- 40
+  if (is.na(pta_hf)) pta_hf <- 40
   
-  # Taper the Severe Loss Booster for frequencies inside a dead region.
-  # Pumping massive gain into a dead region causes distortion without benefit.
-  # However, hard-clipping the gain to 0 instantly at the boundary creates a massive cliff in the 
-  # frequency response (e.g. dropping 10 dB in half an octave), which causes phase distortion
-  # and is technically infeasible for hearing aid receivers. We taper it smoothly over 1 octave.
+  slope_diff <- pta_hf - pta_lf
+  
+  if (slope_diff > 15 && pta_hf > 65) {
+    # STEEP SLOPE: Aggressive penalty to low-frequency gain 
+    # to prevent the overall loudness density from exceeding the comfort threshold (fixes A5 overprescription).
+    lf_penalty_factor <- pmin(1, (slope_diff - 15) / 20)
+    lf_penalty_max <- lf_penalty_factor * 15 # Up to 15 dB penalty
+    
+    lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
+    g_base <- g_base - (lf_penalty_max * lf_weights)
+  } else if (slope_diff < -15) {
+    # REVERSE SLOPE: Low frequencies are significantly worse than high frequencies.
+    # We must suppress low-frequency gain to prevent upward spread of masking.
+    rs_factor <- pmin(1, (-slope_diff - 15) / 20)
+    flat_target <- -10
+    lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
+    # Apply the -10 dB suppression to the correction array (c_interp) in the low frequencies
+    # rather than flattening the entire g_base to -10 (which would cause severe attenuation)
+    g_base <- g_base - (c_interp - flat_target) * rs_factor * lf_weights
+  }
+  # For FLAT audiograms (slope_diff between -15 and 15), NO low-frequency penalty is applied.
+  # This solves the A4 under-prescription paradox by allowing severe flat losses to retain their 50% gain.
+  
+  # 4. Dead Region Tapering
+  f_e_hf <- if (!is.null(ten_edge_hf)) ten_edge_hf else Inf
+  hf_dead_idx <- if (!is.null(ten_edge_hf)) which(freq >= ten_edge_hf) else integer(0)
   hf_dead_weight <- ifelse(freq >= f_e_hf, pmax(0, 1 - (log10(freq) - log10(f_e_hf)) / log10(2)), 1)
+  
+  f_e_lf <- if (!is.null(ten_edge_lf)) ten_edge_lf else -Inf
+  lf_dead_idx <- if (!is.null(ten_edge_lf)) which(freq <= ten_edge_lf) else integer(0)
   lf_dead_weight <- ifelse(freq <= f_e_lf, pmax(0, 1 - (log10(f_e_lf) - log10(freq)) / log10(2)), 1)
   
-  slb_raw <- slb_raw * hf_dead_weight * lf_dead_weight
+  # Apply dead region suppression to any gain exceeding standard half-gain
+  # to test the hypothesis that boosting dead regions is detrimental.
+  excess_gain <- pmax(0, g_base - (0.5 * sn_threshold + c_interp))
+  g_base <- g_base - excess_gain + (excess_gain * hf_dead_weight * lf_dead_weight)
   
-  # Taper SLB in mid frequencies (1000-2000 Hz)
-  mid_taper <- pmax(0, pmin(1, 1 - abs(freq - 1500) / 1000)) # 1 at 1500, 0 at 500 and 2500
-  slb_final <- slb_raw * (1 - 0.5 * mid_taper)
-  
-  g_65 <- g_65 + slb_final
+  g_65 <- g_base
   
   # High-Frequency Desensitization Roll-off (Smooth Soft-Compression)
   # Instead of a harsh penalty or hard cap (which causes jagged artifacts),
@@ -216,13 +153,14 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   hf_weight <- pmax(0, pmin(1, (freq - 2000) / 2000)) 
   
   # We dynamically scale the gain limit so severe losses can still get the amplification they need.
-  # Lifted base limit from 25 to 30 dB to prevent underamplification of steep slopes
+  # Lifted base limit to 45 dB, and increased the slope multiplier to 1.0 
+  # to prevent severe/profound losses from being crushed by soft-compression (Macrae, 1991).
   if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    gain_limit <- 40 + pmax(0, sn_threshold - 60) * 0.5
+    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
   } else if (experience == "power") {
-    gain_limit <- 40 + pmax(0, sn_threshold - 60) * 0.5
+    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
   } else {
-    gain_limit <- 30 + pmax(0, sn_threshold - 60) * 0.4
+    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
   }
   
   if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High") && (is.null(age) || substr(age[1], 1, 5) != "child")) {
@@ -238,8 +176,8 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   g_65 <- g_65 - (hf_weight * slope_factor * (excess_gain - compressed_excess))
   
   # 1.5 Dynamic Range Mapping (DSL v5.0 philosophy)
-  # Compare measured LDL to expected LDL
-  predicted_ldl_spl <- 100 + pmax(0, sn_threshold - 40) * 0.5
+  # Compare measured LDL to expected LDL (adding loss to properly account for conductive component)
+  predicted_ldl_spl <- 100 + pmax(0, sn_threshold - 40) * 0.5 + loss
   
   if (!is.null(ldl) && length(ldl) == length(sn_threshold)) {
     measured_ldl_spl <- ifelse(is.na(ldl), predicted_ldl_spl, ldl + 10)
@@ -329,29 +267,13 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # A lower LDL (squeezed dynamic range) requires a higher compression ratio
   base_cr <- base_cr - (ldl_diff * 0.02)
   
-  # Severe/Profound (>65 HL): CR actually REDUCES back toward linear.
-  # Patients with severe loss prefer lower compression (1:1 to 2:1) to preserve the temporal envelope.
-  severe_penalty <- pmax(0, sn_threshold - 65) / 30
-  
-  # Frequency dependence for severe loss:
-  # Low frequencies (<1000 Hz) strongly prefer linear (CR ~1.0).
-  # High frequencies can tolerate more compression (CR ~1.5 - 2.0).
   freq_modifier <- pmax(0, pmin(1, (freq - 500) / 2500)) # 0 at 500Hz, 1 at >=3000Hz
-  adjusted_penalty <- severe_penalty * (1.5 - 0.5 * freq_modifier)
-  
-  cr_loud <- base_cr - adjusted_penalty
-  
-  # Clinical Limits: Ensure CR stays between 1.0 (linear) and a strict frequency-dependent maximum.
-  # Based on Keidser et al. (2007) and Hornsby & Ricketts (2001), low frequencies are strictly capped at 1.5,
-  # while high frequencies can tolerate slightly more (up to 2.4).
   max_cr <- 1.5 + (0.9 * freq_modifier) # 1.5 at <=500Hz, 2.4 at >=3000Hz
   
-  # Grant & Walden (2013) Age-based Compression Relaxing
-  # Older adults (>60 years) have significantly poorer temporal resolution (gap detection).
-  # We reduce the max_cr progressively toward 1.5 to preserve the temporal speech envelope.
-  if (!is.null(age_years) && age == "adult" && age_years > 60) {
-    age_factor <- pmin(1.0, (age_years - 60) / 30.0) # Scales from 0 at age 60 to 1 at age 90
-    max_cr <- max_cr - (max_cr - 1.5) * age_factor
+  if (!is.null(user_cr) && length(user_cr) == length(freq)) {
+    cr_loud <- user_cr
+  } else {
+    cr_loud <- base_cr
   }
   
   cr_loud <- pmax(1.0, pmin(cr_loud, max_cr))
@@ -396,15 +318,23 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # 3.8 Comfort in Noise (CIN) Module
   if (module == "cin") {
     # Comfort in Noise (CIN) module aims to reduce loudness and improve comfort
-    # in high-level noise environments. Based on evidence, listeners prefer
-    # less compression (linear or 1.5:1) when noise exceeds the compression threshold.
-    cr_loud <- pmin(cr_loud, 1.5)
+    # 3. Apply Multi-Stage WDRC limits
+  # Higher thresholds require lower compression ratios to preserve the speech envelope
+  # in high-level noise environments. (Keidser et al., 2012).
+  cr_loud <- 1 + (sn_threshold / 50)
+  cr_loud <- pmin(cr_loud, 2.0)
+  
+  # For severe losses (>70 dB HL), we drop the CR back down to preserve modulation depth.
+  cr_loud <- ifelse(sn_threshold > 70, 1.5, cr_loud)
     
     # We lower the WDRC pivot / CT so compression kicks in earlier.
     ct_band <- ct_band - 10
   }
   
-  # The target gain 'g_65' is prescribed for an input level of 'pivot'.
+  # The target gain 'g_65' is prescribed for an input level of 'pivot' (the band level for 65 dB overall).
+  # We convert the overall input_level to the corresponding band level:
+  input_band <- pivot + (input_level - 65)
+  
   # If CT > pivot, the pivot is in the linear region, so the linear gain is simply g_65.
   # If CT <= pivot, the pivot is in the WDRC region. We calculate the gain at CT by climbing the WDRC slope backward.
   g_ct <- ifelse(ct_band > pivot,
@@ -412,9 +342,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
                  g_65 + (pivot - ct_band) * (1 - 1/cr_loud))
   
   # 4. Multistage I/O calculation (Linear below CT, WDRC above CT)
-  ig <- ifelse(input_level <= ct_band,
+  ig <- ifelse(input_band <= ct_band,
                g_ct,
-               g_ct - (input_level - ct_band) * (1 - 1/cr_loud))
+               g_ct - (input_band - ct_band) * (1 - 1/cr_loud))
                
   # 5. Apply Infant/Toddler RECD Correction
   # Infants have smaller ear canals, meaning the same hearing aid output produces a higher SPL at the eardrum.
@@ -492,7 +422,8 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 8. Conductive Component Correction
   # Restore 75% of the Air-Bone Gap as linear gain, as specified by NAL-NL2 / Johnson (2013).
-  abg_gain <- 0.75 * loss
+  # Cap at 30 dB to prevent runaway loudness in extreme ABG cases (Ching et al., 2013).
+  abg_gain <- pmin(0.75 * loss, 30)
   
   # Apply a gentle 6 dB low-frequency taper to the ABG gain (fading out by 1000 Hz)
   # to prevent upward spread of masking without being overkill or destroying the smooth response.
@@ -504,6 +435,22 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # We floor the target at slightly below the physical insertion loss of the vent/coupling.
   # A hard floor at 0 dB forces the hearing aid to fight open vents, causing massive comb filtering.
   ig <- pmax(ig, ve_interp - 10, na.rm = TRUE)
+  
+  # Absolute ceiling: Insertion gain should not exceed 85% of the total threshold to prevent permanent threshold shift (PTS).
+  ig <- pmin(ig, 0.85 * threshold, na.rm = TRUE)
+  
+  # 9. MPO-domain saturation limit
+  # The output of the hearing aid must not exceed the predicted LDL.
+  # Instead of hard-clipping the WDRC gain (which starves soft sounds),
+  # we cap the gain such that the final aided output never exceeds the LDL minus a 5 dB buffer.
+  mpo_spl_ceiling <- predicted_ldl_spl - 5
+  
+  # The absolute maximum gain is the ceiling minus the current input level (band level).
+  # This correctly allows large gain for soft sounds while compressing loud sounds.
+  max_allowable_ig <- mpo_spl_ceiling - input_band
+  ig <- pmin(ig, max_allowable_ig, na.rm = TRUE)
+
+  
   return(ig)
 }
 
@@ -550,13 +497,18 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age
   }
   mpo <- pmin(mpo, pts_safe_limit)
   
-  # ABSOLUTE CLINICAL HARD CAP: NEVER exceed 120 dB SPL (at the cochlea)
-  # Infants require lower limits due to smaller ear canal volumes (RECDs)
+  # ABSOLUTE CLINICAL HARD CAP: 
+  # We removed the arbitrary 120 dB SPL max_cochlear cap for adults. 
+  # Macrae (1991) and Johnson (2017) demonstrated that profoundly damaged cochleas 
+  # safely tolerate (and require) up to 130-135 dB SPL to achieve speech audibility.
+  # Infants still require careful monitoring of RECD limits.
   recd_data <- get_recd_diff(age, age_months)
   recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
   
-  max_cochlear <- 120 + loss - recd_diff
-  mpo <- pmin(mpo, max_cochlear)
+  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
+    max_cochlear <- 125 + loss - recd_diff
+    mpo <- pmin(mpo, max_cochlear)
+  }
   
   # ABSOLUTE HARDWARE LIMIT: Acoustic hearing aids max out around 135 dB SPL.
   mpo <- pmin(mpo, 135)
@@ -572,7 +524,7 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age
 #'
 #' @param freq A numeric vector of frequencies.
 #' @param threshold A numeric vector of hearing thresholds.
-#' @param module The operating module ("standard", "cin", "mhl").
+#' @param module The operating module ("standard", "cin").
 #' @return A list containing compression recommendations.
 #' @export
 prescribe_compression <- function(freq, threshold, module = "standard") {

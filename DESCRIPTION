@@ -17,14 +17,16 @@ Description:
    score. The methods implemented here extend the standard computations
    to allow calculation of 'SII' when the measured frequencies do not
    match those required by the standard by applying interpolation.
-   Furthermore, the package now includes advanced clinical methods to
-   predict aided 'SII' based on hearing aid prescriptive rationales.
-   This includes 'Open-NL' (Open Non-Linear), a novel theoretical
-   rationale inspired by 'NAL-NL2' (National Acoustic Laboratories
-   Non-Linear 2) and 'DSL' (Desired Sensation Level), as well as
-   functions to calculate real-ear insertion gains, estimate maximum
-   power output ('SSPL90' or Saturation Sound Pressure Level for a
-   90 dB input), and prescribe dynamic range compression.
+   Furthermore, the package now includes a hybrid nonlinear loudness 
+   engine integrating the excitation patterns of Chen et al. (2011) 
+   with the compressive integrals of Moore & Glasberg (2004) to predict
+   impaired loudness recruitment in sones. It also includes advanced 
+   clinical methods to predict aided 'SII' based on hearing aid 
+   prescriptive rationales, including 'Open-NL' (Open Non-Linear), a 
+   novel theoretical rationale inspired by 'NAL-NL2' (National Acoustic 
+   Laboratories Non-Linear 2) and 'DSL' (Desired Sensation Level), as 
+   well as functions to calculate real-ear insertion gains, estimate 
+   maximum power output ('SSPL90'), and prescribe dynamic range compression.
    Development of this package was originally funded by the Center for
    'Bioscience' Education and Technology ('CBET') of the Rochester
    Institute of Technology ('RIT').

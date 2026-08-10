@@ -1,0 +1,8 @@
+source("R/sii.R")
+source("R/open_nl.R")
+source("R/moore_glasberg.R")
+f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
+targ <- structure(list(freq = f_htl, gain = c(14, 20, 22, 20, 17, 12), mpo = rep(120, 6)), class="prescription_target")
+res <- sii(speech = 65, noise = 0, threshold = c(15, 20, 30, 40, 50, 60), loss = rep(0, 6), freq = f_htl, method = "critical", prescription = targ)
+l_uni <- calculate_loudness(res)
+cat("A1: ", l_uni, "\n")

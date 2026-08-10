@@ -1,0 +1,7 @@
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+a5 <- c(10, 10, 20, 60, 80, 100)
+devtools::load_all()
+res <- sii(speech = 65, threshold = a5, freq = freqs, prescription = "Open-NL")
+print(sprintf("SII: %.3f", res$sii))
+ldn <- calculate_loudness(res)
+print(sprintf("Sones: %.1f", ldn$sones))

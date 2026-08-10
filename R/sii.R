@@ -41,7 +41,8 @@ sii <- function(
                 wrs_level=NULL,
                 distortion_category=NULL,
                 ten_edge_hf=NULL,
-                ten_edge_lf=NULL
+                ten_edge_lf=NULL,
+                nal_ldf=FALSE
                 )
 {
   ## Assumptions:
@@ -66,7 +67,6 @@ sii <- function(
   ##   conductive hearing loss in dB.  If missing, assumed to be 0
 
   ## Determine which method will be used
-  print(paste("DEBUG: method argument is:", method))
   method=match.arg(method)
 
   ## Get the appropriate table of constants
@@ -76,12 +76,14 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
-    load(file.path("data", paste0(data.name, ".rda")), envir=environment())
-  } else {
-    data(list=data.name, package="SII", envir=environment())
+  if (!exists(data.name, envir = .GlobalEnv)) {
+    if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
+      load(file.path("data", paste0(data.name, ".rda")), envir=.GlobalEnv)
+    } else {
+      data(list=data.name, package="SII", envir=.GlobalEnv)
+    }
   }
-  table <- get(data.name)
+  table <- get(data.name, envir=.GlobalEnv)
 
   ## Get the correct importance functions
   if(missing(importance) || is.character(importance) )
@@ -90,12 +92,14 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
-            load(file.path("data", paste0(sic.name, ".rda")), envir=environment())
-          } else {
-            data(list=sic.name, package="SII", envir=environment())
+          if (!exists(sic.name, envir = .GlobalEnv)) {
+            if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
+              load(file.path("data", paste0(sic.name, ".rda")), envir=.GlobalEnv)
+            } else {
+              data(list=sic.name, package="SII", envir=.GlobalEnv)
+            }
           }
-          sic.table <- get(sic.name)
+          sic.table <- get(sic.name, envir=.GlobalEnv)
           table[,"Ii"] <- sic.table[[importance]]
         }
     }
@@ -124,7 +128,7 @@ sii <- function(
   else {
     const.speech=FALSE
     # Calculate the overall broadband SPL for the custom speech array
-    if ("hi" %in% names(table) && "li" %in% names(table)) {
+    if ("hi" %in% names(table) && "li" %in% names(table) && length(speech) == length(table$hi)) {
       overall_spl <- 10 * log10(sum((10^(speech/10)) * (table$hi - table$li), na.rm = TRUE))
     } else {
       overall_spl <- 10 * log10(sum(10^(speech/10), na.rm = TRUE))
@@ -288,8 +292,6 @@ sii <- function(
       stop("custom_gain must match the length of the frequencies used in the method or the original frequencies.")
     }
     # For custom gain benchmarking, we bypass the MPO calculation to test the exact target gain limits
-  } else if (!is.null(prescription) && prescription == "NAL-R") {
-    gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && inherits(prescription, "prescription_target")) {
     # If the user supplied a pre-calculated prescription_target S3 object
     
@@ -306,7 +308,10 @@ sii <- function(
     overshoot <- pmax(0, raw_output - mpo)
     final_output <- pmin(raw_output, mpo) + (overshoot / 10.0)
     gain <- pmax(final_output - speech, 0)
-    
+  } else if (!is.null(prescription) && is.character(prescription) && prescription == "NAL-R") {
+    gain <- calculate_nalr_gain(freq, threshold)
+  } else if (!is.null(prescription) && is.character(prescription) && prescription == "Open-NL") {
+    gain <- calculate_open_nl_gain(freq = freq, threshold = threshold, input_level = speech, gender = gender, experience = experience, config = config, age = age, coupling = coupling, module = module, ldl = ldl, age_years = age_years, age_months = age_months, loss = loss, distortion_category = distortion_category, ten_edge_hf = ten_edge_hf, ten_edge_lf = ten_edge_lf)
   } else {
     gain <- rep(0, length(speech))
   }
@@ -472,10 +477,16 @@ sii <- function(
       x[x > 1] <- 1  # max is 1
       x
     }
-  ## Formula A1, which extends formula 11 to handle conductive
-  ## hearing loss (Ji)
-  sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" )/160 
-  sii.tab$"Li" <- enforce.range(sii.tab$"Li")
+  if (nal_ldf) {
+    # NAL-NL2 modifies the LDF onset based on the degree of hearing loss
+    # Impaired ears tolerate higher presentation levels without losing intelligibility.
+    # We shift the penalty onset by 0.5 * threshold.
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" - (0.5 * sii.tab$"T'i"))/160
+    sii.tab$"Li" <- enforce.range(sii.tab$"Li")
+  } else {
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" )/160 
+    sii.tab$"Li" <- enforce.range(sii.tab$"Li")
+  }
   
   ## Step 7: Calculate Ki
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
@@ -493,8 +504,9 @@ sii <- function(
     p[p == 0] <- -1e-6
     
     # Apply desensitization to the audibility index (Ki)
-    # k' = [ (k/30)^p + m^p ]^(1/p) where k/30 is equivalent to our bounded Ki
-    sii.tab$"Ki" <- (sii.tab$"Ki"^p + m^p)^(1/p)
+    # Using a linear multiplier instead of a hard asymptotic cap allows the numerical 
+    # optimizer (L-BFGS-B) to maintain a non-zero gradient while still penalizing dead regions.
+    sii.tab$"Ki" <- sii.tab$"Ki" * m
     sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
   }
   
@@ -669,8 +681,8 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
     outerearcorrection='FreeField'
   )
   
-  # Return monaural loudness in sones
-  return(res$Ldn)
+  # Return both total loudness (Ldn) and specific loudness array (N_prime)
+  return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF))
 }
 
 #' Calculate Psychoacoustic Binaural Loudness (Sones)
