@@ -79,7 +79,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       y_min <- 0 # Start Y axis at 0 dB SPL
       y_max <- max(c(100, thresh_spl, noise, speech, x$mpo), na.rm=TRUE) + 5
       
-      is_aided <- !is.null(x$prescription)
+      is_aided <- !is.null(x[["prescription"]])
       
       if (grepl("dB SPL", x$vocal_effort)) {
         vocal_effort_str <- paste("Input Level:", x$vocal_effort)

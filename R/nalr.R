@@ -61,6 +61,9 @@ get_recd_diff <- function(age, age_months = NULL) {
 }
 
 calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, ten_edge_hf = NULL, ten_edge_lf = NULL, user_cr = NULL) {
+  # Define steep_slope_diff for HFDR and LDL logic
+  steep_slope_diff <- if (length(threshold) > 1) max(diff(threshold), na.rm = TRUE) else 0
+
   # 0. Conductive Component Separation
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))

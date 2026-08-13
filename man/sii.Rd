@@ -35,7 +35,8 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     wrs_level=NULL,
     distortion_category=NULL,
     ten_edge_hf=NULL,
-    ten_edge_lf=NULL)
+    ten_edge_lf=NULL,
+    nal_ldf=FALSE)
 \method{print}{SII}(x, digits=3, ...)
 \method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
 \method{summary}{SII}(object, digits=2, ...)
@@ -94,6 +95,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   \item{distortion_category}{Character string ("Mild", "Moderate", or "Severe") specifying the degree of speech distortion. If \code{NULL}, it is estimated based on \code{measured_wrs} and \code{wrs_level}.}
   \item{ten_edge_hf}{High-frequency dead region edge (optional).}
   \item{ten_edge_lf}{Low-frequency dead region edge (optional).}
+  \item{nal_ldf}{Logical flag indicating whether to use NAL-NL2 loudness discomfort factors (optional).}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 
   \item{clinical}{Logical flag. If \code{TRUE}, plots a patient-friendly clinical SPLogram highlighting the audible speech area. If \code{FALSE} (the default), the behavior depends on whether the object is aided or unaided. For unaided objects, it plots a diagnostic interpolation graph. For aided objects (when a prescription was used), it automatically generates a 3-line Insertion Gain plot for 55, 65, and 75 dB SPL input levels (dynamically loading and scaling the true Normal and Loud LTASS spectra).}
