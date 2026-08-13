@@ -11,7 +11,8 @@
 open_nl(speech = 65, threshold, freq, gender = "male", experience = "experienced",
         config = "bilateral", age = "adult", coupling = "custom_occluded",
         module = "standard", ldl = NULL, age_years = NULL, age_months = NULL,
-        loss = NULL, distortion_category = NULL, ten_edge_hf = NULL, ten_edge_lf = NULL)
+        loss = NULL, distortion_category = NULL, ten_edge_hf = NULL, ten_edge_lf = NULL,
+        user_cr = NULL, optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead")
 \method{print}{prescription_target}(x, ...)
 \method{summary}{prescription_target}(object, ...)
 \method{plot}{prescription_target}(x, ...)
@@ -33,6 +34,10 @@ open_nl(speech = 65, threshold, freq, gender = "male", experience = "experienced
   \item{distortion_category}{Distortion category ("Normal", "Low", "Moderate", "High").}
   \item{ten_edge_hf}{High-frequency dead region edge (optional).}
   \item{ten_edge_lf}{Low-frequency dead region edge (optional).}
+  \item{user_cr}{User defined compression ratio (optional).}
+  \item{optimize}{Optimization flag.}
+  \item{seed_noise}{Random noise for optimizer seeding.}
+  \item{optim_method}{Optimization method.}
   \item{x,object}{A \code{prescription_target} object.}
   \item{\dots}{Additional graphical or printing parameters.}
 }
