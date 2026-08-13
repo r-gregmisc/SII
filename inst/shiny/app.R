@@ -94,14 +94,6 @@ ui <- page_sidebar(
         selectInput("prescription", "Fitting Rationale:", 
                     choices = c("Unaided" = "none", "NAL-R" = "NAL-R", "Open-NL" = "Open-NL"),
                     selected = "Open-NL"),
-        conditionalPanel(
-          condition = "input.prescription == 'Open-NL'",
-          checkboxInput("optimize_opennl", "Use Formal Optimization (Maximizes SII)", value = FALSE),
-          conditionalPanel(
-            condition = "input.optimize_opennl == true",
-            sliderInput("loudness_cap", "Loudness Cap (Sones):", min = 5, max = 30, value = 10, step = 1)
-          )
-        ),
         selectInput("module", "Operating Module:",
                     choices = c("Standard (Everyday)" = "standard", 
                                 "Comfort in Noise (CIN)" = "cin", 
@@ -339,8 +331,75 @@ server <- function(input, output, session) {
     if (input$bc4000 > input$htl4000) updateSliderInput(session, "bc4000", value = input$htl4000)
   })
   
-  # Reactive SII Calculation triggers every time a slider is moved
+  # Synchronize heavy computations to prevent intermediate UI updates
+  heavy_inputs_raw <- reactive({
+    list(
+      t250 = input$htl250, t500 = input$htl500, t1000 = input$htl1000, 
+      t2000 = input$htl2000, t4000 = input$htl4000, t8000 = input$htl8000,
+      bc250 = input$bc250, bc500 = input$bc500, bc1000 = input$bc1000, 
+      bc2000 = input$bc2000, bc4000 = input$bc4000,
+      use_bc = input$use_bc, nr_air = input$nr_air, nr_bone = input$nr_bone,
+      speech_level = input$speech_level, gender = input$gender, 
+      experience = input$experience, config = input$config, age = input$age, 
+      adult_age = input$adult_age, coupling = input$coupling, module = input$module
+    )
+  })
+  heavy_inputs <- debounce(heavy_inputs_raw, 800)
+
+  # Reactive for Open-NL Target
+  open_nl_target <- reactive({
+    req(identical(heavy_inputs_raw(), heavy_inputs()))
+    req(input$htl250)
+    f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
+    threshold <- c(input$htl250, input$htl500, input$htl1000, 
+                   input$htl2000, input$htl4000, input$htl8000)
+                   
+    nr_a <- input$nr_air
+    if (!is.null(nr_a)) {
+      if ("250" %in% nr_a) threshold[1] <- 120
+      if ("500" %in% nr_a) threshold[2] <- 120
+      if ("1000" %in% nr_a) threshold[3] <- 120
+      if ("2000" %in% nr_a) threshold[4] <- 120
+      if ("4000" %in% nr_a) threshold[5] <- 120
+      if ("8000" %in% nr_a) threshold[6] <- 120
+    }
+
+    if (isTRUE(input$use_bc)) {
+      bc_f <- c(250, 500, 1000, 2000, 4000)
+      bc_input <- c(input$bc250, input$bc500, input$bc1000, input$bc2000, input$bc4000)
+      ac_at_bc_f <- threshold[1:5]
+      nr_b <- input$nr_bone
+      if (!is.null(nr_b)) {
+        if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
+        if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
+        if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
+        if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
+        if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
+      }
+      bc_input <- pmin(bc_input, ac_at_bc_f)
+      bc_6 <- approx(x = log10(bc_f), y = bc_input, xout = log10(f_htl), rule = 2)$y
+      loss_6 <- pmax(0, threshold - bc_6)
+    } else {
+      loss_6 <- rep(0, 6)
+    }
+    
+    open_nl(speech = as.numeric(input$speech_level), 
+            threshold = threshold, 
+            freq = f_htl, 
+            loss = loss_6,
+            gender = input$gender,
+            experience = input$experience,
+            config = input$config,
+            age = input$age,
+            age_years = input$adult_age,
+            coupling = input$coupling,
+            module = input$module,
+            optimize = TRUE)
+  })
+
+  # Reactive SII Calculation
   sii_obj <- reactive({
+    req(identical(heavy_inputs_raw(), heavy_inputs()))
     req(input$htl250)
     d <- setup_data()
     
@@ -364,42 +423,10 @@ server <- function(input, output, session) {
     htl_21 <- approx(x = log10(f_htl), y = threshold, xout = log10(d$f_21), rule = 2)$y
     
     # 3. Handle prescription
-    if (input$prescription == "none") {
+    if (isTRUE(input$prescription == "none")) {
       presc <- NULL
-    } else if (input$prescription == "Open-NL" && isTRUE(input$optimize_opennl)) {
-      # Recalculate discrete 6-freq loss array for open_nl
-      if (isTRUE(input$use_bc)) {
-        bc_f <- c(250, 500, 1000, 2000, 4000)
-        bc_input <- c(input$bc250, input$bc500, input$bc1000, input$bc2000, input$bc4000)
-        ac_at_bc_f <- threshold[1:5]
-        nr_b <- input$nr_bone
-        if (!is.null(nr_b)) {
-          if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
-          if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
-          if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
-          if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
-          if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
-        }
-        bc_input <- pmin(bc_input, ac_at_bc_f)
-        bc_6 <- approx(x = log10(bc_f), y = bc_input, xout = log10(f_htl), rule = 2)$y
-        loss_6 <- pmax(0, threshold - bc_6)
-      } else {
-        loss_6 <- rep(0, 6)
-      }
-      
-      presc <- open_nl(speech = as.numeric(input$speech_level), 
-                       threshold = threshold, 
-                       freq = f_htl, 
-                       loss = loss_6,
-                       gender = input$gender,
-                       experience = input$experience,
-                       config = input$config,
-                       age = input$age,
-                       age_years = input$adult_age,
-                       coupling = input$coupling,
-                       module = input$module,
-                       optimize = TRUE, 
-                       loudness_cap = input$loudness_cap)
+    } else if (isTRUE(input$prescription == "Open-NL")) {
+      presc <- open_nl_target()
     } else {
       presc <- input$prescription
     }
@@ -467,7 +494,7 @@ server <- function(input, output, session) {
     # Append JD2011 targets for plotting if a preset is selected
     preset <- input$preset
     target_level <- as.numeric(input$speech_level)
-    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7") && !is.null(presc) && presc == "Open-NL") {
+    if (preset %in% c("a1", "a2", "a3", "a4", "a5", "a6", "a7") && isTRUE(input$prescription == "Open-NL")) {
       obj$target_nalnl2 <- get_jd2011_target(preset, "NAL-NL2", d$f_21, target_level)
     }
     
@@ -533,6 +560,7 @@ server <- function(input, output, session) {
   )
   # Render the Benchmark Comparison Table
   output$comparison_table <- renderTable({
+    req(identical(heavy_inputs_raw(), heavy_inputs()))
     req(input$htl250)
     d <- setup_data()
     f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
@@ -591,45 +619,11 @@ server <- function(input, output, session) {
     meas_wrs <- input$measured_wrs
     if (!is.null(meas_wrs) && is.na(meas_wrs)) meas_wrs <- NULL
     
-    # Calculate Open-NL
-    if (isTRUE(input$optimize_opennl)) {
-      if (isTRUE(input$use_bc)) {
-        bc_f <- c(250, 500, 1000, 2000, 4000)
-        bc_input <- c(input$bc250, input$bc500, input$bc1000, input$bc2000, input$bc4000)
-        ac_at_bc_f <- threshold[1:5]
-        nr_b <- input$nr_bone
-        if (!is.null(nr_b)) {
-          if ("250" %in% nr_b) bc_input[1] <- ac_at_bc_f[1]
-          if ("500" %in% nr_b) bc_input[2] <- ac_at_bc_f[2]
-          if ("1000" %in% nr_b) bc_input[3] <- ac_at_bc_f[3]
-          if ("2000" %in% nr_b) bc_input[4] <- ac_at_bc_f[4]
-          if ("4000" %in% nr_b) bc_input[5] <- ac_at_bc_f[5]
-        }
-        bc_input <- pmin(bc_input, ac_at_bc_f)
-        bc_6 <- approx(x = log10(bc_f), y = bc_input, xout = log10(f_htl), rule = 2)$y
-        loss_6 <- pmax(0, threshold - bc_6)
-      } else {
-        loss_6 <- rep(0, 6)
-      }
-      
-      target <- open_nl(speech = target_level, 
-                        threshold = threshold, freq = f_htl, loss = loss_6,
-                        gender = input$gender, experience = input$experience, 
-                        config = input$config, age = input$age, age_years = input$adult_age, 
-                        coupling = input$coupling, module = input$module, 
-                        optimize = TRUE, loudness_cap = input$loudness_cap)
-                        
-      obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = target, 
-                        desensitization = input$desensitization, transducer = input$transducer,
-                        measured_wrs = meas_wrs, wrs_level = input$wrs_level)
-    } else {
-      obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = "Open-NL", 
-                        desensitization = input$desensitization, 
-                        gender = input$gender, experience = input$experience, 
-                        config = input$config, age = input$age, age_years = input$adult_age, 
-                        coupling = input$coupling, module = input$module, transducer = input$transducer,
-                        measured_wrs = meas_wrs, wrs_level = input$wrs_level)
-    }
+    target <- open_nl_target()
+                      
+    obj_opennl <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, prescription = target, 
+                      desensitization = input$desensitization, transducer = input$transducer,
+                      measured_wrs = meas_wrs, wrs_level = input$wrs_level)
     
     calc_loudness <- function(obj) {
       if (input$config == "unilateral") {
@@ -649,11 +643,11 @@ server <- function(input, output, session) {
       obj_nalnl2 <- sii(speech = speech_input, threshold = htl_21, loss = loss_21, freq = d$f_21, custom_gain = target_nalnl2, desensitization = input$desensitization, transducer = input$transducer, age = input$age, age_years = input$adult_age)
       val_nalnl2_sii <- obj_nalnl2$sii
       val_nalnl2_loudness <- sprintf("%.1f", calc_loudness(obj_nalnl2))
-      name_nalnl2 <- "NAL-NL2 (JD2011)"
+      name_nalnl2 <- "NAL-NL2"
     } else {
       val_nalnl2_sii <- NA
       val_nalnl2_loudness <- "NA"
-      name_nalnl2 <- "NAL-NL2 (N/A for Custom)"
+      name_nalnl2 <- "NAL-NL2"
     }
     
     df <- data.frame(
@@ -673,6 +667,7 @@ server <- function(input, output, session) {
   
   # Render the Compression Prescription
   output$compression_prescription <- renderUI({
+    req(identical(heavy_inputs_raw(), heavy_inputs()))
     req(input$htl250)
     f_htl <- c(250, 500, 1000, 2000, 4000, 8000)
     threshold <- c(input$htl250, input$htl500, input$htl1000, 

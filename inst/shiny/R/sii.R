@@ -297,11 +297,62 @@ sii <- function(
     
     # Interpolate gain to sii evaluation frequencies
     if (length(prescription$gain) == length(freq) && all(prescription$freq == freq)) {
-       gain <- prescription$gain
+       gain_65 <- prescription$gain
        mpo <- prescription$mpo
     } else {
-       gain <- approx(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), rule = 2)$y
-       mpo <- approx(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), rule = 2)$y
+       # Use cubic spline for smoother frequency response targets instead of jagged linear interpolation
+       gain_65 <- pmax(0, spline(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), method = "natural")$y)
+       mpo <- pmax(0, spline(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), method = "natural")$y)
+    }
+    
+    # WDRC: Derive compression ratios per Section H of the manuscript
+    # The prescription_target stores the optimized 65 dB SPL anchor gain.
+    # For other input levels, apply dynamic compression ratios.
+    p_loss <- if (!is.null(prescription$loss)) prescription$loss else rep(0, length(prescription$freq))
+    p_threshold <- if (!is.null(prescription$threshold)) prescription$threshold else threshold
+    
+    # Interpolate SN thresholds to evaluation frequencies
+    if (length(p_threshold) == length(prescription$freq)) {
+      htl_sn_interp <- approx(x = log10(prescription$freq), y = p_threshold, xout = log10(freq), rule = 2)$y
+      loss_interp <- approx(x = log10(prescription$freq), y = p_loss, xout = log10(freq), rule = 2)$y
+    } else {
+      htl_sn_interp <- threshold
+      loss_interp <- if (!is.null(loss)) loss else rep(0, length(freq))
+    }
+    htl_sn <- pmax(0, htl_sn_interp - loss_interp)
+    
+    # CR_base = 1 + max(0, HTL_sn - 20) / 40  (Eq. from Section H)
+    cr_base <- 1 + pmax(0, htl_sn - 20) / 40
+    
+    # F_mod = max(0, min(1, (f - 500) / 2500))  (frequency modulation factor)
+    f_mod <- pmax(0, pmin(1, (freq - 500) / 2500))
+    
+    # For loud inputs (>65): reduce CR toward linear for severe losses (>65 dB HL)
+    cr_loud <- pmax(1.0, cr_base - (pmax(0, htl_sn - 65) / 30) * (1.5 - 0.5 * f_mod))
+    
+    # Determine the input level difference from the 65 dB anchor
+    # Compare current speech spectrum to the stored reference speech at 65 dB
+    if (!is.null(prescription$speech) && length(prescription$speech) == length(prescription$freq)) {
+      speech_ref <- approx(x = log10(prescription$freq), y = prescription$speech, 
+                           xout = log10(freq), rule = 2)$y
+      level_diff <- mean(speech - speech_ref, na.rm = TRUE)
+    } else {
+      level_diff <- 0  # No reference available, assume 65 dB
+    }
+    
+    if (abs(level_diff) > 1) {
+      # Apply WDRC: gain changes by (1/CR - 1) per dB of input change
+      # For soft inputs: use cr_base (more compression = more gain for soft)
+      # For loud inputs: use cr_loud (reduced CR for severe losses)
+      if (level_diff < 0) {
+        cr_use <- cr_base
+      } else {
+        cr_use <- cr_loud
+      }
+      gain <- gain_65 + level_diff * (1 / cr_use - 1)
+      gain <- pmax(0, gain)
+    } else {
+      gain <- gain_65
     }
     
     raw_output <- speech + gain
@@ -544,6 +595,16 @@ sii <- function(
   retval$gain      <- gain
   retval$mpo       <- mpo
   retval$prescription <- prescription
+  # Store a display-friendly name for plotting labels
+  if (is.null(prescription)) {
+    retval$prescription_name <- "Unaided"
+  } else if (is.character(prescription)) {
+    retval$prescription_name <- prescription
+  } else if (inherits(prescription, "prescription_target")) {
+    retval$prescription_name <- "Open-NL"
+  } else {
+    retval$prescription_name <- "Custom"
+  }
   retval$method    <- method
   retval$table     <- sii.tab
   retval$sii       <- sii.val

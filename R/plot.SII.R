@@ -97,7 +97,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # Prepare Legend Variables
       leg_names <- c("Speech Level (E'i)", "Hearing Threshold (T'i)")
       if (is_aided) {
-         leg_names[1] <- paste("Aided Speech Level (", x$prescription, ")", sep="")
+         presc_label <- if (!is.null(x$prescription_name)) x$prescription_name else "Aided"
+         leg_names[1] <- paste("Aided Speech Level (", presc_label, ")", sep="")
       }
       leg_cols <- c("forestgreen", "red")
       leg_pch <- c(NA, 4)
@@ -394,8 +395,9 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
   }
   
   freq <- res65$freq
-  prescription <- res65$prescription
-  if (is.null(prescription)) prescription <- "Custom"
+  prescription <- if (!is.null(res65$prescription_name)) res65$prescription_name else
+                  if (is.null(res65$prescription)) "Custom" else
+                  if (is.character(res65$prescription)) res65$prescription else "Open-NL"
   
   # Calculate insertion gain (Aided Speech - Unaided Speech) for each input level
   # Adding robust max(0, x) to ensure we don't plot negative insertion gain curves

@@ -16,6 +16,10 @@
 #' @param distortion_category Distortion category ("Normal", "Low", "Moderate", "High").
 #' @param ten_edge_hf High-frequency dead region edge (optional).
 #' @param ten_edge_lf Low-frequency dead region edge (optional).
+#' @param user_cr User defined compression ratio (optional).
+#' @param optimize Optimization flag.
+#' @param seed_noise Random noise for optimizer seeding.
+#' @param optim_method Optimization method.
 #'
 #' @return An object of class \code{prescription_target}.
 #' @export
@@ -26,7 +30,7 @@ open_nl <- function(speech = 65, threshold, freq,
                     ldl = NULL, age_years = NULL, age_months = NULL, 
                     loss = NULL, distortion_category = NULL, 
                     ten_edge_hf = NULL, ten_edge_lf = NULL, user_cr = NULL,
-                    optimize = TRUE, loudness_cap = 10.0) {
+                    optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead") {
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -60,28 +64,41 @@ open_nl <- function(speech = 65, threshold, freq,
     pta_sn <- mean(threshold[c(2, 3, 4, 5)], na.rm = TRUE)
     if (is.na(pta_sn)) pta_sn <- 30
     
-    # --- Loudness Normalization Target ---
-    # loudness for severe losses due to recruitment intolerance.
+    # --- Generate 65 dB SPL Heuristic Seed ---
+    # We must explicitly calculate the heuristic at 65 dB SPL to anchor the shifts.
+    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, ten_edge_hf, ten_edge_lf, user_cr)
+    mpo_65 <- calculate_nal_sspl90(threshold, gain_65, ldl, age, age_months, loss, freq)
+    
+    if (file.exists(file.path("data", "critical.rda"))) {
+      load(file.path("data", "critical.rda"), envir = environment())
+    } else {
+      data("critical", package="SII", envir = environment())
+    }
+    normal_speech_65 <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
+    overall_normal <- 10 * log10(sum((10^(critical$normal / 10)) * (critical$hi - critical$li), na.rm = TRUE))
+    speech_spec_65 <- normal_speech_65 + (65 - overall_normal)
+    
+    raw_output_65 <- speech_spec_65 + gain_65
+    overshoot_65 <- pmax(0, raw_output_65 - mpo_65)
+    final_output_65 <- pmin(raw_output_65, mpo_65) + (overshoot_65 / 10.0)
+    final_gain_65 <- pmax(final_output_65 - speech_spec_65, 0)
     
     obj_fn <- function(shifts) {
-      gain_array <- pmax(0, pmin(80, final_gain + shifts))
+      gain_array <- pmax(0, pmin(80, final_gain_65 + shifts))
       
       # We evaluate the objective function at 65 dB SPL (Standard Speech) to align with
-      # clinical conventions and JASA reviewer expectations. We rely on the robust
-      # heuristic seed (g_65) and soft anchor penalty to maintain the correct loudness
-      # bounds in regions where SII hits its +15 dB SNR plateau.
+      # clinical conventions and JASA reviewer expectations.
       eval_level <- 65
-      speech_65 <- speech_spec - (overall_level - eval_level)
       
       temp_target <- list(
-        freq = freq, gain = gain_array, mpo = mpo, speech = speech_65,
+        freq = freq, gain = gain_array, mpo = mpo_65, speech = speech_spec_65,
         threshold = threshold, loss = loss, module = module, overall_level = eval_level
       )
       class(temp_target) <- "prescription_target"
       
       # Maximize Audibility with NAL-NL2 modified LDF
       res <- tryCatch({
-        sii(speech = speech_65, noise = rep(-50, length(freq)), 
+        sii(speech = speech_spec_65, noise = rep(-50, length(freq)), 
             threshold = threshold, loss = loss, freq = freq, 
             prescription = temp_target, interpolate = TRUE, 
             nal_ldf = TRUE, desensitization = TRUE)
@@ -91,43 +108,69 @@ open_nl <- function(speech = 65, threshold, freq,
 
       score <- res$sii * 100.0
       
-      # Evaluate physiological loudness constraint (Section II.L)
+      # Chen 2011 loudness (100 points for optimizer speed)
+      fi <- res$table[, "Fi"]
+      Ei <- res$table[, "E'i"]
+      dense_f <- 10^(seq(log10(100), log10(10000), length.out = 100))
+      dense_l <- approx(x = log10(fi), y = Ei, xout = log10(dense_f), rule = 1)$y
+      idx_low <- which(dense_f < fi[1])
+      if (length(idx_low) > 0) dense_l[idx_low] <- Ei[1] - 24 * log2(fi[1] / dense_f[idx_low])
+      idx_high <- which(dense_f > fi[length(fi)])
+      if (length(idx_high) > 0) dense_l[idx_high] <- Ei[length(Ei)] - 24 * log2(dense_f[idx_high] / fi[length(fi)])
+      dense_l[is.na(dense_l)] <- -100
+      
+      local_loss <- if (is.null(loss)) rep(0, length(threshold)) else loss
+      dense_abg <- approx(x = log10(freq), y = local_loss, xout = log10(dense_f), rule = 2)$y
+      dense_l <- dense_l - dense_abg
+      
+      hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+      htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
+      sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
+      ohc_loss <- pmin(0.65 * sn_htl, 57.6)
+      ihc_loss <- pmax(sn_htl - ohc_loss, 0)
+      
       loud_res <- tryCatch({
-        calculate_loudness(res)
+        calculate_loudness_chen2011(inputF = dense_f, inputLdB = dense_l,
+          HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss,
+          cambin = 0.1, outerearcorrection = 'FreeField')
       }, error = function(e) NULL)
       
       loudness_penalty <- 0.0
       if (!is.null(loud_res)) {
-        loudness_sones <- loud_res$total
-        if (is.null(loss)) loss <- rep(0, length(threshold))
-        sn_threshold <- threshold - loss
-        pta_sn <- mean(sn_threshold[c(2, 3, 4, 5)], na.rm = TRUE) # 500, 1000, 2000, 4000 Hz
-        dynamic_cap <- min(18.6, 6.0 + 0.10 * pta_sn)
+        loudness_sones <- loud_res$Ldn
+        sn_threshold <- threshold - local_loss
+        pta_sn_local <- mean(sn_threshold[c(2, 3, 4, 5)], na.rm = TRUE)
+        dynamic_cap <- min(18.6, 6.0 + 0.10 * pta_sn_local)
         
         if (loudness_sones > dynamic_cap) {
           excess <- loudness_sones - dynamic_cap
-          # Severe penalty to force Nelder-Mead to respect the boundary
           loudness_penalty <- excess * 50.0 
         }
       }
       
-      slope_penalty <- 0.0
-      
       # Soft Anchor Penalty to prevent drifting in regions where SII plateaus
       anchor_penalty <- sum(shifts^2) * 0.1
       
-      return(-score + slope_penalty + anchor_penalty + loudness_penalty)
+      return(-score + anchor_penalty + loudness_penalty)
     }
     
-    # Use Nelder-Mead as described in the manuscript to handle non-differentiable penalty walls
-    opt <- suppressWarnings(optim(
-      par = rep(0, length(freq)), 
+    # Nelder-Mead optimization (150 iterations for full convergence)
+    start_par <- rep(0, length(freq))
+    if (!is.null(seed_noise)) {
+      start_par <- start_par + runif(length(freq), -seed_noise, seed_noise)
+    }
+    
+    opt_res <- suppressWarnings(optim(
+      par = start_par, 
       fn = obj_fn, 
-      method = "Nelder-Mead", 
+      method = optim_method, 
       control = list(maxit = 150)
     ))
     
-    best_shifts <- opt$par
+    best_shifts <- opt_res$par
+    
+    # Apply the 65 dB optimal shifts to the dynamically scaled heuristic target
+    # This preserves the exact WDRC compression ratios (the difference between 50, 65, and 80 dB targets)
     final_gain <- pmax(0, pmin(80, final_gain + best_shifts))
   }
   

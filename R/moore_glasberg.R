@@ -62,17 +62,31 @@ calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NU
   tl <- CF / (0.1084*CF + 2.3301)
   tu <- rep(15.0, length(CF))
   
-  E_pf <- numeric(length(CF))
-  for (i in 1:length(CF)) {
-    g <- inputF/CF[i] - 1
-    indexl <- which(g < 0)
-    gl <- abs(g[indexl])
-    E_pf[i] <- sum( (1 + gl*tl[i]) * exp(-gl*tl[i]) * inputL[indexl] )
-    
-    indexu <- which(g >= 0)
-    gu <- g[indexu]
-    E_pf[i] <- E_pf[i] + sum( (1 + gu*tu[i]) * exp(-gu*tu[i]) * inputL[indexu] )
-  }
+  # Matrix-based Vectorization for massive speedup
+  # Compute normalized frequency deviations (g) for all inputF and CF combinations
+  g_mat <- outer(inputF, CF, function(x, y) x / y - 1)
+  
+  # Negative and positive parts of g
+  g_neg <- pmax(0, -g_mat) # equivalent to abs(g) where g < 0
+  g_pos <- pmax(0, g_mat)  # equivalent to abs(g) where g >= 0
+  
+  # Expand tl and tu to match matrix dimensions
+  tl_mat <- matrix(tl, nrow=length(inputF), ncol=length(CF), byrow=TRUE)
+  tu_mat <- matrix(tu, nrow=length(inputF), ncol=length(CF), byrow=TRUE)
+  
+  # Calculate filter weights for negative and positive deviations
+  term_neg <- (1 + g_neg * tl_mat) * exp(-g_neg * tl_mat)
+  term_pos <- (1 + g_pos * tu_mat) * exp(-g_pos * tu_mat)
+  
+  # Combine weights using a mask (where g < 0)
+  mask_neg <- g_mat < 0
+  weight_mat_pf <- matrix(0, nrow=length(inputF), ncol=length(CF))
+  weight_mat_pf[mask_neg] <- term_neg[mask_neg]
+  weight_mat_pf[!mask_neg] <- term_pos[!mask_neg]
+  
+  # Multiply by inputL and sum over frequencies
+  E_pf <- colSums(weight_mat_pf * inputL)
+  
   E_pf <- pmax(E_pf, 10^(-10))
   EdB_pf <- 10*log10(E_pf)
   EdB_pf <- pmax(EdB_pf, 0)
@@ -93,17 +107,18 @@ calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NU
   pl <- CF / (0.0272*CF + 5.4365)
   pu <- rep(27.9, length(CF))
   
-  E_af <- numeric(length(CF))
-  for (i in 1:length(CF)) {
-    g <- inputF/CF[i] - 1
-    indexl <- which(g < 0)
-    gl <- abs(g[indexl])
-    E_af[i] <- G[i] * sum( (1 + gl*pl[i]) * exp(-gl*pl[i]) * inputL[indexl] )
-    
-    indexu <- which(g >= 0)
-    gu <- g[indexu]
-    E_af[i] <- E_af[i] + G[i] * sum( (1 + gu*pu[i]) * exp(-gu*pu[i]) * inputL[indexu] )
-  }
+  pl_mat <- matrix(pl, nrow=length(inputF), ncol=length(CF), byrow=TRUE)
+  pu_mat <- matrix(pu, nrow=length(inputF), ncol=length(CF), byrow=TRUE)
+  
+  term_neg_af <- (1 + g_neg * pl_mat) * exp(-g_neg * pl_mat)
+  term_pos_af <- (1 + g_pos * pu_mat) * exp(-g_pos * pu_mat)
+  
+  weight_mat_af <- matrix(0, nrow=length(inputF), ncol=length(CF))
+  weight_mat_af[mask_neg] <- term_neg_af[mask_neg]
+  weight_mat_af[!mask_neg] <- term_pos_af[!mask_neg]
+  
+  # Compute active excitation by summing and multiplying by active gain G
+  E_af <- G * colSums(weight_mat_af * inputL)
   
   E <- E_pf + E_af
   E <- pmax(E, 10^(-10))
