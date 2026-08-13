@@ -38,3 +38,4 @@ Packaged: 2018-11-18 09:53:18 UTC; hornik
 NeedsCompilation: no
 Repository: CRAN
 Date/Publication: 2018-11-18 09:56:48 UTC
+Config/roxygen2/version: 8.0.0
