@@ -34,7 +34,7 @@ data(sic.octave)
   \describe{
     \item{\code{sic.critical}}{provides alternative weights for the
       critical band SII procedure.}
-    \item{\code{sic.threeoctave}}{provides alternative weights for the
+    \item{\code{sic.onethird}}{provides alternative weights for the
       one-third octave frequency band SII procedure.}
     \item{\code{octave}}{provides alternative weights for the
       octave frequency band SII procedure.}
@@ -83,7 +83,7 @@ legend(
        col=rainbow(ngroup)
        )
 
-data(threeoctave)
+data(onethird)
 data(octave)
 }
 \keyword{datasets}

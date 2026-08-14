@@ -94,6 +94,7 @@ ui <- page_sidebar(
         selectInput("prescription", "Fitting Rationale:", 
                     choices = c("Unaided" = "none", "NAL-R" = "NAL-R", "Open-NL" = "Open-NL"),
                     selected = "Open-NL"),
+        checkboxInput("optimize_target", "Optimize Target using Nelder-Mead (Slower)", value = FALSE),
         selectInput("module", "Operating Module:",
                     choices = c("Standard (Everyday)" = "standard", 
                                 "Comfort in Noise (CIN)" = "cin", 
@@ -394,7 +395,7 @@ server <- function(input, output, session) {
             age_years = input$adult_age,
             coupling = input$coupling,
             module = input$module,
-            optimize = TRUE)
+            optimize = input$optimize_target)
   })
 
   # Reactive SII Calculation

@@ -38,7 +38,7 @@ open_nl(speech = 65, threshold, freq, gender = "male", experience = "experienced
   \item{optimize}{Optimization flag.}
   \item{seed_noise}{Random noise for optimizer seeding.}
   \item{optim_method}{Optimization method.}
-  \item{x,object}{A \code{prescription_target} object.}
+  \item{x, object}{A \code{prescription_target} object.}
   \item{\dots}{Additional graphical or printing parameters.}
 }
 \value{
