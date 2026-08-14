@@ -83,6 +83,19 @@ open_nl <- function(speech = 65, threshold, freq,
     final_output_65 <- pmin(raw_output_65, mpo_65) + (overshoot_65 / 10.0)
     final_gain_65 <- pmax(final_output_65 - speech_spec_65, 0)
     
+    # --- STATIC PRE-CALCULATIONS FOR OBJECTIVE FUNCTION ---
+    # Hoisted out of the Nelder-Mead loop for performance
+    dense_f <- 10^(seq(log10(100), log10(10000), length.out = 100))
+    local_loss <- if (is.null(loss)) rep(0, length(threshold)) else loss
+    dense_abg <- approx(x = log10(freq), y = local_loss, xout = log10(dense_f), rule = 2)$y
+    
+    hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+    htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
+    sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
+    ohc_loss <- pmin(0.65 * sn_htl, 57.6)
+    ihc_loss <- pmax(sn_htl - ohc_loss, 0)
+    # ------------------------------------------------------
+    
     obj_fn <- function(shifts) {
       gain_array <- pmax(0, pmin(80, final_gain_65 + shifts))
       
@@ -111,7 +124,6 @@ open_nl <- function(speech = 65, threshold, freq,
       # Chen 2011 loudness (100 points for optimizer speed)
       fi <- res$table[, "Fi"]
       Ei <- res$table[, "E'i"]
-      dense_f <- 10^(seq(log10(100), log10(10000), length.out = 100))
       dense_l <- approx(x = log10(fi), y = Ei, xout = log10(dense_f), rule = 1)$y
       idx_low <- which(dense_f < fi[1])
       if (length(idx_low) > 0) dense_l[idx_low] <- Ei[1] - 24 * log2(fi[1] / dense_f[idx_low])
@@ -119,15 +131,7 @@ open_nl <- function(speech = 65, threshold, freq,
       if (length(idx_high) > 0) dense_l[idx_high] <- Ei[length(Ei)] - 24 * log2(dense_f[idx_high] / fi[length(fi)])
       dense_l[is.na(dense_l)] <- -100
       
-      local_loss <- if (is.null(loss)) rep(0, length(threshold)) else loss
-      dense_abg <- approx(x = log10(freq), y = local_loss, xout = log10(dense_f), rule = 2)$y
       dense_l <- dense_l - dense_abg
-      
-      hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-      htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
-      sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
-      ohc_loss <- pmin(0.65 * sn_htl, 57.6)
-      ihc_loss <- pmax(sn_htl - ohc_loss, 0)
       
       loud_res <- tryCatch({
         calculate_loudness_chen2011(inputF = dense_f, inputLdB = dense_l,
