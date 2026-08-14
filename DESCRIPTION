@@ -1,35 +1,35 @@
 Package: SII
 Type: Package
 Title: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
-Version: 1.1.7
-Date: 2026-07-26
+Version: 1.1.8
+Date: 2026-08-14
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = c("aut", "cph")),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description:
-   Calculates the American National Standards Institute ('ANSI')
-   S3.5-1997 Speech Intelligibility Index ('SII') (ANSI 1997,
+   Calculates the American National Standards Institute (ANSI)
+   S3.5-1997 Speech Intelligibility Index (SII) (ANSI 1997,
    <https://webstore.ansi.org/standards/asa/asaansis31997r2024>), a standard method
    for computing the intelligibility of speech from acoustical
    measurements of speech, noise, and hearing thresholds. This package
-   includes data frames corresponding to Tables 1 - 4 in the 'ANSI'
+   includes data frames corresponding to Tables 1 - 4 in the ANSI
    standard as well as functions utilizing these tables and user-provided
-   hearing threshold and noise level measurements to compute the 'SII'
+   hearing threshold and noise level measurements to compute the SII
    score. The methods implemented here extend the standard computations
-   to allow calculation of 'SII' when the measured frequencies do not
+   to allow calculation of SII when the measured frequencies do not
    match those required by the standard by applying interpolation.
    Furthermore, the package now includes a hybrid nonlinear loudness 
    engine integrating the excitation patterns of Chen et al. (2011) 
    with the compressive integrals of Moore & Glasberg (2004) to predict
    impaired loudness recruitment in sones. It also includes advanced 
-   clinical methods to predict aided 'SII' based on hearing aid 
-   prescriptive rationales, including 'Open-NL' (Open Non-Linear), a 
-   novel theoretical rationale inspired by 'NAL-NL2' (National Acoustic 
-   Laboratories Non-Linear 2) and 'DSL' (Desired Sensation Level), as 
+   clinical methods to predict aided SII based on hearing aid 
+   prescriptive rationales, including Open-NL (Open Non-Linear), a 
+   novel theoretical rationale inspired by NAL-NL2 (National Acoustic 
+   Laboratories Non-Linear 2) and DSL (Desired Sensation Level), as 
    well as functions to calculate real-ear insertion gains, estimate 
-   maximum power output ('SSPL90'), and prescribe dynamic range compression.
+   maximum power output (SSPL90), and prescribe dynamic range compression.
    Development of this package was originally funded by the Center for
-   'Bioscience' Education and Technology ('CBET') of the Rochester
-   Institute of Technology ('RIT').
+   Bioscience Education and Technology (CBET) of the Rochester
+   Institute of Technology (RIT).
 Depends: R (>= 3.5.0)
 Suggests: splines, readxl, xtable, shiny, bslib, testthat
 License: GPL-3
@@ -39,3 +39,4 @@ NeedsCompilation: no
 Repository: CRAN
 Date/Publication: 2018-11-18 09:56:48 UTC
 Config/roxygen2/version: 8.0.0
+Encoding: UTF-8

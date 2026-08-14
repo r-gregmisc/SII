@@ -34,3 +34,4 @@
 ^site$
 ^SII\.Rcheck$
 ^SII_.*\.tar\.gz$
+^cran-comments\.md$

@@ -10,6 +10,14 @@
 #' of the Clinical SPLogram and the Insertion Gain plot based on the selected 
 #' prescriptive rationale (e.g., Unaided, NAL-R, Open-NL) and desensitization settings.
 #' 
+#' @return No return value, called for side effects.
+#' 
+#' @examples
+#' if(interactive()){
+#'   # Launch the interactive SII dashboard in your web browser
+#'   launch_app()
+#' }
+#' 
 #' @export
 launch_app <- function() {
   if (!requireNamespace("shiny", quietly = TRUE) || !requireNamespace("bslib", quietly = TRUE)) {

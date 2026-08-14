@@ -18,8 +18,11 @@ Gregory R. Warnes \email{greg@warnes.net}, Mark Shaver \email{mark.shaver@posteo
 \seealso{
 \code{\link{sii}}, \code{\link{plot.SII}}
 }
+\value{
+No return value, called for side effects.
+}
 \examples{
-\dontrun{
+if(interactive()){
   # Launch the interactive SII dashboard in your web browser
   launch_app()
 }
