@@ -33,7 +33,7 @@ calculate_loudness_chen2011(
 
 \item{fhigh}{Highest center frequency of an auditory filter}
 
-\item{outerearcorrection}{'FreeField', 'PDR10', or 'Eardrum'}
+\item{outerearcorrection}{"FreeField", "PDR10", or "Eardrum"}
 }
 \value{
 A list containing Loudness (sones), Excitation, Cams, and CFs.

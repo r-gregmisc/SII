@@ -13,11 +13,11 @@
 #' @param cambin Spacing [ERB] between successive auditory filter CFs
 #' @param flow Lowest center frequency of an auditory filter
 #' @param fhigh Highest center frequency of an auditory filter
-#' @param outerearcorrection 'FreeField', 'PDR10', or 'Eardrum'
+#' @param outerearcorrection "FreeField", "PDR10", or "Eardrum"
 #'
 #' @return A list containing Loudness (sones), Excitation, Cams, and CFs.
 #' @export
-calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NULL, HLihcdB0=NULL, cambin=0.1, flow=50, fhigh=15000, outerearcorrection='FreeField') {
+calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NULL, HLihcdB0=NULL, cambin=0.1, flow=50, fhigh=15000, outerearcorrection="FreeField") {
   
   if (length(inputF) != length(inputLdB)) {
     stop('inputF and inputLdB should be dB/Hz and have same length')
@@ -41,7 +41,7 @@ calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NU
   HLihcdB <- pmax(HLihcdB, 0)
   
   # step1: outer ear correction
-  if (outerearcorrection == 'FreeField') {
+  if (outerearcorrection == "FreeField") {
     freefield_F <- c(0, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500, 3000, 3150, 4000, 5000, 6000, 6300, 8000, 9000, 10000, 11200, 12500, 14000, 15000, 16000, 20000)
     freefield_dB <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.3, 0.5, 0.9, 1.4, 1.6, 1.7, 2.5, 2.7, 2.6, 2.6, 3.2, 5.2, 6.6, 12, 16.8, 15.3, 15.2, 14.2, 10.7, 7.1, 6.4, 1.8, -0.9, -1.6, 1.9, 4.9, 2, -2, 2.5, 2.5)
     inputLdB <- inputLdB + approx(freefield_F, freefield_dB, xout=inputF, rule=2)$y
