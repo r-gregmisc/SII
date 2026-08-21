@@ -220,6 +220,7 @@ void simulate_tone(double F_tone, double L_tone_dB,
 //' @param NoChan Number of ERB channels (default 30)
 //' @param E_Beg Lowest ERB rate (default 3.0)
 //' @param E_End Highest ERB rate (default 32.0)
+//' @param Binaural Integer indicating whether to compute binaural loudness (default 0L)
 //' @return A list containing Loudness (sones), Excitation, Cams, and CFs.
 //' @export
 // [[Rcpp::export]]

@@ -14,6 +14,7 @@
 #' @param NoChan Number of ERB channels (default 30)
 #' @param E_Beg Lowest ERB rate (default 3.0)
 #' @param E_End Highest ERB rate (default 32.0)
+#' @param Binaural Integer indicating whether to compute binaural loudness (default 0L)
 #' @return A list containing Loudness (sones), Excitation, Cams, and CFs.
 #' @export
 calculate_loudness_cpp <- function(inputF, inputLdB, HLcf, HLohcdB0, HLihcdB0, NoChan = 30L, E_Beg = 3.0, E_End = 32.0, Binaural = 0L) {

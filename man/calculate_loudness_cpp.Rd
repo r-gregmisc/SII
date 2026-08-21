@@ -12,7 +12,8 @@ calculate_loudness_cpp(
   HLihcdB0,
   NoChan = 30L,
   E_Beg = 3,
-  E_End = 32
+  E_End = 32,
+  Binaural = 0L
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ calculate_loudness_cpp(
 \item{E_Beg}{Lowest ERB rate (default 3.0)}
 
 \item{E_End}{Highest ERB rate (default 32.0)}
+
+\item{Binaural}{Integer indicating whether to compute binaural loudness (default 0L)}
 }
 \value{
 A list containing Loudness (sones), Excitation, Cams, and CFs.
