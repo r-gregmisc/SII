@@ -696,14 +696,14 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
   orig_loss <- if (!is.null(x$loss)) x$loss else rep(0, length(orig_freqs))
   abg <- approx(x = log10(orig_freqs), y = orig_loss, xout = log10(hl_freqs), rule=2)$y
   
-  # Sensorineural component dictates OHC/IHC  # The Moore & Glasberg (2004) / Bramslow standard assumption: 
-  # OHC loss constitutes up to 65 dB of the total sensorineural loss
+  # Sensorineural component dictates OHC/IHC damage and recruitment
   sn_htl <- pmax(htl - abg, 0)
-  ohc_loss <- pmin(sn_htl, 65)
+  
+  ohc_loss <- pmin(ohc_proportion * sn_htl, 57.6)
   ihc_loss <- pmax(sn_htl - ohc_loss, 0)
   
-  # Create a dense 10 Hz spectrum from the band densities
-  dense_f <- seq(20, 15000, by=10)
+  # Create a dense 1 Hz spectrum from the band densities
+  dense_f <- seq(20, 15000, by=1)
   dense_l <- rep(-100, length(dense_f)) # noise floor
   
   # Interpolate the density (rule=1 returns NA outside the range, which we handle below)
@@ -732,16 +732,17 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
   dense_abg <- approx(x = log10(orig_freqs), y = orig_loss, xout = log10(dense_f), rule=2)$y
   dense_l <- dense_l - dense_abg
   
-  res <- calculate_loudness_cpp(
+  res <- calculate_loudness_chen2011(
     inputF = dense_f, 
     inputLdB = dense_l,
     HLcf = hl_freqs, 
     HLohcdB0 = ohc_loss, 
-    HLihcdB0 = ihc_loss
+    HLihcdB0 = ihc_loss, 
+    outerearcorrection='FreeField'
   )
   
-  # Return both total loudness (Ldn), specific loudness array (N_prime), and excitation (E)
-  return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF, E = res$E, Cam = res$Cam))
+  # Return both total loudness (Ldn) and specific loudness array (N_prime)
+  return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF))
 }
 
 #' Calculate Psychoacoustic Binaural Loudness (Sones)

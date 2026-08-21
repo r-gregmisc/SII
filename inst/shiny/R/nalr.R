@@ -60,7 +60,7 @@ get_recd_diff <- function(age, age_months = NULL) {
   return(list(f = recd_f, diff = infant_recd - adult_recd))
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE) {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL) {
   # Define steep_slope_diff for HFDR and LDL logic
   steep_slope_diff <- if (length(threshold) > 1) max(diff(threshold), na.rm = TRUE) else 0
 
@@ -74,9 +74,11 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # NAL-style frequency-specific constants to shape the response
   c_freqs <- c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000)
   
-  # Base C_vals are independent of experience.
-  # The experience penalty is calculated dynamically based on PTA later.
-  c_vals <- c(-8, -1, 3, 1, 0, 0, 0, 0)
+  if (experience == "new") {
+    c_vals <- c(-3, 2, 3, 0, -2, -2, -2, -2)
+  } else {
+    c_vals <- c(-8, -1, 3, 1, 0, 0, 0, 0)
+  }
   
   if (gender == "female") {
     c_vals <- c_vals - 1.5
@@ -89,12 +91,8 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   g_base <- 0.46 * sn_threshold + c_interp
   
   # A modest Severe-Loss Booster (0.15 slope) is applied to thresholds > 60 dB HL
-  # to gently assist severe losses. Based on Engler et al. (2026) and Convery & Keidser (2011),
-  # this booster is explicitly capped above 80 dB HL to prevent structural over-prescription
-  # in profound regions where excessive gain objectively worsens speech discrimination.
-  if (enable_severe_booster) {
-    g_base <- g_base + 0.15 * pmax(0, pmin(sn_threshold, 80) - 60)
-  }
+  # to gently assist profound losses without triggering explosive recruitment.
+  g_base <- g_base + 0.15 * pmax(0, sn_threshold - 60)
   
   # 3. Slope-Dependent Loudness Normalization
   # Because low frequencies dominate overall loudness, scaling severe losses
@@ -107,7 +105,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   slope_diff <- pta_hf - pta_lf
   
-  if (slope_diff > 15 && pta_hf > 65 && pta_lf <= 70) {
+  if (slope_diff > 15 && pta_hf > 65) {
     # STEEP SLOPE: Aggressive penalty to low-frequency gain 
     # to prevent the overall loudness density from exceeding the comfort threshold (fixes A5 overprescription).
     lf_penalty_factor <- pmin(1, (slope_diff - 15) / 20)
@@ -383,9 +381,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   }
   
   # 8. Conductive Component Correction
-  # Restore the defined fraction of the Air-Bone Gap as linear gain.
+  # Restore 75% of the Air-Bone Gap as linear gain, as specified by NAL-NL2 / Johnson (2013).
   # Cap at 30 dB to prevent runaway loudness in extreme ABG cases (Ching et al., 2013).
-  abg_gain <- pmin(abg_fraction * loss, 30)
+  abg_gain <- pmin(0.75 * loss, 30)
   
   # Apply a gentle 6 dB low-frequency taper to the ABG gain (fading out by 1000 Hz)
   # to prevent upward spread of masking without being overkill or destroying the smooth response.

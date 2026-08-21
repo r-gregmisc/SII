@@ -1,3 +1,10 @@
+VERSION 1.1.9 (2026-08-15)
+--------------------------
+
+- Removed deprecated cochlear dead regions parameters (ten_edge_hf, ten_edge_lf) and associated heuristic suppression logic from Open-NL and SII cores.
+- Integrated active LDL Squeeze algorithm and NAL-NL3 Bandwidth roll-off into the primary prescription calculation.
+
+
 VERSION 1.0.3 (2013-12-06)
 --------------------------
 

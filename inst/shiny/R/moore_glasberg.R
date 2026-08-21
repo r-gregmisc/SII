@@ -174,17 +174,8 @@ calculate_loudness_chen2011 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NU
   N_prime <- pmax(0, N_prime)
   
   # Total loudness is the integral across the ERB scale
-  # We apply a dynamic structural calibration factor derived via multiple regression
-  # to anchor this hybrid engine's absolute sone values to the canonical Bramslow 2004 outputs,
-  # correcting for the geometric divergence of Chen's density integration for severe losses.
-  # We use the original audiometric anchor points (HLohcdB0) rather than the 39 ERB bands
-  # to prevent the ERB scale's high-frequency density from over-weighting steep sloping losses (like A5).
-  mean_ohc <- mean(HLohcdB0)
-  mean_ihc <- mean(HLihcdB0)
-  calibration_factor <- max(0.001, 0.006284 + 0.021848 * mean_ohc - 0.073119 * mean_ihc)
-  
-  Ldn <- sum(N_prime) * cambin * calibration_factor
-  
+  Ldn <- sum(N_prime) * cambin
+
   return(list(Ldn=Ldn, N_prime=N_prime, E=E, Cam=Cam, CF=CF))
 }
 

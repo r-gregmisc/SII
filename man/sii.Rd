@@ -34,8 +34,6 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     measured_wrs=NULL,
     wrs_level=NULL,
     distortion_category=NULL,
-    ten_edge_hf=NULL,
-    ten_edge_lf=NULL,
     nal_ldf=FALSE)
 \method{print}{SII}(x, digits=3, ...)
 \method{plot}{SII}(x, clinical=FALSE, legend=TRUE, legend_only=FALSE, ...)
@@ -93,8 +91,6 @@ sii(speech = c("normal", "raised", "loud", "shout"),
   \item{measured_wrs}{Numeric value specifying the clinical Word Recognition Score (WRS) in percent (0-100). When provided, invokes the Margolis (2025) speech distortion model.}
   \item{wrs_level}{Numeric value specifying the presentation level (in dB HL or SPL) of the clinical WRS test.}
   \item{distortion_category}{Character string ("Mild", "Moderate", or "Severe") specifying the degree of speech distortion. If \code{NULL}, it is estimated based on \code{measured_wrs} and \code{wrs_level}.}
-  \item{ten_edge_hf}{High-frequency dead region edge (optional).}
-  \item{ten_edge_lf}{Low-frequency dead region edge (optional).}
   \item{nal_ldf}{Logical flag indicating whether to use NAL-NL2 loudness discomfort factors (optional).}
   \item{object,x}{SII object}
   \item{digits}{Number of digits to display} 

@@ -3,3 +3,16 @@
 .RData
 .Ruserdata
 site/
+*.txt
+*.py
+*.m
+*.sh
+/*.R
+!/auto_update_all.R
+octave-workspace
+legacy_backup/
+validation/
+scratch/
+OpenNL_Manuscript.pdf
+Figure6_LDL_UCL.png
+cran-comments.md

@@ -4,12 +4,15 @@ export(
        print.SII,
        summary.SII,
        launch_app,
-       calculate_loudness
+       calculate_loudness,
+       calculate_loudness_cpp
        )
 
 importFrom("utils", "data")
 importFrom("graphics", "abline", "legend", "lines", "axis", "points", "mtext", "par", "text")
-importFrom("stats", "approx", "predict")
+importFrom(Rcpp, sourceCpp)
+useDynLib(SII, .registration=TRUE)
+importFrom("stats", "approx", "predict", "approxfun", "runif", "setNames")
 S3method(plot, SII)
 S3method(print, SII)
 S3method(summary, SII)

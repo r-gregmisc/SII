@@ -29,8 +29,7 @@ open_nl <- function(speech = 65, threshold, freq,
                     ldl = NULL, age_years = NULL, age_months = NULL, 
                     loss = NULL, distortion_category = NULL, 
                     user_cr = NULL,
-                    optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
-                    abg_fraction = 0.75, enable_severe_booster = FALSE) {
+                    optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead") {
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -48,7 +47,7 @@ open_nl <- function(speech = 65, threshold, freq,
     overall_level <- 65 # Fallback
   }
   
-  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
+  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr)
   mpo <- calculate_nal_sspl90(threshold, gain, ldl, age, age_months, loss, freq)
   
   raw_output <- speech_spec + gain
@@ -66,7 +65,7 @@ open_nl <- function(speech = 65, threshold, freq,
     
     # --- Generate 65 dB SPL Heuristic Seed ---
     # We must explicitly calculate the heuristic at 65 dB SPL to anchor the shifts.
-    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
+    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr)
     mpo_65 <- calculate_nal_sspl90(threshold, gain_65, ldl, age, age_months, loss, freq)
     
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -131,14 +130,12 @@ open_nl <- function(speech = 65, threshold, freq,
       if (length(idx_high) > 0) dense_l[idx_high] <- Ei[length(Ei)] - 24 * log2(dense_f[idx_high] / fi[length(fi)])
       dense_l[is.na(dense_l)] <- -100
       
-
-      
       dense_l <- dense_l - dense_abg
       
       loud_res <- tryCatch({
-        calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l,
+        calculate_loudness_chen2011(inputF = dense_f, inputLdB = dense_l,
           HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss,
-          NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
+          cambin = 0.1, outerearcorrection = 'FreeField')
       }, error = function(e) NULL)
       
       loudness_penalty <- 0.0
