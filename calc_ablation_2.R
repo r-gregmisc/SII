@@ -1,6 +1,0 @@
-library(devtools)
-load_all(".")
-freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-a5 <- c(10, 10, 20, 60, 80, 100)
-tgt1 <- open_nl(65, threshold = a5, freq = freqs)
-print(tgt1$gain)

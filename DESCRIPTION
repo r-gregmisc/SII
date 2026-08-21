@@ -28,10 +28,14 @@ Description:
    well as functions to calculate real-ear insertion gains, estimate 
    maximum power output (SSPL90 or Saturation Sound Pressure Level for a
    90 dB input), and prescribe dynamic range compression. NOTE: This
-   package and its interactive tools are strictly for non-clinical
-   academic research and educational purposes. They are not approved
-   for direct patient care or use as a medical diagnostic device.
-   Development of this package was originally funded by the Center for
+   package and its interactive tools are explicitly flagged as non-clinical
+   academic tools designed exclusively for theoretical modeling and simulation.
+   They have not undergone clinical validation and are strictly contraindicated
+   for general clinical fitting. Unapproved use for direct patient care is
+   prohibited. Any application of these tools to human subjects must occur
+   exclusively within the strictly controlled context of Institutional Review
+   Board (IRB) approved research studies. Development of this package was
+   originally funded by the Center for
    Bioscience Education and Technology (CBET) of the Rochester
    Institute of Technology (RIT).
 Depends: R (>= 3.5.0)
