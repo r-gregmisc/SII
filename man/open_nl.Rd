@@ -12,7 +12,8 @@ open_nl(speech = 65, threshold, freq, gender = "male", experience = "experienced
         config = "bilateral", age = "adult", coupling = "custom_occluded",
         module = "standard", ldl = NULL, age_years = NULL, age_months = NULL,
         loss = NULL, distortion_category = NULL, user_cr = NULL, optimize = TRUE,
-        seed_noise = NULL, optim_method = "Nelder-Mead")
+        seed_noise = NULL, optim_method = "Nelder-Mead", abg_fraction = 0.75,
+        enable_severe_booster = FALSE)
 \method{print}{prescription_target}(x, ...)
 \method{summary}{prescription_target}(object, ...)
 \method{plot}{prescription_target}(x, ...)
@@ -36,6 +37,8 @@ open_nl(speech = 65, threshold, freq, gender = "male", experience = "experienced
   \item{optimize}{Optimization flag.}
   \item{seed_noise}{Random noise for optimizer seeding.}
   \item{optim_method}{Optimization method.}
+  \item{abg_fraction}{Air-bone gap fraction to compensate.}
+  \item{enable_severe_booster}{Logical flag to enable severe-loss booster.}
   \item{x, object}{A \code{prescription_target} object.}
   \item{\dots}{Additional graphical or printing parameters.}
 }

@@ -19,6 +19,8 @@
 #' @param optimize Optimization flag.
 #' @param seed_noise Random noise for optimizer seeding.
 #' @param optim_method Optimization method.
+#' @param abg_fraction Air-bone gap fraction to compensate.
+#' @param enable_severe_booster Logical flag to enable severe-loss booster.
 #'
 #' @return An object of class \code{prescription_target}.
 #' @export
