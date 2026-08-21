@@ -26,7 +26,7 @@ Description:
    novel theoretical rationale inspired by NAL-NL2 (National Acoustic 
    Laboratories Non-Linear 2) and DSL (Desired Sensation Level), as 
    well as functions to calculate real-ear insertion gains, estimate 
-   maximum power output ('SSPL90' or Saturation Sound Pressure Level for a
+   maximum power output (SSPL90 or Saturation Sound Pressure Level for a
    90 dB input), and prescribe dynamic range compression. NOTE: This
    package and its interactive tools are strictly for non-clinical
    academic research and educational purposes. They are not approved
@@ -40,9 +40,7 @@ LinkingTo: Rcpp
 Suggests: splines, readxl, xtable, shiny, bslib, testthat
 License: GPL-3
 LazyLoad: yes
-Packaged: 2018-11-18 09:53:18 UTC; hornik
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2018-11-18 09:56:48 UTC
 Config/roxygen2/version: 8.0.0
 Encoding: UTF-8
