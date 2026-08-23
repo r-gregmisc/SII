@@ -33,6 +33,7 @@
 #' @param ... Additional graphical or printing parameters.
 #'
 #' @return An object of class \code{prescription_target}.
+#' @importFrom stats var
 #' @export
 open_nl <- function(speech = 65, threshold, freq, 
                     gender = "male", experience = "experienced", 
