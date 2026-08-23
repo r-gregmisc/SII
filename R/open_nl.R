@@ -1,5 +1,14 @@
 #' Open-NL WDRC Gain Prescription
 #'
+#' @description
+#' Calculates experimental prescriptive insertion gain and SSPL90 targets for a given hearing loss, based on a rule-based WDRC heuristic.
+#' 
+#' @details
+#' This experimental function generates non-linear prescriptive targets for research and modeling purposes. It is not intended for clinical use.
+#' 
+#' @author
+#' Mark Shaver
+#'
 #' @param speech Input speech spectrum level at each frequency. If a single number is provided, it's assumed to be the overall broadband SPL.
 #' @param threshold Hearing threshold level at each frequency.
 #' @param freq Frequencies at which the thresholds are measured.
@@ -20,6 +29,8 @@
 #' @param enable_severe_booster Logical flag to enable severe-loss booster.
 #' @param booster_onset Threshold for the severe-loss booster (default: 70).
 #' @param disable_sdlfp Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).
+#' @param x,object A \code{prescription_target} object.
+#' @param ... Additional graphical or printing parameters.
 #'
 #' @return An object of class \code{prescription_target}.
 #' @export

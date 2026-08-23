@@ -49,7 +49,10 @@
 ^evaluate_.*\.m$
 ^octave-workspace$
 ^legacy_backup$
+^legacy_backup/
 ^validation$
+^validation/
 ^scratch$
+^scratch/
 ^OpenNL_Manuscript\.pdf$
 ^Figure6_LDL_UCL\.png$
