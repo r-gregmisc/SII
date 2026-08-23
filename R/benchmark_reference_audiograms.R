@@ -16,14 +16,17 @@ benchmark_reference_audiograms <- function() {
     
     for (formula in formulas) {
       if (formula == "Open-NL") {
-        # Let the sii() engine correctly translate broadband 65 dB SPL "normal" speech into band levels
+        # Actually run the Open-NL optimizer to get the prescribed target
+        opt_res <- open_nl(speech = 65, threshold = threshold, freq = freq, loss = loss_vals)
+        gain <- opt_res$gain
+        
+        # Then calculate the final SII and Loudness using the optimized gain
         res <- sii(speech = "normal", 
                    threshold = threshold, 
                    loss = loss_vals,
                    freq = freq, 
                    method = "octave", 
-                   prescription = "Open-NL")
-        gain <- res$gain
+                   custom_gain = gain)
       } else {
         # Get target gain
         gain <- get_jd2011_target(preset, formula, target_freqs = freq, level = 65)
@@ -37,7 +40,8 @@ benchmark_reference_audiograms <- function() {
                    custom_gain = gain)
       }
                  
-      sone_val <- calculate_loudness(res)
+      sone_res <- calculate_loudness(res)
+      sone_val <- if (is.list(sone_res)) sone_res$total else sone_res
                  
       results <- rbind(results, data.frame(
         Audiogram = toupper(preset),

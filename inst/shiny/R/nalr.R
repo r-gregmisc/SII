@@ -245,8 +245,6 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # especially when using our lower-gain comfort multipliers (e.g. 0.40 / 0.45).
   if (!is.null(age) && substr(age[1], 1, 5) == "child") {
     ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
-  } else if (experience == "power") {
-    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
   } else {
     ct_overall <- approx(x = c(20, 50, 80, 100), y = c(30, 35, 40, 45), xout = sn_threshold, rule = 2)$y
   }

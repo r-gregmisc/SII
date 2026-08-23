@@ -4,7 +4,7 @@
 #' @param threshold Hearing threshold level at each frequency.
 #' @param freq Frequencies at which the thresholds are measured.
 #' @param gender Gender of the patient ("male", "female").
-#' @param experience Hearing aid experience ("new", "experienced", "power").
+#' @param experience Hearing aid experience ("new", "experienced").
 #' @param config Fitting configuration ("unilateral", "bilateral").
 #' @param age Age group ("adult", "child_0_5", "child_6_11", "child_12_23", "child_24_35", "child_36_59", "child_60_plus").
 #' @param coupling Acoustic coupling ("custom_occluded", "open_dome", "tulip_dome", "double_dome", "vent_1mm_solid", etc.).

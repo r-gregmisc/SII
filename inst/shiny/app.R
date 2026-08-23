@@ -76,25 +76,20 @@ ui <- page_sidebar(
                                 "Comfort in Noise (CIN)" = "cin", 
                                 "Minimal Hearing Loss (MHL)" = "mhl"),
                     selected = "standard"),
-        checkboxInput("desensitization", "Apply Desensitization (Johnson 2013)", value = FALSE)
+        checkboxInput("desensitization", "Apply Desensitization (Johnson 2011)", value = FALSE)
       ),
       accordion_panel(
         "Demographics & Fitting",
         selectInput("gender", "Gender:", choices = c("Male" = "male", "Female" = "female"), selected = "male"),
         selectInput("age", "Age Group:", 
-                    choices = c("Adult (>5 years)" = "adult", 
-                                "Child: 36-59 months" = "child_36_59",
-                                "Child: 24-35 months" = "child_24_35",
-                                "Child: 12-23 months" = "child_12_23",
-                                "Child: 6-11 months" = "child_6_11",
-                                "Child: 0-5 months" = "child_0_5"), 
+                    choices = c("Adult (>5 years)" = "adult"), 
                     selected = "adult"),
         conditionalPanel(
           condition = "input.age == 'adult'",
           numericInput("adult_age", "Adult Age (Years):", value = 65, min = 18, max = 110, step = 1)
         ),
         selectInput("experience", "Experience:", 
-                    choices = c("Power User" = "power", "Experienced User" = "experienced", "New User" = "new"), 
+                    choices = c("Experienced User" = "experienced", "New User" = "new"), 
                     selected = "experienced"),
         selectInput("config", "Fitting Configuration:", choices = c("Bilateral (Both Ears)" = "bilateral", "Unilateral (One Ear)" = "unilateral"), selected = "unilateral"),
 
@@ -121,7 +116,6 @@ ui <- page_sidebar(
         "Advanced Parameters",
         tags$div(class = "mt-3"),
         tags$strong("Word Recognition & Distortion"),
-        tags$i(class = "fa fa-info-circle text-muted", title = "Distortion penalties (HF roll-off & soft-compression) are only applied for Adults. Pediatric targets prioritize maximum audibility.", "data-toggle" = "tooltip", style = "margin-left: 5px; cursor: help;"),
         tooltip(
           numericInput("measured_wrs", "Measured Word Rec (%):", value = NA, min = 0, max = 100),
           "The patient's clinical NU-6 score. Used to categorize cochlear distortion (Margolis et al., 2025)."

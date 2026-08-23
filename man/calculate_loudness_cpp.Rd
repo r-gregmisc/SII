@@ -39,5 +39,6 @@ calculate_loudness_cpp(
 A list containing Loudness (sones), Excitation, Cams, and CFs.
 }
 \description{
-This is the native C++ port of the bramslow2004 canonical engine.
+Native C++ port of the bramslow2004 canonical engine, corrected per
+AMToolbox 1.6.0 reference with noted simplifications.
 }

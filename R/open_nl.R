@@ -4,14 +4,11 @@
 #' @param threshold Hearing threshold level at each frequency.
 #' @param freq Frequencies at which the thresholds are measured.
 #' @param gender Gender of the patient ("male", "female").
-#' @param experience Hearing aid experience ("new", "experienced", "power").
+#' @param experience Hearing aid experience ("new", "experienced").
 #' @param config Fitting configuration ("unilateral", "bilateral").
-#' @param age Age group ("adult", "child_0_5", "child_6_11", "child_12_23", "child_24_35", "child_36_59", "child_60_plus").
 #' @param coupling Acoustic coupling ("custom_occluded", "open_dome", "tulip_dome", "double_dome", "vent_1mm_solid", etc.).
 #' @param module Fitting module ("standard", "cin").
 #' @param ldl Loudness Discomfort Levels (optional).
-#' @param age_years Age in years (optional).
-#' @param age_months Age in months (optional).
 #' @param loss Conductive hearing loss component (optional).
 #' @param distortion_category Distortion category ("Normal", "Low", "Moderate", "High").
 
@@ -26,13 +23,13 @@
 #' @export
 open_nl <- function(speech = 65, threshold, freq, 
                     gender = "male", experience = "experienced", 
-                    config = "bilateral", age = "adult", 
+                    config = "bilateral", 
                     coupling = "custom_occluded", module = "standard", 
-                    ldl = NULL, age_years = NULL, age_months = NULL, 
+                    ldl = NULL, 
                     loss = NULL, distortion_category = NULL, 
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
-                    abg_fraction = 0.75, enable_severe_booster = FALSE) {
+                    abg_fraction = 0.75, enable_severe_booster = FALSE, disable_sdlfp = FALSE) {
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -50,8 +47,8 @@ open_nl <- function(speech = 65, threshold, freq,
     overall_level <- 65 # Fallback
   }
   
-  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
-  mpo <- calculate_nal_sspl90(threshold, gain, ldl, age, age_months, loss, freq)
+  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster, disable_sdlfp = disable_sdlfp)
+  mpo <- calculate_nal_sspl90(threshold, gain, ldl, loss, freq)
   
   raw_output <- speech_spec + gain
   overshoot <- pmax(0, raw_output - mpo)
@@ -68,8 +65,8 @@ open_nl <- function(speech = 65, threshold, freq,
     
     # --- Generate 65 dB SPL Heuristic Seed ---
     # We must explicitly calculate the heuristic at 65 dB SPL to anchor the shifts.
-    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, age, coupling, module, ldl, age_years, age_months, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
-    mpo_65 <- calculate_nal_sspl90(threshold, gain_65, ldl, age, age_months, loss, freq)
+    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
+    mpo_65 <- calculate_nal_sspl90(threshold, gain_65, ldl, loss, freq)
     
     if (file.exists(file.path("data", "critical.rda"))) {
       load(file.path("data", "critical.rda"), envir = environment())
@@ -87,19 +84,24 @@ open_nl <- function(speech = 65, threshold, freq,
     
     # --- STATIC PRE-CALCULATIONS FOR OBJECTIVE FUNCTION ---
     # Hoisted out of the Nelder-Mead loop for performance
-    dense_f <- 10^(seq(log10(100), log10(10000), length.out = 100))
+    # MUST be linearly spaced because bramslow2004.cpp assumes a constant df = F[1] - F[0]
+    dense_f <- seq(100, 10000, by = 10)
     local_loss <- if (is.null(loss)) rep(0, length(threshold)) else loss
     dense_abg <- approx(x = log10(freq), y = local_loss, xout = log10(dense_f), rule = 2)$y
     
     hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
     htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
     sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
-    ohc_loss <- pmin(0.65 * sn_htl, 57.6)
-    ihc_loss <- pmax(sn_htl - ohc_loss, 0)
+    ohc_loss <- sn_htl
+    ihc_loss <- rep(0, length(sn_htl))
     # ------------------------------------------------------
     
     obj_fn <- function(shifts) {
-      gain_array <- pmax(0, pmin(80, final_gain_65 + shifts))
+      # Add a massive penalty for shifts outside +10 / -30 dB to anchor to clinical heuristic
+      out_of_bounds_penalty <- (sum(pmax(0, shifts - 10)^2) + sum(pmax(0, -shifts - 30)^2)) * 1000.0
+      
+      clamped_shifts <- pmax(-30, pmin(10, shifts))
+      gain_array <- pmax(0, pmin(80, final_gain_65 + clamped_shifts))
       
       # We evaluate the objective function at 65 dB SPL (Standard Speech) to align with
       # clinical conventions and JASA reviewer expectations.
@@ -116,7 +118,7 @@ open_nl <- function(speech = 65, threshold, freq,
         sii(speech = speech_spec_65, noise = rep(-50, length(freq)), 
             threshold = threshold, loss = loss, freq = freq, 
             prescription = temp_target, interpolate = TRUE, 
-            nal_ldf = TRUE, desensitization = TRUE)
+            nal_ldf = TRUE, desensitization = "johnson2011_smoothed")
       }, error = function(e) NULL)
       
       if (is.null(res)) return(1000)
@@ -148,38 +150,88 @@ open_nl <- function(speech = 65, threshold, freq,
         loudness_sones <- loud_res$Ldn
         sn_threshold <- threshold - local_loss
         pta_sn_local <- mean(sn_threshold[c(2, 3, 4, 5)], na.rm = TRUE)
-        dynamic_cap <- min(18.6, 6.0 + 0.10 * pta_sn_local)
+        
+        # Clinical Heuristic: Reverse-slope losses (LF > HF) suffer from upward spread of 
+        # masking. NAL-NL2 inherently limits LF gain, resulting in much lower loudness. 
+        # To prevent SII maximization from over-amplifying low frequencies, we enforce a 
+        # stricter dynamic cap for reverse-slope profiles.
+        is_reverse_slope <- sn_threshold[2] > sn_threshold[5] # 500 Hz > 4000 Hz
+        if (is_reverse_slope) {
+            dynamic_cap <- max(4.0, 1.5 + 0.08 * pta_sn_local)
+        } else {
+            dynamic_cap <- max(6.5, 2.5 + 0.12 * pta_sn_local)
+        }
         
         if (loudness_sones > dynamic_cap) {
           excess <- loudness_sones - dynamic_cap
-          loudness_penalty <- excess * 50.0 
+          loudness_penalty <- excess * 500.0 
         }
       }
       
-      # Soft Anchor Penalty to prevent drifting in regions where SII plateaus
-      anchor_penalty <- sum(shifts^2) * 0.1
+      # Safety Limit: Real hearing aids restrict Maximum Power Output (MPO) to 
+      # prevent hazardous exposure. If the optimizer boosts dead regions, loudness 
+      # won't increase but physical SPL will. This SPL limit prevents the Octave 
+      # bramslow2004 C-engine from crashing due to >120 dB SPL signals.
+      # dense_l is power density per Hz, and we have a 10 Hz resolution
+      overall_spl <- 10 * log10(sum(10^(dense_l / 10) * 10))
+      spl_penalty <- 0.0
+      if (is.finite(overall_spl) && overall_spl > 110.0) {
+        spl_penalty <- (overall_spl - 110.0) * 500.0
+      }
       
-      return(-score + anchor_penalty + loudness_penalty)
+      # Soft Anchor Penalty to prevent drifting in regions where SII plateaus
+      anchor_penalty <- sum(abs(shifts)) * 0.1
+      
+      return(-score + anchor_penalty + loudness_penalty + out_of_bounds_penalty + spl_penalty)
     }
     
-    # Nelder-Mead optimization (150 iterations for full convergence)
-    start_par <- rep(0, length(freq))
-    if (!is.null(seed_noise)) {
-      start_par <- start_par + runif(length(freq), -seed_noise, seed_noise)
+    # Multi-start Nelder-Mead optimization (5 iterations, 150 max iter per run)
+    # Mitigates initialization sensitivity near the recruitment boundary
+    num_starts <- 5
+    best_val <- Inf
+    best_shifts <- rep(0, length(freq))
+    convergence_codes <- integer(num_starts)
+    obj_values <- numeric(num_starts)
+    
+    for (i in seq_len(num_starts)) {
+      start_par <- rep(0, length(freq))
+      # Apply random uniform jitter to mitigate initialization sensitivity
+      # Jitter is applied on all iterations except the first (which uses the pure baseline)
+      if (i > 1 || !is.null(seed_noise)) {
+        jitter_amount <- if (!is.null(seed_noise)) seed_noise else 5
+        start_par <- start_par + runif(length(freq), -jitter_amount, jitter_amount)
+      }
+      
+      opt_res <- suppressWarnings(optim(
+        par = start_par, 
+        fn = obj_fn, 
+        method = optim_method, 
+        control = list(maxit = 150)
+      ))
+      
+      convergence_codes[i] <- opt_res$convergence
+      obj_values[i] <- opt_res$value
+      
+      if (opt_res$value < best_val) {
+        best_val <- opt_res$value
+        best_shifts <- opt_res$par
+      }
     }
     
-    opt_res <- suppressWarnings(optim(
-      par = start_par, 
-      fn = obj_fn, 
-      method = optim_method, 
-      control = list(maxit = 150)
-    ))
+    convergence_stats <- list(
+      success_rate = sum(convergence_codes == 0) / num_starts,
+      variance = if (num_starts > 1) var(obj_values) else 0,
+      best_value = best_val,
+      codes = convergence_codes
+    )
     
-    best_shifts <- opt_res$par
+    constrained_best_shifts <- pmax(-30, pmin(10, best_shifts))
     
     # Apply the 65 dB optimal shifts to the dynamically scaled heuristic target
     # This preserves the exact WDRC compression ratios (the difference between 50, 65, and 80 dB targets)
-    final_gain <- pmax(0, pmin(80, final_gain + best_shifts))
+    final_gain <- pmax(0, pmin(80, final_gain + constrained_best_shifts))
+  } else {
+    convergence_stats <- NULL
   }
   
   res <- list(
@@ -190,7 +242,8 @@ open_nl <- function(speech = 65, threshold, freq,
     threshold = threshold,
     loss = loss,
     module = module,
-    overall_level = overall_level
+    overall_level = overall_level,
+    convergence_stats = convergence_stats
   )
   class(res) <- "prescription_target"
   return(res)

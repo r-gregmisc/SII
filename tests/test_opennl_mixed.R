@@ -63,28 +63,3 @@ stopifnot(res$sii >= 0 && res$sii <= 1.0)
 
 print("All Open-NL Conductive/Mixed Loss unit tests passed successfully!")
 
-# Test Infant RECD application
-gain_adult <- SII:::calculate_open_nl_gain(
-  freq = freq_21,
-  threshold = htl_a6,
-  input_level = 65,
-  age = "adult"
-)
-
-gain_infant <- SII:::calculate_open_nl_gain(
-  freq = freq_21,
-  threshold = htl_a6,
-  input_level = 65,
-  age = "child_0_5"
-)
-
-# Infant should have LESS insertion gain prescribed because the smaller ear canal
-# will naturally produce MORE real-ear SPL for the same coupler output.
-# We check the mid-frequencies (e.g., 1000 Hz) to avoid the high-frequency 
-# bandwidth roll-off differences between infants and adults confounding the check.
-idx_1k <- which(freq_21 == 1000)
-if (gain_infant[idx_1k] < gain_adult[idx_1k]) {
-  print("Infant RECD gain reduction successfully applied!")
-} else {
-  stop("Infant RECD failed to reduce gain appropriately.")
-}

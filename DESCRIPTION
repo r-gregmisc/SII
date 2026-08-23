@@ -1,8 +1,8 @@
 Package: SII
 Type: Package
 Title: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
-Version: 1.1.9
-Date: 2026-08-15
+Version: 1.2.0
+Date: 2026-08-21
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = c("aut", "cph")),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description:
@@ -17,17 +17,19 @@ Description:
    score. The methods implemented here extend the standard computations
    to allow calculation of SII when the measured frequencies do not
    match those required by the standard by applying interpolation.
-   Furthermore, the package now includes a hybrid nonlinear loudness 
-   engine integrating the excitation patterns of Chen et al. (2011) 
-   with the compressive integrals of Moore & Glasberg (2004) to predict
-   impaired loudness recruitment in sones. It also includes advanced 
-   clinical methods to predict aided SII based on hearing aid 
-   prescriptive rationales, including Open-NL (Open Non-Linear), a 
-   novel theoretical rationale inspired by NAL-NL2 (National Acoustic 
-   Laboratories Non-Linear 2) and DSL (Desired Sensation Level), as 
-   well as functions to calculate real-ear insertion gains, estimate 
-   maximum power output (SSPL90 or Saturation Sound Pressure Level for a
-   90 dB input), and prescribe dynamic range compression. NOTE: This
+   Furthermore, the package now includes a native, highly optimized C++ 
+   implementation of the canonical Moore & Glasberg (2004) specific loudness 
+   model for impaired hearing, which structurally mirrors the bramslow2004 
+   implementation from the Auditory Modeling Toolbox (AMT) to calculate 
+   loudness in perceptual sones. It also includes advanced methods to 
+   predict aided SII based on hearing aid prescriptive rationales, 
+   introducing Open-NL (Open Non-Linear), a novel theoretical optimization 
+   framework. Open-NL utilizes a Nelder-Mead simplex algorithm to maximize 
+   the ANSI SII metric, subject to computational physiological loudness 
+   penalties and simulated hardware Maximum Power Output (MPO) constraints, 
+   to derive theoretical gain targets. The package also provides functions to 
+   calculate real-ear insertion gains, estimate maximum power output 
+   (SSPL90), and prescribe dynamic range compression. NOTE: This
    package and its interactive tools are explicitly flagged as non-clinical
    academic tools designed exclusively for theoretical modeling and simulation.
    They have not undergone clinical validation and are strictly contraindicated
@@ -42,7 +44,7 @@ Depends: R (>= 3.5.0)
 Imports: Rcpp
 LinkingTo: Rcpp
 Suggests: splines, readxl, xtable, shiny, bslib, testthat
-License: GPL-3
+License: GPL-3 | file LICENSE
 LazyLoad: yes
 NeedsCompilation: yes
 Repository: CRAN

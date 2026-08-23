@@ -1,3 +1,4 @@
+#' @export
 plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ...)
   {
     if (clinical) {
@@ -42,23 +43,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
         # Insert Earphones (ER-3A) use RETSPL + RECD
         retspl <- c(14.0, 5.5, 0.0, 3.0, 5.5, 0.0)
         
-        # DSL v5.0a RECD (Real-Ear-to-Coupler Difference) based on specific age bracket
-        if (is.null(x$age) || x$age == "adult") {
-          recd <- c(2.0, 4.0, 5.0, 6.0, 8.0, 4.0)
-        } else if (x$age == "child_36_59") {
-          recd <- c(3.0, 6.0, 8.0, 12.0, 15.0, 14.0)
-        } else if (x$age == "child_24_35") {
-          recd <- c(3.0, 6.0, 9.0, 13.0, 15.0, 15.0)
-        } else if (x$age == "child_12_23") {
-          recd <- c(4.0, 6.0, 9.0, 14.0, 17.0, 16.0)
-        } else if (x$age == "child_6_11") {
-          recd <- c(4.0, 7.0, 10.0, 15.0, 18.0, 18.0)
-        } else if (x$age == "child_0_5") {
-          recd <- c(4.0, 7.0, 11.0, 16.0, 21.0, 21.0)
-        } else {
-          # Fallback generic pediatric
-          recd <- c(4.0, 6.0, 8.0, 10.0, 12.0, 9.0)
-        }
+        # Standard Adult RECD (Real-Ear-to-Coupler Difference)
+        recd <- c(2.0, 4.0, 5.0, 6.0, 8.0, 4.0)
         
         # Interpolate RETSPL + RECD to get the True Eardrum SPL offset
         eardrum_offset <- approx(x = log10(f_oct), y = retspl + recd, xout = log10(freq), rule = 2)$y
@@ -310,8 +296,6 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
-                     age = x$age,
-                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module,
                      distortion_category = x$distortion_category)
@@ -328,8 +312,6 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
-                     age = x$age,
-                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module,
                      distortion_category = x$distortion_category)
@@ -346,8 +328,6 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      experience = x$experience,
                      gender = x$gender,
                      config = x$config,
-                     age = x$age,
-                     age_years = x$age_years,
                      coupling = x$coupling,
                      module = x$module,
                      distortion_category = x$distortion_category)

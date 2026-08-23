@@ -17,9 +17,9 @@ using namespace Rcpp;
 //   5. UCL divisor is simple division, not squared
 //   6. LOUDNORM bandwidth normalization for widened critical bands
 //   7. Dead if/else branches collapsed
+//   8. (NEW) Internal 2048-point FFT interpolation mathematically mirrors MATLAB AMT environment.
 //
 // Noted simplifications retained (vs. AMT reference):
-//   - Sparse spectral-density input replaces FFT-bin integration
 //   - Moore & Glasberg (2004) outer/middle ear corrections replace ZWICKA0
 //   - Audiometric input is OHC+IHC dB HL, not dB SPL via RET4153/IEC303
 // -------------------------------------------------------------------------
@@ -228,18 +228,37 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
                               NumericVector HLcf, NumericVector HLohcdB0, NumericVector HLihcdB0,
                               int NoChan = 30, double E_Beg = 3.0, double E_End = 32.0, int Binaural = 0) {
     
-    size_t N_spec = inputF.size();
-    std::vector<double> F(N_spec);
-    std::vector<double> L_linear(N_spec);
+    // 2048-point FFT parameters (at 44100 Hz sampling rate)
+    int N_FFT = 2048;
+    double FS = 44100.0;
+    double df_fft = FS / N_FFT;
+    
+    // Create the FFT-equivalent frequency grid (Nyquist)
+    std::vector<double> F;
+    for (int i = 0; i < N_FFT / 2; ++i) { 
+        double freq = i * df_fft;
+        if (freq > 0.1) {
+            F.push_back(freq);
+        }
+    }
+    
+    // Convert R inputs to std::vectors for interpolation
+    std::vector<double> in_F(inputF.begin(), inputF.end());
+    std::vector<double> in_LdB(inputLdB.begin(), inputLdB.end());
+    
+    std::vector<double> L_linear(F.size());
     
     // ZWICKA0: Transmission factor (static outer and middle ear correction)
     std::vector<double> zwicka0_F = {31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500};
     std::vector<double> zwicka0_dB = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.5, 5.0, 6.5, 6.0, 3.5, -1.0, -4.0, -7.5, -20.0};
     
-    for (size_t i = 0; i < N_spec; ++i) {
-        F[i] = inputF[i];
-        double L = inputLdB[i];
+    for (size_t i = 0; i < F.size(); ++i) {
+        // Dynamically interpolate the R input sparse array onto this dense canonical FFT grid
+        double L = interp1(F[i], in_F, in_LdB);
+        
+        // Apply ZWICKA0 static outer and middle ear correction
         L += interp1(F[i], zwicka0_F, zwicka0_dB);
+        
         L_linear[i] = std::pow(10.0, L / 10.0);
     }
     
@@ -251,14 +270,17 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
     std::vector<double> hl_ohc_plus_ihc(hl_cf.size());
     
     // RET4153: ISO 389 thresholds in dB SPL as measured on the ear-simulator (4153) coupler.
-    // Matches frequencies: 125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 10000, 12500
-    std::vector<double> ret4153 = {45.0, 27.0, 13.5, 9.0, 7.5, 7.5, 9.0, 11.5, 12.0, 16.0, 15.5, 12.5, 10.0};
+    std::vector<double> ret4153_freqs = {125.0, 250.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 6000.0, 8000.0, 10000.0, 12500.0};
+    std::vector<double> ret4153_dB = {45.0, 27.0, 13.5, 9.0, 7.5, 7.5, 9.0, 11.5, 12.0, 16.0, 15.5, 12.5, 10.0};
+    
+    std::vector<double> ret4153_aligned(hl_cf.size());
     
     for(size_t i=0; i<hl_cf.size(); ++i) {
         agfs_e[i] = f2erbrate(hl_cf[i]);
         hl_ohc_plus_ihc[i] = hl_ohc[i] + hl_ihc[i];
-        // Convert dB HL to dB SPL by adding RET4153
-        ag_loss[i] = hl_ohc[i] + hl_ihc[i] + ret4153[i];
+        // Safely interpolate the RET4153 value to dynamically align with whatever freq array R passed!
+        ret4153_aligned[i] = interp1(hl_cf[i], ret4153_freqs, ret4153_dB);
+        ag_loss[i] = hl_ohc[i] + hl_ihc[i] + ret4153_aligned[i];
     }
     
     std::vector<double> E_Bin(NoChan);
@@ -266,10 +288,10 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
     std::vector<double> E_SPL(NoChan);
     
     // For speech signal, widen is true
-    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ret4153, true, NoChan, E_Beg, E_End, E_SPL, f0_Hz, E_Bin);
+    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ret4153_aligned, true, NoChan, E_Beg, E_End, E_SPL, f0_Hz, E_Bin);
     
     std::vector<double> E_Vector(NoChan);
-    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ret4153, true, NoChan, E_Bin, f0_Hz, E_Vector);
+    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ret4153_aligned, true, NoChan, E_Bin, f0_Hz, E_Vector);
     
     // Canonical Specific Loudness Integration (bramslow2004_specloudn)
     double TotLoudn = 0.0;
@@ -306,18 +328,18 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
         std::vector<double> e0_vec(NoChan), etq_vec(NoChan), eucl_vec(NoChan);
         
         // E_0: excitation from 0 dB SPL tone (free-field, so is_coupler=false)
-        simulate_tone(f0_Hz[c], 0.0, agfs_e, ag_loss, ret4153, NoChan, E_Beg, E_End, E_Bin, f0_Hz, e0_vec, false, false, false);
+        simulate_tone(f0_Hz[c], 0.0, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, e0_vec, false, false, false);
         
-        // HTL is in dB SPL as measured on the ear-simulator (4153/IEC303) coupler
-        double RET = interp1(f0_Hz[c], hl_cf, ret4153);
-        double HTL = interp1(f0_Hz[c], hl_cf, hl_ohc_plus_ihc) + RET;
+        // Find absolute threshold
+        double RET = interp1(f0_Hz[c], hl_cf, ret4153_aligned);
+        double HTL = std::max(30.708, interp1(f0_Hz[c], hl_cf, ag_loss));
         
         // E_TQ: excitation from HTL tone (coupler, so is_coupler=true)
-        simulate_tone(f0_Hz[c], HTL, agfs_e, ag_loss, ret4153, NoChan, E_Beg, E_End, E_Bin, f0_Hz, etq_vec, false, true, false);
+        simulate_tone(f0_Hz[c], HTL, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, etq_vec, false, true, false);
         
         // E_UCL: excitation from UCL tone (forced narrow filters, coupler, so is_coupler=true)
         // Default AG_UCL is 120 dB HL
-        simulate_tone(f0_Hz[c], 120.0 + RET, agfs_e, ag_loss, ret4153, NoChan, E_Beg, E_End, E_Bin, f0_Hz, eucl_vec, true, true, false);
+        simulate_tone(f0_Hz[c], 120.0 + RET, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, eucl_vec, true, true, false);
         
         // Fix 3: E_0 and E_TQ use total summed excitation across all channels
         // (reference: bramslow2004_exc0dbspl.m line 108, bramslow2004_htl.m line 98)

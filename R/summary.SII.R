@@ -1,3 +1,4 @@
+#' @export
 `summary.SII` <-
 function (object, digits = 2, ...) 
 {

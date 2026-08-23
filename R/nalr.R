@@ -31,36 +31,9 @@ calculate_nalr_gain <- function(freq, threshold) {
   return(ig)
 }
 
-get_recd_diff <- function(age, age_months = NULL) {
-  recd_f <- c(250, 500, 1000, 2000, 4000, 8000)
-  adult_recd <- c(2, 3, 5, 8, 10, 6)
-  
-  # If age is a string like "child_6_11", parse the months
-  if (is.null(age_months) && !is.null(age) && substr(age[1], 1, 5) == "child") {
-    if (age == "child_0_5") age_months <- 3
-    else if (age == "child_6_11") age_months <- 9
-    else if (age == "child_12_23") age_months <- 18
-    else if (age == "child_24_35") age_months <- 30
-    else if (age == "child_36_59") age_months <- 48
-    else age_months <- 60
-  }
-  
-  if (is.null(age) || age == "adult" || is.null(age_months)) {
-    infant_recd <- adult_recd
-  } else if (age_months <= 6) {
-    infant_recd <- c(6, 8, 12, 15, 17, 14)
-  } else if (age_months <= 12) {
-    infant_recd <- c(5, 7, 10, 13, 15, 12)
-  } else if (age_months <= 24) {
-    infant_recd <- c(4, 6, 8, 11, 13, 10)
-  } else {
-    infant_recd <- c(3, 4, 6, 9, 11, 8)
-  }
-  
-  return(list(f = recd_f, diff = infant_recd - adult_recd))
-}
-
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE) {
+#' @param enable_severe_booster Logical. Defaults to FALSE. **WARNING (RISK STATEMENT):** This is an experimental feature that bypasses standard gain-limiting heuristics for profound thresholds. Enabling this on human subjects without real-ear verification risks severe over-amplification and acoustic trauma.
+#' @param dynamic_mpo_attenuation Logical. Defaults to FALSE. **WARNING (RISK STATEMENT):** This feature aggressively limits gain based on predicted LDLs to prevent saturation. However, predicting LDLs theoretically is highly variable. If enabled without verified clinical LDLs, this risks severely starving audibility for loud speech inputs, compromising safety and situational awareness.
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", coupling = "custom_occluded", module = "standard", ldl = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE, dynamic_mpo_attenuation = FALSE, anchor = 0.46, slope_trigger = 15, bypass_pta = 70, rs_floor = -10, hardware_mpo = 120, disable_sdlfp = FALSE) {
   # Define steep_slope_diff for HFDR and LDL logic
   steep_slope_diff <- if (length(threshold) > 1) max(diff(threshold), na.rm = TRUE) else 0
 
@@ -86,7 +59,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # 2. Loudness-Density Normalization Heuristic (LDN-H)
   # Instead of arbitrary dynamic base multipliers, we anchor to the theoretically
   # derived 0.46 half-gain rule (Lyregaard, 1988; NAL-R).
-  g_base <- 0.46 * sn_threshold + c_interp
+  g_base <- anchor * sn_threshold + c_interp
   
   # A modest Severe-Loss Booster (0.15 slope) is applied to thresholds > 60 dB HL
   # to gently assist severe losses. Based on Engler et al. (2026) and Convery & Keidser (2011),
@@ -107,23 +80,30 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   slope_diff <- pta_hf - pta_lf
   
-  if (slope_diff > 15 && pta_hf > 65 && pta_lf <= 70) {
-    # STEEP SLOPE: Aggressive penalty to low-frequency gain 
-    # to prevent the overall loudness density from exceeding the comfort threshold (fixes A5 overprescription).
-    lf_penalty_factor <- pmin(1, (slope_diff - 15) / 20)
-    lf_penalty_max <- lf_penalty_factor * 15 # Up to 15 dB penalty
-    
-    lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
-    g_base <- g_base - (lf_penalty_max * lf_weights)
-  } else if (slope_diff < -15) {
-    # REVERSE SLOPE: Low frequencies are significantly worse than high frequencies.
-    # We must suppress low-frequency gain to prevent upward spread of masking.
-    rs_factor <- pmin(1, (-slope_diff - 15) / 20)
-    flat_target <- -10
-    lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
-    # Apply the -10 dB suppression to the correction array (c_interp) in the low frequencies
-    # rather than flattening the entire g_base to -10 (which would cause severe attenuation)
-    g_base <- g_base - (c_interp - flat_target) * rs_factor * lf_weights
+  if (!disable_sdlfp) {
+    if (slope_diff > slope_trigger && pta_hf > 65 && pta_lf <= bypass_pta) {
+      # STEEP SLOPE: Aggressive penalty to low-frequency gain 
+      # to prevent the overall loudness density from exceeding the comfort threshold (fixes A5 overprescription).
+      lf_penalty_factor <- pmin(1, (slope_diff - slope_trigger) / 20)
+      
+      # Configuration-Aware Bypass: Severe-to-profound listeners require more LF energy (Byrne et al. 1990)
+      # Fade out the penalty as high-frequency PTA approaches 95 dB HL.
+      profound_bypass_factor <- pmax(0, pmin(1, (95 - pta_hf) / 25))
+      
+      lf_penalty_max <- lf_penalty_factor * slope_trigger * profound_bypass_factor # Up to slope_trigger penalty, tapered by profound loss
+      
+      lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
+      g_base <- g_base - (lf_penalty_max * lf_weights)
+    } else if (slope_diff < -slope_trigger) {
+      # REVERSE SLOPE: Low frequencies are significantly worse than high frequencies.
+      # We must suppress low-frequency gain to prevent upward spread of masking.
+      rs_factor <- pmin(1, (-slope_diff - slope_trigger) / 20)
+      flat_target <- -10
+      lf_weights <- pmax(0, 1 - (log10(freq) - log10(250)) / log10(1000/250))
+      # Apply the -10 dB suppression to the correction array (c_interp) in the low frequencies
+      # rather than flattening the entire g_base to -10 (which would cause severe attenuation)
+      g_base <- g_base - (c_interp - flat_target) * rs_factor * lf_weights
+    }
   }
   # For FLAT audiograms (slope_diff between -15 and 15), NO low-frequency penalty is applied.
   # This solves the A4 under-prescription paradox by allowing severe flat losses to retain their 50% gain.
@@ -146,15 +126,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # We dynamically scale the gain limit so severe losses can still get the amplification they need.
   # Lifted base limit to 45 dB, and increased the slope multiplier to 1.0 
   # to prevent severe/profound losses from being crushed by soft-compression (Macrae, 1991).
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
-  } else if (experience == "power") {
-    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
-  } else {
-    gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
-  }
+  gain_limit <- 45 + pmax(0, sn_threshold - 60) * 1.0
   
-  if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High") && (is.null(age) || substr(age[1], 1, 5) != "child")) {
+  if (!is.null(distortion_category) && distortion_category %in% c("Moderate", "High")) {
     gain_limit <- gain_limit - 10 # Increase soft compression significantly for distorted ears
   }
   
@@ -183,19 +157,14 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   # 1e. NAL-NL3 Bandwidth Roll-off
   # Reduced emphasis on using low-frequency (<= 250 Hz) and very high-frequency (>= 6 kHz) gain
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
-                         y = c(0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0), xout = freq, rule = 2)$y
-  } else {
-    bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
-                         y = c(0.7, 1.0, 1.0, 1.0, 1.0, 0.8, 0.5), xout = freq, rule = 2)$y
-  }
+  bw_rolloff <- approx(x = c(250, 500, 1000, 2000, 4000, 6000, 8000), 
+                       y = c(0.7, 1.0, 1.0, 1.0, 1.0, 0.8, 0.5), xout = freq, rule = 2)$y
   g_65 <- g_65 * bw_rolloff
   
   
   # 1d. Margolis et al. (2025) Distortion Categorization Roll-off
   # Based on the untested heuristic in Appendix A.
-  if (!is.null(distortion_category) && (is.null(age) || substr(age[1], 1, 5) != "child")) {
+  if (!is.null(distortion_category)) {
     if (distortion_category == "Moderate") {
       # Roll off -5 dB per octave above 2000 Hz
       dist_roll <- pmax(0, log2(freq / 2000)) * 5
@@ -245,13 +214,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # A lower CT ensures WDRC kicks in earlier, applying more gain to soft speech (55 dB SPL).
   # This restores audibility for soft sounds and dramatically reduces listening effort,
   # especially when using our lower-gain comfort multipliers (e.g. 0.40 / 0.45).
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
-  } else if (experience == "power") {
-    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(25, 30, 35, 40), xout = sn_threshold, rule = 2)$y
-  } else {
-    ct_overall <- approx(x = c(20, 50, 80, 100), y = c(30, 35, 40, 45), xout = sn_threshold, rule = 2)$y
-  }
+  ct_overall <- approx(x = c(20, 50, 80, 100), y = c(30, 35, 40, 45), xout = sn_threshold, rule = 2)$y
   
   # ct_overall is the OVERALL speech level CT. We must convert it to a BAND level CT.
   # Since 'pivot' is the band level for 65 dB SPL overall speech, 
@@ -308,14 +271,6 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
                g_ct,
                g_ct - (input_band - ct_band) * (1 - 1/cr_loud))
                
-  # 5. Apply Infant/Toddler RECD Correction
-  # Infants have smaller ear canals, meaning the same hearing aid output produces a higher SPL at the eardrum.
-  # To achieve the same target SPL at the eardrum, the prescribed insertion gain must be reduced 
-  # by the difference between the infant RECD and the adult RECD.
-  recd_data <- get_recd_diff(age, age_months)
-  recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
-  
-  ig <- ig - recd_diff
   
   # 6. Apply Empirical Demographic Adjustments (Keidser et al., 2012)
   adjustment <- 0
@@ -327,15 +282,18 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Age / Acquired-Loss Penalty (DSL v5.0a Philosophy)
   # Adults prefer less gain than children, particularly for mild-to-moderate losses.
   # This difference shrinks as the hearing loss becomes more severe.
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    # We apply a dynamic boost for children relative to the adult baseline.
-    # ~5 dB for mild/moderate losses, tapering to ~1 dB for severe losses.
-    child_boost <- approx(x = c(20, 50, 80, 100), y = c(5, 5, 2, 1), xout = sn_threshold, rule = 2)$y
-    adjustment <- adjustment + child_boost
-  }
-  # Configuration: Unilateral fittings require ~3 dB more gain due to lack of binaural summation
+  # Configuration: Level-dependent binaural summation
+  unilateral_adjustment <- 3.0
   if (config == "unilateral") {
-    adjustment <- adjustment + 3.0
+    adjustment <- adjustment + unilateral_adjustment
+  } else if (config == "bilateral") {
+    # NAL-NL2 style level-dependent binaural summation (2 to 6 dB reduction)
+    # At 50 dB SPL: 2 dB reduction. At 80 dB SPL: 6 dB reduction.
+    binaural_reduction <- 2.0 + (input_level - 50) * (4.0 / 30.0)
+    binaural_reduction <- max(2.0, min(6.0, binaural_reduction))
+    
+    # The baseline represents (unilateral - 3), so we adjust the difference
+    adjustment <- adjustment + (unilateral_adjustment - binaural_reduction)
   }
   
   # Experience: New users with PTA > 40 prefer less gain (up to 6 dB less)
@@ -383,9 +341,22 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   }
   
   # 8. Conductive Component Correction
-  # Restore the defined fraction of the Air-Bone Gap as linear gain.
-  # Cap at 30 dB to prevent runaway loudness in extreme ABG cases (Ching et al., 2013).
-  abg_gain <- pmin(abg_fraction * loss, 30)
+  # Following NAL conventions and Johnson (2013), we explicitly avoid 100% ABG restoration 
+  # to prevent saturation distortion against modern hearing aid MPO limits (e.g., RIC limits of ~118-124 dB SPL).
+  # We enforce a flat restoration rate across the board, defaulting to 75% (0.75).
+  abg_fraction_used <- rep(abg_fraction, length(sn_threshold))
+  
+  # Hardware MPO Cap 
+  # Prevent physiological LDLs from exceeding the physical limits of the hearing aid receiver.
+  effective_ldl_spl <- pmin(predicted_ldl_spl, hardware_mpo)
+  
+  # Physiological MPO Gain Cap (Replacing the arbitrary 30 dB Wall)
+  # The maximum safe output is the effective LDL. We subtract the input speech spectrum (pivot) 
+  # and a 10 dB safety margin to determine the absolute maximum safe linear gain per band.
+  max_safe_gain <- effective_ldl_spl - pivot - 10
+  
+  # Apply dynamic restoration fraction and mathematically constrain the total resulting gain (ig + abg_gain)
+  abg_gain <- pmax(0, pmin(abg_fraction_used * loss, max_safe_gain - ig))
   
   # Apply a gentle 6 dB low-frequency taper to the ABG gain (fading out by 1000 Hz)
   # to prevent upward spread of masking without being overkill or destroying the smooth response.
@@ -402,21 +373,23 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   ig <- pmin(ig, 0.85 * threshold, na.rm = TRUE)
   
   # 9. MPO-domain saturation limit
-  # The output of the hearing aid must not exceed the predicted LDL.
-  # Instead of hard-clipping the WDRC gain (which starves soft sounds),
-  # we cap the gain such that the final aided output never exceeds the LDL minus a 5 dB buffer.
-  mpo_spl_ceiling <- predicted_ldl_spl - 5
-  
-  # The absolute maximum gain is the ceiling minus the current input level (band level).
-  # This correctly allows large gain for soft sounds while compressing loud sounds.
-  max_allowable_ig <- mpo_spl_ceiling - input_band
-  ig <- pmin(ig, max_allowable_ig, na.rm = TRUE)
+  if (dynamic_mpo_attenuation) {
+    # The output of the hearing aid must not exceed the predicted LDL.
+    # Instead of hard-clipping the WDRC gain (which starves soft sounds),
+    # we cap the gain such that the final aided output never exceeds the LDL minus a 5 dB buffer.
+    mpo_spl_ceiling <- effective_ldl_spl - 5
+    
+    # The absolute maximum gain is the ceiling minus the current input level (band level).
+    # This correctly allows large gain for soft sounds while compressing loud sounds.
+    max_allowable_ig <- mpo_spl_ceiling - input_band
+    ig <- pmin(ig, max_allowable_ig, na.rm = TRUE)
+  }
 
   
   return(ig)
 }
 
-calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age_months = NULL, loss = NULL, freq = c(250, 500, 1000, 2000, 4000, 8000)) {
+calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, loss = NULL, freq = c(250, 500, 1000, 2000, 4000, 8000)) {
   # 0. Separate Sensorineural component
   if (is.null(loss)) {
     loss <- rep(0, length(threshold))
@@ -452,25 +425,13 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age
   
   # Absolute ceiling (Johnson 2017 PTS Safety Limits)
   # Limit output based on threshold to avoid permanent threshold shift.
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    pts_safe_limit <- 110 + pmax(0, sn_threshold - 50) * 0.5 + loss
-  } else {
-    pts_safe_limit <- 105 + pmax(0, sn_threshold - 50) * 0.5 + loss
-  }
+  pts_safe_limit <- 105 + pmax(0, sn_threshold - 50) * 0.5 + loss
   mpo <- pmin(mpo, pts_safe_limit)
   
   # ABSOLUTE CLINICAL HARD CAP: 
   # We removed the arbitrary 120 dB SPL max_cochlear cap for adults. 
   # Macrae (1991) and Johnson (2017) demonstrated that profoundly damaged cochleas 
   # safely tolerate (and require) up to 130-135 dB SPL to achieve speech audibility.
-  # Infants still require careful monitoring of RECD limits.
-  recd_data <- get_recd_diff(age, age_months)
-  recd_diff <- approx(x = log10(recd_data$f), y = recd_data$diff, xout = log10(freq), rule = 2)$y
-  
-  if (!is.null(age) && substr(age[1], 1, 5) == "child") {
-    max_cochlear <- 125 + loss - recd_diff
-    mpo <- pmin(mpo, max_cochlear)
-  }
   
   # ABSOLUTE HARDWARE LIMIT: Acoustic hearing aids max out around 135 dB SPL.
   mpo <- pmin(mpo, 135)

@@ -30,9 +30,6 @@ sii <- function(
                 gender="male",
                 experience="experienced",
                 config="bilateral",
-                age="adult",
-                age_years=NULL,
-                age_months=NULL,
                 coupling="custom_occluded",
                 module="standard",
                 transducer="inserts",
@@ -44,6 +41,15 @@ sii <- function(
                 nal_ldf=FALSE
                 )
 {
+  # Map backwards-compatible boolean to new string identifier
+  if (is.logical(desensitization)) {
+    if (desensitization) {
+      desensitization <- "johnson2011_complete"
+    } else {
+      desensitization <- "none"
+    }
+  }
+
   ## Assumptions:
   ##
   ## freq: If provided, frequencies in Hz at which speech, noise, and/or
@@ -75,14 +81,14 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  if (!exists(data.name, envir = .GlobalEnv)) {
+  if (!exists(data.name, envir = environment())) {
     if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
-      load(file.path("data", paste0(data.name, ".rda")), envir=.GlobalEnv)
+      load(file.path("data", paste0(data.name, ".rda")), envir=environment())
     } else {
-      data(list=data.name, package="SII", envir=.GlobalEnv)
+      data(list=data.name, package="SII", envir=environment())
     }
   }
-  table <- get(data.name, envir=.GlobalEnv)
+  table <- get(data.name, envir=environment())
 
   ## Get the correct importance functions
   if(missing(importance) || is.character(importance) )
@@ -91,14 +97,14 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          if (!exists(sic.name, envir = .GlobalEnv)) {
+          if (!exists(sic.name, envir = environment())) {
             if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
-              load(file.path("data", paste0(sic.name, ".rda")), envir=.GlobalEnv)
+              load(file.path("data", paste0(sic.name, ".rda")), envir=environment())
             } else {
-              data(list=sic.name, package="SII", envir=.GlobalEnv)
+              data(list=sic.name, package="SII", envir=environment())
             }
           }
-          sic.table <- get(sic.name, envir=.GlobalEnv)
+          sic.table <- get(sic.name, envir=environment())
           table[,"Ii"] <- sic.table[[importance]]
         }
     }
@@ -183,8 +189,6 @@ sii <- function(
   retval$experience <- experience
   retval$gender <- gender
   retval$config <- config
-  retval$age <- age
-  retval$age_years <- age_years
   retval$coupling <- coupling
   retval$module <- module
   retval$transducer <- transducer
@@ -241,6 +245,8 @@ sii <- function(
   predicted_wrs <- NULL
   
   if (!is.null(measured_wrs) && !is.null(wrs_level) && is.null(distortion_category)) {
+
+
     # Estimate speech spectrum at wrs_level
     if ("hi" %in% names(table) && "li" %in% names(table)) {
       overall_normal <- 10 * log10(sum((10^(table$normal / 10)) * (table$hi - table$li), na.rm = TRUE))
@@ -361,7 +367,7 @@ sii <- function(
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "Open-NL") {
-    gain <- calculate_open_nl_gain(freq = freq, threshold = threshold, input_level = speech, gender = gender, experience = experience, config = config, age = age, coupling = coupling, module = module, ldl = ldl, age_years = age_years, age_months = age_months, loss = loss, distortion_category = distortion_category)
+    gain <- calculate_open_nl_gain(freq = freq, threshold = threshold, input_level = speech, gender = gender, experience = experience, config = config, coupling = coupling, module = module, ldl = ldl, loss = loss, distortion_category = distortion_category)
   } else {
     gain <- rep(0, length(speech))
   }
@@ -542,8 +548,8 @@ sii <- function(
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
   sii.tab$"Ki" <- enforce.range( sii.tab$"Ki" )
   
-  if (desensitization) {
-    # Apply Hearing Loss Desensitization (Johnson 2013 / Ching et al. 2011)
+  if (desensitization == "johnson2011_smoothed" || desensitization == "johnson2011_complete") {
+    # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
     T_hl <- sii.tab$"T'i"
     
     # Calculate m and p variables based on frequency-specific hearing loss (T)
@@ -553,10 +559,18 @@ sii <- function(
     # Prevent division by exactly zero for mathematical safety
     p[p == 0] <- -1e-6
     
-    # Apply desensitization to the audibility index (Ki)
-    # Using a linear multiplier instead of a hard asymptotic cap allows the numerical 
-    # optimizer (L-BFGS-B) to maintain a non-zero gradient while still penalizing dead regions.
-    sii.tab$"Ki" <- sii.tab$"Ki" * m
+    if (desensitization == "johnson2011_smoothed") {
+      # Apply desensitization to the audibility index (Ki)
+      # Using a linear multiplier instead of a hard asymptotic cap allows the numerical 
+      # optimizer (L-BFGS-B) to maintain a non-zero gradient while still penalizing dead regions.
+      sii.tab$"Ki" <- sii.tab$"Ki" * m
+    } else if (desensitization == "johnson2011_complete") {
+      # Apply the full asymptotic formula: k' = [(k/30)^p + m^p]^(1/p)
+      # Bounding Ki prevents 0^negative = Inf errors.
+      Ki_safe <- pmax(sii.tab$"Ki", 1e-10)
+      sii.tab$"Ki" <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
+    }
+    
     sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
   }
   
@@ -609,8 +623,6 @@ sii <- function(
   retval$sii       <- sii.val
   retval$desensitization <- desensitization
   retval$module    <- module
-  retval$age       <- age
-  retval$age_years <- age_years
   retval$measured_wrs <- measured_wrs
   retval$predicted_wrs <- predicted_wrs
   retval$distortion_category <- distortion_category
@@ -805,9 +817,9 @@ export_gains <- function(x) {
   desens <- if (!is.null(x$desensitization)) x$desensitization else FALSE
   unaided_noise <- x$noise - x$gain
   
-  res50 <- sii(speech = tbl$normal + (50 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
-  res65 <- sii(speech = tbl$normal + (65 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
-  res80 <- sii(speech = tbl$normal + (80 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, age = x$age, age_years = x$age_years, age_months = x$age_months, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
+  res50 <- sii(speech = tbl$normal + (50 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
+  res65 <- sii(speech = tbl$normal + (65 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
+  res80 <- sii(speech = tbl$normal + (80 - overall_normal), noise = unaided_noise, threshold = x$threshold, loss = x$loss, freq = tbl$fi, method = method_name, prescription = x$prescription, desensitization = desens, experience = x$experience, gender = x$gender, config = x$config, coupling = x$coupling, module = x$module, distortion_category = x$distortion_category)
   
   data.frame(
     Frequency = x$freq,
