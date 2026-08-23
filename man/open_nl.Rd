@@ -2,6 +2,9 @@
 % Please edit documentation in R/open_nl.R
 \name{open_nl}
 \alias{open_nl}
+\alias{print.prescription_target}
+\alias{summary.prescription_target}
+\alias{plot.prescription_target}
 \title{Open-NL WDRC Gain Prescription}
 \usage{
 open_nl(
@@ -25,6 +28,12 @@ open_nl(
   booster_onset = 70,
   disable_sdlfp = FALSE
 )
+
+\method{print}{prescription_target}(x, ...)
+
+\method{summary}{prescription_target}(object, ...)
+
+\method{plot}{prescription_target}(x, ...)
 }
 \arguments{
 \item{speech}{Input speech spectrum level at each frequency. If a single number is provided, it's assumed to be the overall broadband SPL.}

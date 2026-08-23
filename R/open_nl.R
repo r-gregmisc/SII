@@ -262,6 +262,7 @@ open_nl <- function(speech = 65, threshold, freq,
   return(res)
 }
 
+#' @rdname open_nl
 #' @export
 print.prescription_target <- function(x, ...) {
   cat("Open-NL Prescription Target\n")
@@ -272,11 +273,13 @@ print.prescription_target <- function(x, ...) {
   print(df, row.names = FALSE)
 }
 
+#' @rdname open_nl
 #' @export
 summary.prescription_target <- function(object, ...) {
   print(object)
 }
 
+#' @rdname open_nl
 #' @export
 plot.prescription_target <- function(x, ...) {
   plot(x$freq, x$gain, type="l", log="x", 

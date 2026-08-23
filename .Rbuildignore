@@ -54,5 +54,7 @@
 ^validation/
 ^scratch$
 ^scratch/
-^OpenNL_Manuscript\.pdf$
+^OpenNL_manuscript\.pdf$
+^OpenNL_manuscript\.tex$
+^plot_landscape\.R$
 ^Figure6_LDL_UCL\.png$
