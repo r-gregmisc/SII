@@ -33,7 +33,7 @@ calculate_nalr_gain <- function(freq, threshold) {
 
 #' @param enable_severe_booster Logical. Defaults to FALSE. **WARNING (RISK STATEMENT):** This is an experimental feature that bypasses standard gain-limiting heuristics for profound thresholds. Enabling this on human subjects without real-ear verification risks severe over-amplification and acoustic trauma.
 #' @param dynamic_mpo_attenuation Logical. Defaults to FALSE. **WARNING (RISK STATEMENT):** This feature aggressively limits gain based on predicted LDLs to prevent saturation. However, predicting LDLs theoretically is highly variable. If enabled without verified clinical LDLs, this risks severely starving audibility for loud speech inputs, compromising safety and situational awareness.
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", coupling = "custom_occluded", module = "standard", ldl = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE, dynamic_mpo_attenuation = FALSE, anchor = 0.46, slope_trigger = 15, bypass_pta = 70, rs_floor = -10, hardware_mpo = 120, disable_sdlfp = FALSE) {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", coupling = "custom_occluded", module = "standard", ldl = NULL, loss = NULL, distortion_category = NULL, user_cr = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, dynamic_mpo_attenuation = FALSE, anchor = 0.46, slope_trigger = 15, bypass_pta = 70, rs_floor = -10, hardware_mpo = 120, disable_sdlfp = FALSE) {
   # Define steep_slope_diff for HFDR and LDL logic
   steep_slope_diff <- if (length(threshold) > 1) max(diff(threshold), na.rm = TRUE) else 0
 
@@ -61,12 +61,12 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # derived 0.46 half-gain rule (Lyregaard, 1988; NAL-R).
   g_base <- anchor * sn_threshold + c_interp
   
-  # A modest Severe-Loss Booster (0.15 slope) is applied to thresholds > 60 dB HL
+  # A modest Severe-Loss Booster (0.15 slope) is applied to thresholds > booster_onset
   # to gently assist severe losses. Based on Engler et al. (2026) and Convery & Keidser (2011),
   # this booster is explicitly capped above 80 dB HL to prevent structural over-prescription
   # in profound regions where excessive gain objectively worsens speech discrimination.
   if (enable_severe_booster) {
-    g_base <- g_base + 0.15 * pmax(0, pmin(sn_threshold, 80) - 60)
+    g_base <- g_base + 0.15 * pmax(0, pmin(sn_threshold, 80) - booster_onset)
   }
   
   # 3. Slope-Dependent Loudness Normalization

@@ -29,7 +29,7 @@ open_nl <- function(speech = 65, threshold, freq,
                     loss = NULL, distortion_category = NULL, 
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
-                    abg_fraction = 0.75, enable_severe_booster = FALSE, disable_sdlfp = FALSE) {
+                    abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE) {
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -47,7 +47,7 @@ open_nl <- function(speech = 65, threshold, freq,
     overall_level <- 65 # Fallback
   }
   
-  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster, disable_sdlfp = disable_sdlfp)
+  gain <- calculate_open_nl_gain(freq, threshold, overall_level, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster, booster_onset = booster_onset, disable_sdlfp = disable_sdlfp)
   mpo <- calculate_nal_sspl90(threshold, gain, ldl, loss, freq)
   
   raw_output <- speech_spec + gain
@@ -65,7 +65,7 @@ open_nl <- function(speech = 65, threshold, freq,
     
     # --- Generate 65 dB SPL Heuristic Seed ---
     # We must explicitly calculate the heuristic at 65 dB SPL to anchor the shifts.
-    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster)
+    gain_65 <- calculate_open_nl_gain(freq, threshold, 65, gender, experience, config, coupling, module, ldl, loss, distortion_category, user_cr, abg_fraction, enable_severe_booster, booster_onset = booster_onset)
     mpo_65 <- calculate_nal_sspl90(threshold, gain_65, ldl, loss, freq)
     
     if (file.exists(file.path("data", "critical.rda"))) {

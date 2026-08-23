@@ -1,8 +1,8 @@
 Package: SII
 Type: Package
 Title: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
-Version: 1.2.0
-Date: 2026-08-21
+Version: 1.2.1
+Date: 2026-08-23
 Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = c("aut", "cph")),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description:

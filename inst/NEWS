@@ -1,3 +1,9 @@
+VERSION 1.2.1 (2026-08-23)
+--------------------------
+
+- Updated Open-NL manuscript theoretical framing and integrated reviewer feedback.
+- Adjusted severe-loss booster onset default from 60 dB HL to 70 dB HL to avoid inadvertent over-prescription.
+
 VERSION 1.1.9 (2026-08-15)
 --------------------------
 
