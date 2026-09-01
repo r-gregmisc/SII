@@ -1,10 +1,26 @@
-SII-package             Calculate ANSI S3.5-1997 Speech Intelligibility
-                        Index
+SII-package             Calculate ANSI/ASA S3.5-1997 (R2024) Speech
+                        Intelligibility Index
+calculate_binaural_loudness
+                        Calculate Psychoacoustic Binaural Loudness
+                        (Sones)
 calculate_loudness      Calculate Loudness (Sones)
-critical                Constants Tables for ANSI S3.5-1997 Speech
+calculate_loudness_bramslow2004
+                        Calculate Loudness for Cochlear Hearing Loss
+calculate_loudness_cpp
+                        Calculate Canonical Loudness (Native C++
+                        Engine)
+convert_1_3_octave_to_density
+                        Convert 1/3-octave band levels to 1 Hz spectrum
+                        density
+critical                Constants Tables for ANSI/ASA S3.5-1997 (R2024)
+                        Speech Intelligibility Index (SII)
+export_gains            Export prescribed insertion gains for 50, 65,
+                        and 80 dB SPL input levels
+get_specific_loudness   Calculate Psychoacoustic Loudness (Sones)
+open_nl                 Open-NL WDRC Gain Prescription
+prescribe_compression   Prescribe Compression Settings based on Hearing
+                        Loss
+sic.critical            Alternative ANSI/ASA S3.5-1997 (R2024) SII
+                        Transfer Function Weights
+sii                     Compute ANSI/ASA S3.5-1997 (R2024) Speech
                         Intelligibility Index (SII)
-launch_app              Launch the SII Interactive Dashboard
-sic.critical            Alternative ANSI S3.5-1997 SII Transfer
-                        Function Weights
-sii                     Compute ANSI S3.5-1997 Speech Intelligibility
-                        Index (SII)

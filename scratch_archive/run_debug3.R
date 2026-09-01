@@ -1,0 +1,10 @@
+library(SII)
+source("R/sii.R")
+source("R/nalr.R")
+source("R/open_nl.R")
+
+cat("\n--- RUNNING DEBUG ---\n")
+htl <- c(15, 20, 30, 40, 50, 60)
+cond <- rep(0, 6)
+res <- open_nl(speech=65, threshold=htl, loss=cond, freq=c(250, 500, 1000, 2000, 4000, 8000), config="bilateral")
+cat("FINAL GAIN:", res$target$gain, "\n")

@@ -3,9 +3,9 @@
 \alias{sic.onethird}
 \alias{sic.octave}
 \docType{data}
-\title{Alternative ANSI S3.5-1997 SII Transfer Function Weights}
+\title{Alternative ANSI/ASA S3.5-1997 (R2024) SII Transfer Function Weights}
 \description{
-  Alternative ANSI S3.5-1997 Speech Intelligibility Index (SII) transfer
+  Alternative ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII) transfer
   function weights for for various types of speech material.
 }
 \usage{
@@ -34,7 +34,7 @@ data(sic.octave)
   \describe{
     \item{\code{sic.critical}}{provides alternative weights for the
       critical band SII procedure.}
-    \item{\code{sic.threeoctave}}{provides alternative weights for the
+    \item{\code{sic.onethird}}{provides alternative weights for the
       one-third octave frequency band SII procedure.}
     \item{\code{octave}}{provides alternative weights for the
       octave frequency band SII procedure.}
@@ -47,14 +47,14 @@ data(sic.octave)
 \source{
   All values except the \code{CST} columns are from:
 
-  ANSI S3.5-1997, "American National Standard Methods for 
+  ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
   Calculation of the Speech Intelligibility Index" American National
   Standards Institute, New York. 
 
   Values in the \code{CST} columns are from the original Connected Speech Test (CST) dataset.
 }
 \references{
-  ANSI S3.5-1997, "American National Standard Methods for 
+  ANSI/ASA S3.5-1997 (R2024), "American National Standard Methods for 
   Calculation of the Speech Intelligibility Index" American National
   Standards Institute, New York. 
 }
@@ -83,7 +83,7 @@ legend(
        col=rainbow(ngroup)
        )
 
-data(threeoctave)
+data(onethird)
 data(octave)
 }
 \keyword{datasets}

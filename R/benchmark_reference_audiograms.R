@@ -29,7 +29,7 @@ benchmark_reference_audiograms <- function() {
                    custom_gain = gain)
       } else {
         # Get target gain
-        gain <- get_jd2011_target(preset, formula, target_freqs = freq, level = 65)
+        gain <- get_nalnl2_v2_target(preset, formula, target_freqs = freq, level = 65)
         
         # Calculate SII and Loudness using custom gain for NAL/DSL
         res <- sii(speech = "normal", 

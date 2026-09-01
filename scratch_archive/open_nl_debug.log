@@ -1,0 +1,184 @@
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 37.5,37.5,37.5,37.5,37.5,37.5
+Objective at shifts=0: -99.297
+Iter 1: start_par=0,0,0,0,0,0, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=-2.82,-1.32,2.2,-3.19,-4.63,-1.27, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=1.42,0.25,1.3,-0.94,-4.31,4.03, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=-3.07,-0.07,4.54,1.41,-2.97,-3.53, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=3.1,3.75,1.43,2.52,-2.41,-2.52, best_score=99.297, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,1.64,16.8,19.4,23,13.8
+Objective at shifts=0: 863.438
+Iter 1: start_par=0,0,0,0,0,0, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 2: start_par=0.75,-2.42,2.62,3.99,1.17,-0.9, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 3: start_par=-4.47,1.05,0.64,3.78,-0.52,0.36, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 4: start_par=3.38,-3.58,-2.24,1.27,4.91,2.4, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 5: start_par=4.16,3.03,-4.25,-0.08,-4.14,0.53, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 12.44,17.88,21.4,14.8,9.2,3.45
+Objective at shifts=0: 1101.541
+Iter 1: start_par=0,0,0,0,0,0, best_score=-327.518, best_shifts=-1.85,1.28,-17.52,4.36,-9.07,10.02
+Iter 2: start_par=-3.83,3.87,-1.87,-2.45,1.03,-3.73, best_score=71.719, best_shifts=4.13,-13.01,-4.6,-14.09,0.4,7.29
+Iter 3: start_par=0.03,2.24,-1.9,-2.52,0.86,0.71, best_score=76.059, best_shifts=9.46,-2.39,-6.27,-12.65,-9.18,7.13
+Iter 4: start_par=4.76,4.02,4.21,-4.65,-0.1,-2.27, best_score=79.017, best_shifts=3.32,-3.55,-7,-7.62,-10.03,9.67
+Iter 5: start_par=-1.61,0.58,-2.35,3.29,-1.58,-0.26, best_score=79.017, best_shifts=3.32,-3.55,-7,-7.62,-10.03,9.67
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0.7,21.4,24,25.3,13.8
+Objective at shifts=0: 624.533
+Iter 1: start_par=0,0,0,0,0,0, best_score=66.909, best_shifts=3.05,-3.55,-12.29,-1.34,1.52,6.71
+Iter 2: start_par=-3.61,3.26,4.76,-4.71,1.26,-0.97, best_score=66.909, best_shifts=3.05,-3.55,-12.29,-1.34,1.52,6.71
+Iter 3: start_par=-4.81,-2.45,-1.7,0.55,-4.14,-4.91, best_score=69.394, best_shifts=-2.72,-0.74,-9.54,0.21,-0.83,-2.71
+Iter 4: start_par=1.67,-4.21,-1.71,-2.58,0.07,0.78, best_score=69.394, best_shifts=-2.72,-0.74,-9.54,0.21,-0.83,-2.71
+Iter 5: start_par=-4.38,2.85,0.35,0.34,-3.05,-2.52, best_score=69.394, best_shifts=-2.72,-0.74,-9.54,0.21,-0.83,-2.71
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,7.6,19.4,33.7,19.45
+Objective at shifts=0: 1548.952
+Iter 1: start_par=0,0,0,0,0,0, best_score=-617.174, best_shifts=-0.27,-0.98,-11.38,-2.75,-11.75,8.27
+Iter 2: start_par=-4.35,-2.94,0.25,-2.86,-0.16,1.16, best_score=-309.401, best_shifts=-0.54,-3.83,-8.77,-19.33,6.85,-1.74
+Iter 3: start_par=-2.81,-4.66,-4.77,3.27,-1.49,-4.78, best_score=-309.401, best_shifts=-0.54,-3.83,-8.77,-19.33,6.85,-1.74
+Iter 4: start_par=-4.06,-2.94,3.29,-0.65,1.88,2.08, best_score=-309.401, best_shifts=-0.54,-3.83,-8.77,-19.33,6.85,-1.74
+Iter 5: start_par=-0.95,-1.51,-4.62,-2.91,-3.03,4.26, best_score=-91.349, best_shifts=-13.08,-3.71,-10.77,-19.4,-2.59,8.36
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,12.2,28.6,38.9,23.75
+Objective at shifts=0: 968.137
+Iter 1: start_par=0,0,0,0,0,0, best_score=-103.216, best_shifts=0.53,0.03,-12.23,0.92,0.99,5.74
+Iter 2: start_par=-0.3,-0.23,-2.85,2.24,-3.64,-2.16, best_score=57.292, best_shifts=-0.14,-0.99,-13.1,-1.33,-0.24,8.18
+Iter 3: start_par=1.59,3.92,-1.98,3.54,-0.42,-4.54, best_score=57.292, best_shifts=-0.14,-0.99,-13.1,-1.33,-0.24,8.18
+Iter 4: start_par=4.47,0.28,4,1.03,2.68,-2.9, best_score=57.292, best_shifts=-0.14,-0.99,-13.1,-1.33,-0.24,8.18
+Iter 5: start_par=-3.11,-2.09,-0.54,3.97,3.43,3.65, best_score=57.292, best_shifts=-0.14,-0.99,-13.1,-1.33,-0.24,8.18
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 23.64,31.36,37.8,39.14,43.2,34
+Objective at shifts=0: -89.110
+Iter 1: start_par=0,0,0,0,0,0, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=-2.93,1.42,-0.64,-0.04,3.44,0.53, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-2.54,2.62,-1.89,-4.62,0.92,-4.06, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=3.28,-1.92,1.12,3.55,2.75,-3.71, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=-3.21,-4.76,0.57,2.8,4.55,3.02, best_score=89.110, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 37.5,37.5,37.5,37.5,37.5,37.5
+Objective at shifts=0: -99.297
+Iter 1: start_par=0,0,0,0,0,0, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=1.82,3.62,-3.05,-1.01,-0.8,0.65, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-0.37,4.69,0.81,2.31,2.03,-0.08, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=-1.75,2.75,-1.23,-4.52,4.52,2.67, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=-1.2,-3.76,3.9,0.66,1.31,-1.75, best_score=99.297, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,1.64,16.8,19.4,23,13.8
+Objective at shifts=0: 863.438
+Iter 1: start_par=0,0,0,0,0,0, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 2: start_par=-3.53,2.12,4.43,-2.58,-2.96,-0.02, best_score=77.918, best_shifts=1.03,-3.33,-13.89,-2.52,3.32,8.26
+Iter 3: start_par=1.6,-0.06,-0.34,0.31,-2.87,-4.09, best_score=78.365, best_shifts=1.63,-4.24,-10.23,-2.29,-1.64,2.21
+Iter 4: start_par=-2.05,4.89,-3.59,0.09,-4.68,-4.46, best_score=78.365, best_shifts=1.63,-4.24,-10.23,-2.29,-1.64,2.21
+Iter 5: start_par=2.49,1.14,-4.03,-3.54,-0.32,-4.68, best_score=78.365, best_shifts=1.63,-4.24,-10.23,-2.29,-1.64,2.21
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 12.44,17.88,21.4,14.8,9.2,3.45
+Objective at shifts=0: 1101.541
+Iter 1: start_par=0,0,0,0,0,0, best_score=-327.518, best_shifts=-1.85,1.28,-17.52,4.36,-9.07,10.02
+Iter 2: start_par=0.12,-2.13,-1.33,4.58,4.26,-4.54, best_score=76.718, best_shifts=0.15,-2.99,-11.37,-6.46,-2.84,2.47
+Iter 3: start_par=1.89,2.8,4.99,-2.33,1.52,1.79, best_score=76.718, best_shifts=0.15,-2.99,-11.37,-6.46,-2.84,2.47
+Iter 4: start_par=-2.75,-2.63,3.43,-3.78,-3.72,-3.97, best_score=78.403, best_shifts=3.11,-6.56,-5.97,-8.01,-3.78,0.99
+Iter 5: start_par=-3.1,1.85,0.81,-2.54,-3.23,1.34, best_score=78.403, best_shifts=3.11,-6.56,-5.97,-8.01,-3.78,0.99
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0.7,21.4,24,25.3,13.8
+Objective at shifts=0: 624.533
+Iter 1: start_par=0,0,0,0,0,0, best_score=66.909, best_shifts=3.05,-3.55,-12.29,-1.34,1.52,6.71
+Iter 2: start_par=-4.82,-1.76,1.55,-2.68,-1.09,0.63, best_score=69.526, best_shifts=-0.05,-0.83,-8.24,-2.01,1.01,3.41
+Iter 3: start_par=-3.25,-4.62,-1.78,-4.25,4.36,2.04, best_score=69.769, best_shifts=0.07,-0.76,-9.92,-0.62,0.91,2.81
+Iter 4: start_par=3.32,-0.75,-4.98,1.29,3.55,-4.32, best_score=69.769, best_shifts=0.07,-0.76,-9.92,-0.62,0.91,2.81
+Iter 5: start_par=-4.08,-2.57,3.67,3.01,-3.68,1.12, best_score=69.769, best_shifts=0.07,-0.76,-9.92,-0.62,0.91,2.81
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,7.6,19.4,33.7,19.45
+Objective at shifts=0: 1548.952
+Iter 1: start_par=0,0,0,0,0,0, best_score=-617.174, best_shifts=-0.27,-0.98,-11.38,-2.75,-11.75,8.27
+Iter 2: start_par=1.38,2.9,4.63,-3.33,4.86,-3.62, best_score=-79.765, best_shifts=-8.5,-7.27,-8.03,-34.36,-4.8,8.05
+Iter 3: start_par=-0.79,1.16,1.62,-0.89,-0.04,0.77, best_score=-79.765, best_shifts=-8.5,-7.27,-8.03,-34.36,-4.8,8.05
+Iter 4: start_par=-3.16,0.71,1.95,-2.27,-1.52,-2.82, best_score=-79.765, best_shifts=-8.5,-7.27,-8.03,-34.36,-4.8,8.05
+Iter 5: start_par=2.89,-0.39,1.84,4.27,4.02,2.77, best_score=-79.765, best_shifts=-8.5,-7.27,-8.03,-34.36,-4.8,8.05
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,12.2,28.6,38.9,23.75
+Objective at shifts=0: 968.137
+Iter 1: start_par=0,0,0,0,0,0, best_score=-103.216, best_shifts=0.53,0.03,-12.23,0.92,0.99,5.74
+Iter 2: start_par=-1.66,0.58,3.37,-3.1,3.51,-0.57, best_score=43.984, best_shifts=0.1,0.17,-12.35,-1.02,-1.79,9.86
+Iter 3: start_par=1.31,1.15,-0.22,1.85,-3.3,-3.18, best_score=52.915, best_shifts=3.81,-2.75,-11.46,-6.65,-2.02,6.56
+Iter 4: start_par=4.94,-2.33,1.84,1.26,-1.83,-2.34, best_score=52.915, best_shifts=3.81,-2.75,-11.46,-6.65,-2.02,6.56
+Iter 5: start_par=2.22,2.58,4.75,-3.8,2.39,-1.62, best_score=52.915, best_shifts=3.81,-2.75,-11.46,-6.65,-2.02,6.56
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 23.64,31.36,37.8,39.14,43.2,34
+Objective at shifts=0: -89.110
+Iter 1: start_par=0,0,0,0,0,0, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=1.44,-0.8,-3.13,-4.21,-2.04,1.84, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-4.16,0.51,3.37,3.5,-0.6,3.33, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=1.97,-1.08,-0.8,-1.91,-1.68,1.33, best_score=89.110, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=0.58,-4.5,-4.58,-3.62,-3.28,-2.08, best_score=89.110, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 37.5,37.5,37.5,37.5,37.5,37.5
+Objective at shifts=0: -99.297
+Iter 1: start_par=0,0,0,0,0,0, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=3.16,-0.47,-4.07,1.02,2.1,1.56, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=3.25,4.93,-1.59,-3.64,-3.05,-3.82, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=4.59,3.65,2.62,3.74,3.73,-2.74, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=1.66,3.7,0.18,4.53,2.74,0.5, best_score=99.297, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,0,0,4.14,8.77,12.87,16.8,17.39,17.98,18.56,19.11,19.7,20.33,20.95,21.92,23,22.27,20.88,17.36,13.8
+Objective at shifts=0: 848.504
+Iter 1: start_par=0,0,0,0,0,0, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=-1.21,-4.49,-3.07,-2.72,-4.25,0.35, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-4.01,-4.03,-4.47,2.77,-4.41,1.55, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=3.74,-2.82,1.06,-0.08,-4.44,4.66, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=-4.64,3.2,1.05,4.99,-1.72,4.5, best_score=848.504, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,0,0,4.14,8.77,12.87,16.8,17.39,17.98,18.56,19.11,19.7,20.33,20.95,21.92,23,22.27,20.88,17.36,13.8
+Objective at shifts=0: 848.504
+Iter 1: start_par=0,0,0,0,0,0, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=4.72,1.04,3.41,2.51,4.56,-0.24, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-1.26,-4.09,3.69,0.84,2.38,2.02, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=-0.11,2.1,-3.86,-2,0.52,-2.75, best_score=848.504, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=-3.83,0.78,0.58,-1.98,-2.25,-2.51, best_score=848.504, best_shifts=0,0,0,0,0,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,0,2.25,8.34,13.12,17.35,21.4,21.99,22.58,23.16,23.71,24.3,24.93,25.55,26.52,27.6,26.87,25.31,21.14,16.85
+Objective at shifts=0: -68.703
+Iter 1: start_par=0,0,0,0,0,0, best_score=70.690, best_shifts=-2.05,-2.43,-2.22,4.45,4.15,-0.36
+Iter 2: start_par=-2.65,1.12,-3.02,-3.9,-1,1.86, best_score=70.690, best_shifts=-2.05,-2.43,-2.22,4.45,4.15,-0.36
+Iter 3: start_par=-3.42,-3.8,-3.01,1.26,-1.13,-2.46, best_score=70.690, best_shifts=-2.05,-2.43,-2.22,4.45,4.15,-0.36
+Iter 4: start_par=0.6,-2.07,-0.4,0.62,-4.19,-1.27, best_score=71.388, best_shifts=0.37,-4.96,-3.7,2.23,9.09,-1.53
+Iter 5: start_par=1.47,-2.11,3.04,3.62,3.06,-4.51, best_score=71.551, best_shifts=1.13,-3.39,-6.36,4.24,9.12,-1.99
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 0,0,0.2,6.7,13.03,17.77,21.98,26,26.59,27.18,27.76,28.31,29.06,30.01,30.95,32.27,33.7,32.38,29.98,24.65,19.45
+Objective at shifts=0: -52.713
+Iter 1: start_par=0,0,0,0,0,0, best_score=55.791, best_shifts=-0.47,1.99,-0.01,9.46,1.41,-7.33
+Iter 2: start_par=2.3,-3.07,-4.47,-3.09,-4.58,4.41, best_score=55.791, best_shifts=-0.47,1.99,-0.01,9.46,1.41,-7.33
+Iter 3: start_par=-4.42,1.93,-0.18,-0.61,-4.73,-4.36, best_score=55.791, best_shifts=-0.47,1.99,-0.01,9.46,1.41,-7.33
+Iter 4: start_par=3.3,-4.17,-3.26,2.59,2.46,1.51, best_score=56.323, best_shifts=-4.23,0.14,-0.08,9.56,7.29,-7.92
+Iter 5: start_par=-4.92,-3.86,-0.99,2.04,-2.08,-4.44, best_score=56.323, best_shifts=-12.36,1.16,-1.03,9.68,8.61,-0.61
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 1.14,1.14,7.69,14.27,20.07,23.92,27.33,30.6,31.53,32.46,33.38,34.24,35.15,36.07,36.95,38.08,39.12,36.94,33.79,27.54,21.6
+Objective at shifts=0: -35.635
+Iter 1: start_par=0,0,0,0,0,0, best_score=38.579, best_shifts=3.99,-0.98,8.04,7.78,2.69,-9.34
+Iter 2: start_par=-3.38,-1.52,-1.14,2.94,-3.57,3.53, best_score=38.579, best_shifts=3.99,-0.98,8.04,7.78,2.69,-9.34
+Iter 3: start_par=0.77,2.05,3.99,-3.97,1.46,-2.99, best_score=39.030, best_shifts=0.08,0.05,3.2,9.87,-1.6,0
+Iter 4: start_par=1.71,-2.58,4.35,1.06,-2.63,1.58, best_score=39.410, best_shifts=-0.21,1.31,2.42,9.96,4.27,-2.89
+Iter 5: start_par=-1.3,-0.73,-4.52,-2.06,4.37,-1.85, best_score=39.948, best_shifts=0.93,0.07,7.23,9.75,7.1,-4.04
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 8.56,8.56,15.19,21.84,27.38,30.79,33.81,36.7,37.63,38.56,39.48,40.34,41.07,41.61,42.09,42.82,43.5,40.92,37.31,30.34,23.75
+Objective at shifts=0: -21.663
+Iter 1: start_par=0,0,0,0,0,0, best_score=24.231, best_shifts=3.88,8.97,3.78,10,1.75,-6.86
+Iter 2: start_par=0.7,-3.83,3.84,-4.07,-2.96,2.59, best_score=24.231, best_shifts=3.88,8.97,3.78,10,1.75,-6.86
+Iter 3: start_par=2.37,1.29,4.69,-4.21,4.34,-0.7, best_score=25.298, best_shifts=2.17,3.25,8.53,9.95,0.16,0
+Iter 4: start_par=1.24,2.3,1.78,-4.02,-1.6,2.95, best_score=25.298, best_shifts=2.17,3.25,8.53,9.95,0.16,0
+Iter 5: start_par=-1.82,-0.26,-2.58,-0.28,3.94,-3.07, best_score=25.298, best_shifts=2.17,3.25,8.53,9.95,0.16,0
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 13.72,13.72,21.29,28.87,34.61,37.6,40.26,42.8,43.39,43.98,44.56,45.11,45.66,46.17,46.62,47.29,47.88,44.91,40.84,33.13,25.9
+Objective at shifts=0: -11.112
+Iter 1: start_par=0,0,0,0,0,0, best_score=11.930, best_shifts=1.83,0.26,9.35,0.54,-0.19,-1.85
+Iter 2: start_par=-2.13,-0.59,-1.35,-4.56,-3.12,-4.46, best_score=12.286, best_shifts=3.49,3.02,9.92,9.16,0.36,-4.13
+Iter 3: start_par=-2.26,-0.77,4.17,-3.77,-3.43,0.49, best_score=12.286, best_shifts=3.49,3.02,9.92,9.16,0.36,-4.13
+Iter 4: start_par=-3.14,1.56,-0.77,3.03,1.92,3.47, best_score=12.548, best_shifts=0.73,7.91,7.06,0.75,-0.03,-1.38
+Iter 5: start_par=-0.57,1.57,-3.54,-4.78,-1.01,-0.31, best_score=12.858, best_shifts=3.64,7.86,9.96,0.92,-0.06,0.01
+--- OPEN_NL DEBUG ---
+Initial Heuristic Gain: 37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5,37.5
+Objective at shifts=0: -99.297
+Iter 1: start_par=0,0,0,0,0,0, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 2: start_par=1.9,-0.03,2.79,0.34,1.87,-4.15, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 3: start_par=-0.44,-0.59,4.31,-1.71,2.25,-0.97, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 4: start_par=-3.98,-2.78,2.94,4.55,2.3,2.45, best_score=99.297, best_shifts=0,0,0,0,0,0
+Iter 5: start_par=-2.83,4.15,-0.83,-0.93,-3.87,-0.09, best_score=99.297, best_shifts=0,0,0,0,0,0

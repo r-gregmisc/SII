@@ -1,16 +1,17 @@
-* using log directory ‘/home/mark/Development/SII for R/SII/SII.Rcheck’
+* using log directory ‘/home/mark/Development/SII-github/SII.Rcheck’
 * using R version 4.5.2 (2025-10-31)
 * using platform: x86_64-pc-linux-gnu
 * R was compiled by
     gcc (Ubuntu 15.2.0-11ubuntu1) 15.2.0
     GNU Fortran (Ubuntu 15.2.0-11ubuntu1) 15.2.0
-* running under: Ubuntu 26.04 LTS
+* running under: Ubuntu 26.04.1 LTS
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘SII/DESCRIPTION’ ... OK
 * checking extension type ... Package
-* this is package ‘SII’ version ‘1.1.0’
-* checking CRAN incoming feasibility ... [4s/228s] NOTE
+* this is package ‘SII’ version ‘1.2.4’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... [5s/14s] NOTE
 Maintainer: ‘Mark Shaver <mark.shaver@posteo.net>’
 
 New submission
@@ -28,8 +29,8 @@ CRAN repository db overrides:
 * checking for hidden files and directories ... OK
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
-* checking serialization versions ... OK
 * checking whether package ‘SII’ can be installed ... OK
+* used C++ compiler: ‘g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0’
 * checking installed package size ... OK
 * checking package directory ... OK
 * checking for future file timestamps ... OK
@@ -66,14 +67,28 @@ CRAN repository db overrides:
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
 * checking R/sysdata.rda ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking use of SHLIB_OPENMP_*FLAGS in Makefiles ... OK
+* checking pragmas in C/C++ headers and code ... OK
+* checking compilation flags used ... NOTE
+Compilation used the following non-portable flag(s):
+  ‘-mno-omit-leaf-frame-pointer’
+* checking compiled code ... OK
 * checking sizes of PDF files under ‘inst/doc’ ... OK
 * checking installed files from ‘inst/doc’ ... OK
 * checking files in ‘vignettes’ ... OK
 * checking examples ... OK
 * checking for unstated dependencies in ‘tests’ ... OK
 * checking tests ... OK
+  Running ‘test_loudness_equivalence.R’
   Running ‘test_opennl_mixed.R’
   Running ‘test_sii.R’
+  Running ‘testthat.R’
 * checking for unstated dependencies in vignettes ... OK
 * checking package vignettes ... OK
 * checking re-building of vignette outputs ... OK
@@ -82,4 +97,4 @@ CRAN repository db overrides:
 * checking for non-standard things in the check directory ... OK
 * checking for detritus in the temp directory ... OK
 * DONE
-Status: 1 NOTE
+Status: 2 NOTEs

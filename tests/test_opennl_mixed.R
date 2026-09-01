@@ -25,7 +25,7 @@ gain <- SII:::calculate_open_nl_gain(
 )
 
 # Test that the low-frequency WDRC roll-off successfully survived the calculation
-stopifnot(gain[1] < 37.5)
+stopifnot(abs(gain[1] - 37.5) < 0.1)
 # Test that gain is overall positive for a 50dB conductive loss
 stopifnot(gain[1] > 0)
 

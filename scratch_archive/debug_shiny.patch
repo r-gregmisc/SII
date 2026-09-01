@@ -1,0 +1,12 @@
+--- inst/shiny/app.R
++++ inst/shiny/app.R
+@@ -614,6 +614,9 @@
+ 
+     # Unify Shiny and command-line by using the exact same standard monaural loudness calculation from sii()
+     calc_amt_loudness <- function(gain_tgt, htl, cond, target_level) {
++      cat("--- SHINY CALC_AMT_LOUDNESS DEBUG ---\n", file=stderr())
++      cat("Gain Tgt:", paste(round(gain_tgt,2), collapse=", "), "\n", file=stderr())
++      cat("HTL:", paste(htl, collapse=", "), "\n", file=stderr())
+       freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+ 
+       if (!exists("critical", envir = .GlobalEnv)) {

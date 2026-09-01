@@ -38,7 +38,8 @@ sii <- function(
                 wrs_level=NULL,
                 distortion_category=NULL,
 
-                nal_ldf=FALSE
+                nal_ldf=FALSE,
+                ...
                 )
 {
   # Map backwards-compatible boolean to new string identifier
@@ -303,11 +304,21 @@ sii <- function(
     # Interpolate gain to sii evaluation frequencies
     if (length(prescription$gain) == length(freq) && all(prescription$freq == freq)) {
        gain_65 <- prescription$gain
-       mpo <- prescription$mpo
+       mpo <- if (!is.null(prescription$mpo)) prescription$mpo else rep(120, length(freq))
     } else {
        # Use cubic spline for smoother frequency response targets instead of jagged linear interpolation
-       gain_65 <- pmax(0, spline(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), method = "natural")$y)
-       mpo <- pmax(0, spline(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), method = "natural")$y)
+       # but cap the extrapolation to prevent the natural spline from artificially inflating gain below 250Hz
+       spl_gain <- spline(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), method = "natural")$y
+       flat_gain <- approx(x = log10(prescription$freq), y = prescription$gain, xout = log10(freq), rule = 2)$y
+       gain_65 <- pmax(0, ifelse(freq < min(prescription$freq) | freq > max(prescription$freq), flat_gain, spl_gain))
+       
+       if (!is.null(prescription$mpo)) {
+         spl_mpo <- spline(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), method = "natural")$y
+         flat_mpo <- approx(x = log10(prescription$freq), y = prescription$mpo, xout = log10(freq), rule = 2)$y
+         mpo <- pmax(0, ifelse(freq < min(prescription$freq) | freq > max(prescription$freq), flat_mpo, spl_mpo))
+       } else {
+         mpo <- rep(120, length(freq))
+       }
     }
     
     # WDRC: Derive compression ratios per Section H of the manuscript
@@ -367,7 +378,7 @@ sii <- function(
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "Open-NL") {
-    gain <- calculate_open_nl_gain(freq = freq, threshold = threshold, input_level = speech, gender = gender, experience = experience, config = config, coupling = coupling, module = module, ldl = ldl, loss = loss, distortion_category = distortion_category)
+    gain <- calculate_open_nl_gain(freq = freq, threshold = threshold, input_level = speech, gender = gender, experience = experience, config = config, coupling = coupling, module = module, ldl = ldl, loss = loss, distortion_category = distortion_category, ...)
   } else {
     gain <- rep(0, length(speech))
   }
@@ -408,10 +419,10 @@ sii <- function(
 
   #####
   ## Step 2: Equivalent speech E'i, noise N'i, and hearing threshold
-  ##         T'i spectra
+  ##         T'i spectra. (ANSI S3.5: E'i and N'i are decreased by conductive loss Ji)
   #####
-  sii.tab$"E'i" <- speech
-  sii.tab$"N'i" <- noise
+  sii.tab$"E'i" <- speech - loss
+  sii.tab$"N'i" <- noise - loss
   sii.tab$"T'i" <- threshold
   sii.tab$"Ji"  <- loss
 
@@ -512,7 +523,9 @@ sii <- function(
   sii.tab$"Xi" <- table$"Xi"
   
   ## Calculate  X'i
-  sii.tab$"X'i" <- sii.tab$"Xi" + sii.tab$"T'i" 
+  ## Conductive loss (Ji) acts as a pre-cochlear attenuator and does NOT elevate
+  ## internal cochlear noise. Only the sensorineural component contributes to Xi.
+  sii.tab$"X'i" <- sii.tab$"Xi" + pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
 
   #####
   ## Step 5: Equivalent disturbance spectrum, Di
@@ -536,11 +549,12 @@ sii <- function(
   if (nal_ldf) {
     # NAL-NL2 modifies the LDF onset based on the degree of hearing loss
     # Impaired ears tolerate higher presentation levels without losing intelligibility.
-    # We shift the penalty onset by 0.5 * threshold.
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" - (0.5 * sii.tab$"T'i"))/160
+    # We shift the penalty onset by 0.5 * sensorineural threshold. 
+    # Conductive losses act as pre-cochlear attenuators and are already subtracted from E'i.
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - (0.5 * pmax(0, sii.tab$"T'i" - sii.tab$"Ji")))/160
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   } else {
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" )/160 
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10)/160 
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   }
   
@@ -550,7 +564,9 @@ sii <- function(
   
   if (desensitization == "johnson2011_smoothed" || desensitization == "johnson2011_complete") {
     # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
-    T_hl <- sii.tab$"T'i"
+    # Use sensorineural threshold only: conductive loss (Ji) does not cause
+    # cochlear desensitization, only sensorineural loss does.
+    T_hl <- pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
     
     # Calculate m and p variables based on frequency-specific hearing loss (T)
     m <- 1 / (1 + exp(0.075 * (T_hl - 66)))
@@ -685,72 +701,58 @@ get_specific_loudness <- function(x) {
   return(list(E_prime = E_prime, X_prime = X_prime))
 }
 
-#' @export
 calculate_loudness <- function(x, ohc_proportion = 0.65) {
-  if (is.null(x$table$"E'i")) {
-    return(NA) # Cannot compute loudness without aided equivalent spectrum level
+  if (is.null(x$gain)) {
+    return(NA) # Cannot compute loudness without aided gain
   }
   
-  freqs <- x$table$"Fi"
-  
-  # The Equivalent Speech Spectrum Level (E'i) is already in dB/Hz (spectrum density)
-  aided_density <- x$table$"E'i"
-  # Use the original audiogram thresholds and frequencies passed into sii()
-  # instead of the equivalent spectrum threshold T'i.
-  orig_freqs <- x$freq
-  orig_threshold <- x$threshold
-  
-  # Approximate the audiogram frequencies required by the model
+  # Ensure we extract the correct gain and thresholds at standard audiometric frequencies
   hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-  htl <- approx(x = log10(orig_freqs), y = orig_threshold, xout = log10(hl_freqs), rule=2)$y
   
-  # Conductive component (Air-Bone Gap)
-  orig_loss <- if (!is.null(x$loss)) x$loss else rep(0, length(orig_freqs))
-  abg <- approx(x = log10(orig_freqs), y = orig_loss, xout = log10(hl_freqs), rule=2)$y
+  # Interpolate the required parameters to the 6 standard frequencies
+  gain_tgt <- approx(x = log10(x$freq), y = x$gain, xout = log10(hl_freqs), rule=2)$y
+  threshold <- approx(x = log10(x$freq), y = x$threshold, xout = log10(hl_freqs), rule=2)$y
+  loss <- if (!is.null(x$loss)) approx(x = log10(x$freq), y = x$loss, xout = log10(hl_freqs), rule=2)$y else rep(0, 6)
   
-  # Sensorineural component dictates OHC/IHC  # The Moore & Glasberg (2004) / Bramslow standard assumption: 
-  # OHC loss constitutes up to 65 dB of the total sensorineural loss
-  sn_htl <- pmax(htl - abg, 0)
-  ohc_loss <- pmin(sn_htl, 65)
-  ihc_loss <- pmax(sn_htl - ohc_loss, 0)
-  
-  # Create a dense 10 Hz spectrum from the band densities
-  dense_f <- seq(20, 15000, by=10)
-  dense_l <- rep(-100, length(dense_f)) # noise floor
-  
-  # Interpolate the density (rule=1 returns NA outside the range, which we handle below)
-  dense_l <- approx(x = log10(freqs), y = aided_density, xout = log10(dense_f), rule=1)$y
-  
-  # Roll off below the first band to prevent artificial low-frequency loudness
-  idx_low <- which(dense_f < freqs[1])
-  if (length(idx_low) > 0) {
-    octaves_below <- log2(freqs[1] / dense_f[idx_low])
-    dense_l[idx_low] <- aided_density[1] - 24 * octaves_below
+  # Determine the target speech level
+  target_level <- as.numeric(gsub(" dB SPL", "", x$vocal_effort))
+  if (is.na(target_level) || length(target_level) == 0) {
+    target_level <- 65
   }
   
-  # Roll off above the last band to prevent artificial high-frequency loudness
-  last_freq <- freqs[length(freqs)]
-  idx_high <- which(dense_f > last_freq)
-  if (length(idx_high) > 0) {
-    octaves_above <- log2(dense_f[idx_high] / last_freq)
-    dense_l[idx_high] <- aided_density[length(aided_density)] - 24 * octaves_above
-  }
+  # LTASS PSD Bandwidth Normalization for Bramslow2004
+  # This mirrors the pipeline in generate_open_nl_metrics.R perfectly.
+  ltass_65  <- c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78)
+  input_speech <- ltass_65 + (target_level - 65)
+  aided_spl    <- input_speech + gain_tgt - loss
+
+  # Step 1: Dense 10 Hz grid
+  dense_f <- seq(10, 23990, by = 10)
   
-  # Replace any remaining NAs with noise floor
-  dense_l[is.na(dense_l)] <- -100
+  # Convert 1/3-octave band levels to spectrum density (dB/Hz) before interpolating to 10 Hz grid
+  # A 1/3-octave band has bandwidth ~ 0.23 * fc
   
-  # Conductive loss physically attenuates the signal in the middle ear before it reaches the cochlea.
-  # We must subtract the ABG from the eardrum spectrum (dense_l) so the cochlea receives the correct energy.
-  dense_abg <- approx(x = log10(orig_freqs), y = orig_loss, xout = log10(dense_f), rule=2)$y
-  dense_l <- dense_l - dense_abg
+  dense_l <- approx(log10(hl_freqs), aided_spl, log10(dense_f), rule = 2)$y
+
+  dense_l[dense_f < hl_freqs[1]] <- aided_spl[1] - 24 * log2(hl_freqs[1] / dense_f[dense_f < hl_freqs[1]])
+  dense_l[dense_f > hl_freqs[6]] <- aided_spl[6] - 24 * log2(dense_f[dense_f > hl_freqs[6]] / hl_freqs[6])
+
+  # Step 3: OHC/IHC split of sensorineural loss
+  sn_loss  <- pmax(threshold - loss, 0)
+  ohc_loss <- pmin(sn_loss, 65)
+  ihc_loss <- pmax(sn_loss - 65, 0)
   
-  res <- calculate_loudness_cpp(
-    inputF = dense_f, 
-    inputLdB = dense_l,
-    HLcf = hl_freqs, 
-    HLohcdB0 = ohc_loss, 
-    HLihcdB0 = ihc_loss
-  )
+  res <- tryCatch({
+    calculate_loudness_cpp(
+      inputF = dense_f, 
+      inputLdB = dense_l,
+      HLcf = hl_freqs, 
+      HLohcdB0 = ohc_loss, 
+      HLihcdB0 = ihc_loss
+    )
+  }, error = function(e) NULL)
+  
+  if (is.null(res)) return(NA)
   
   # Return both total loudness (Ldn), specific loudness array (N_prime), and excitation (E)
   return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF, E = res$E, Cam = res$Cam))

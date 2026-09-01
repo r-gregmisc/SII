@@ -1,0 +1,111 @@
+
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(SII)
+> 
+> # The C++ engine is already loaded natively by the package
+> cat("Using internal C++ engine...\n")
+Using internal C++ engine...
+> 
+> # Define a standard audiogram grid
+> HLcf <- c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000)
+> 
+> cat("\n======================================================\n")
+
+======================================================
+> cat("=== Bramslow 2004 C++ Loudness Engine Verification ===\n")
+=== Bramslow 2004 C++ Loudness Engine Verification ===
+> cat("======================================================\n\n")
+======================================================
+
+> 
+> # Test 1: Normal Hearing (0 dB HL)
+> cat("--- TEST 1: Normal Hearing (0 dB HL) at 1 kHz ---\n")
+--- TEST 1: Normal Hearing (0 dB HL) at 1 kHz ---
+> HLohcdB0_NH <- rep(0, length(HLcf))
+> HLihcdB0_NH <- rep(0, length(HLcf))
+> 
+> levels <- c(30, 50, 65, 80, 100)
+> 
+> for (L in levels) {
++   inputF <- c(1000)
++   inputLdB <- c(L)
++   
++   res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLohcdB0_NH, HLihcdB0_NH)
++   
++   cat(sprintf("Input: 1 kHz @ %3d dB SPL\n", L))
++   cat(sprintf("  -> Total Loudness : %7.3f sones\n", res$Ldn))
++   
++   # Print the peak specific loudness
++   idx <- which.min(abs(res$CF - 1000))
++   cat(sprintf("  -> Peak specific  : %7.4f sones/Cam (at CF = %.1f Hz)\n\n", res$N_prime[idx], res$CF[idx]))
++ }
+Input: 1 kHz @  30 dB SPL
+  -> Total Loudness :  11.518 sones
+  -> Peak specific  :  0.3007 sones/Cam (at CF = 1051.1 Hz)
+
+Input: 1 kHz @  50 dB SPL
+  -> Total Loudness :  42.303 sones
+  -> Peak specific  :  1.2721 sones/Cam (at CF = 1051.1 Hz)
+
+Input: 1 kHz @  65 dB SPL
+  -> Total Loudness :  99.155 sones
+  -> Peak specific  :  3.0597 sones/Cam (at CF = 1051.1 Hz)
+
+Input: 1 kHz @  80 dB SPL
+  -> Total Loudness : 224.907 sones
+  -> Peak specific  :  7.0125 sones/Cam (at CF = 1051.1 Hz)
+
+Input: 1 kHz @ 100 dB SPL
+  -> Total Loudness : 3619.239 sones
+  -> Peak specific  : 20.7386 sones/Cam (at CF = 1051.1 Hz)
+
+> 
+> 
+> # Test 2: Hearing Impaired (50 dB OHC loss flat)
+> cat("--- TEST 2: Hearing Impaired (50 dB OHC flat) at 1 kHz ---\n")
+--- TEST 2: Hearing Impaired (50 dB OHC flat) at 1 kHz ---
+> HLohcdB0_HI <- rep(50, length(HLcf))
+> HLihcdB0_HI <- rep(0, length(HLcf))
+> 
+> for (L in levels) {
++   inputF <- c(1000)
++   inputLdB <- c(L)
++   
++   res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLohcdB0_HI, HLihcdB0_HI)
++   
++   cat(sprintf("Input: 1 kHz @ %3d dB SPL\n", L))
++   cat(sprintf("  -> Total Loudness : %7.3f sones\n", res$Ldn))
++ }
+Input: 1 kHz @  30 dB SPL
+  -> Total Loudness :   0.394 sones
+Input: 1 kHz @  50 dB SPL
+  -> Total Loudness :   7.371 sones
+Input: 1 kHz @  65 dB SPL
+  -> Total Loudness :  23.379 sones
+Input: 1 kHz @  80 dB SPL
+  -> Total Loudness :  58.988 sones
+Input: 1 kHz @ 100 dB SPL
+  -> Total Loudness : 4563.779 sones
+> 
+> cat("\nVerification Complete. Values should monotonically increase and exhibit recruitment in Test 2.\n")
+
+Verification Complete. Values should monotonically increase and exhibit recruitment in Test 2.
+> 
+> proc.time()
+   user  system elapsed 
+  1.536   0.078   0.386 

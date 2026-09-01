@@ -1,12 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  25 JUL 2026 16:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  31 AUG 2026 19:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**Rd2.tex
+**\input ./Rd2.tex \input ./Rd2.tex \input ./Rd2.tex \input ./Rd2.tex
 (./Rd2.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2026-01-19>
-
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo
@@ -359,7 +356,7 @@ File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count315
 )
-(./Rd2.aux)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -380,7 +377,8 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
- (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count316
 \scratchdimen=\dimen163
@@ -395,25 +393,25 @@ LaTeX Font Info:    ... okay on input line 8.
 \everyMPtoPDFconversion=\toks29
 )
 Package hyperref Info: Link coloring ON on input line 8.
- (./Rd2.out) (./Rd2.out)
+ (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-9.
+ [1
 
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
-File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 48
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-di
+st/fonts/enc/dvips/base/8r.enc}]
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 68
 .
-
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 48.
- (./Rd2.toc
+(Font)              scaled to size 10.0pt on input line 68.
+
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.toc
 LaTeX Font Info:    Trying to load font information for U+msa on input line 1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -429,45 +427,111 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-) [1
-
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-di
-st/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/i
-nconsolata/i4-t1-0.enc}])
+))
 \tf@toc=\write5
 \openout5 = `Rd2.toc'.
 
+ [2{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 83.
- [2] [3]
-Overfull \hbox (7.89801pt too wide) in paragraph at lines 163--165
+(Font)              scaled to size 9.0pt on input line 103.
+[3] [4] [5] [6]
+Overfull \hbox (7.89801pt too wide) in paragraph at lines 331--333
 []\T1/ptm/m/n/10 Standard spec-trum lev-els for vo-cal ef-fort lev-els "nor-mal
 ", "raised",
  []
 
-[4] [5] [6] [7]
-LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 4
-00.
+[7]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 361--364
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 367--370
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
+[8] [9] [10]
+LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 5
+01.
  (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 400.
-[8{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-Overfull \hbox (24.24825pt too wide) in paragraph at lines 455--456
+(Font)              scaled to size 10.0pt on input line 501.
+
+Overfull \hbox (25.07813pt too wide) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 Acoustic cou-pling ("cus-tom_occluded", "open_dome", "tulip_do
+me", "dou-ble_dome",
+ []
+
+[11{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (3.4365pt too wide) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 Provides rec-om-men-da-tions for com-pres-sion speed (fast vs 
+slow act-ing) and com-pres-sion ra-tio/release
+ []
+
+
+Underfull \hbox (badness 1789) in paragraph at lines 596--596
+[]\T1/ptm/m/it/10 Alternative ANSI/ASA S3.5-1997 (R2024) SII Trans-fer Func-tio
+n
+ []
+
+
+Overfull \hbox (7.34593pt too wide) in paragraph at lines 602--604
+[]\T1/ptm/m/n/10 Alternative ANSI/ASA S3.5-1997 (R2024) Speech In-tel-li-gi-bil
+-ity In-dex (SII) trans-fer func-tion weights
+ []
+
+[12]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 659--662
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 667--670
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
+[13] [14] [15]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
 nt_2mm_solid",
  []
 
 
-Overfull \hbox (26.63834pt too wide) in paragraph at lines 455--456
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
 m_hollow").
  []
 
-[9] [10] [11]
-Overfull \hbox (118.22133pt too wide) in paragraph at lines 584--585
+
+Overfull \hbox (6.42873pt too wide) in paragraph at lines 796--797
+\T1/ptm/m/n/10 speech dis-tor-tion. If []\T1/zi4/m/n/10 NULL[]\T1/ptm/m/n/10 , 
+it is es-ti-mated based on []\T1/zi4/m/n/10 measured_wrs []\T1/ptm/m/n/10 and [
+]\T1/zi4/m/n/10 wrs_level[]\T1/ptm/m/n/10 . 
+ []
+
+[16]
+Overfull \hbox (5.53693pt too wide) in paragraph at lines 810--817
+[]\T1/ptm/m/n/10 American Na-tional Stan-dard ANSI/ASA S3.5-1997 (R2024) ("Meth
+-ods for Cal-cu-la-tion of the Speech
+ []
+
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 8
+42.
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+) [17] [18]
+Overfull \hbox (118.22133pt too wide) in paragraph at lines 924--925
 \T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
 om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
 f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
@@ -479,7 +543,7 @@ m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
  []
 
 
-Overfull \hbox (7.60295pt too wide) in paragraph at lines 585--586
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 925--926
 []\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
 r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
 OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
@@ -490,39 +554,28 @@ S/cmsy/m/n/10 g$
  []
 
 
-Overfull \hbox (73.56828pt too wide) in paragraph at lines 605--606
+Overfull \hbox (41.86882pt too wide) in paragraph at lines 944--945
 []\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
-t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
-/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
-10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
-1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
-\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
-mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
-it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
+t/10 g[]$\T1/ptm/m/n/10 . In-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (2
+50\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 7)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6\OML/cmm
+/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/cmm/m/it/
+10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
  []
 
-[12]
-Overfull \hbox (58.21927pt too wide) in paragraph at lines 614--615
+[19]
+Overfull \hbox (30.03952pt too wide) in paragraph at lines 953--954
 []\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
 rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
-. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
-n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
-n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
-0 .
+: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/n/10 30
+\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (1
+00\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
  []
 
 
-Overfull \hbox (49.09967pt too wide) in paragraph at lines 623--624
-[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
-es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
-/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
- ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
-OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
-cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
- []
-
-
-Overfull \hbox (6.78781pt too wide) in paragraph at lines 625--626
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 964--965
 []\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
 e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
 cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
@@ -531,21 +584,27 @@ y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
 \OMS/cmsy/m/n/10 g$
  []
 
-[13]
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 989--992
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+ []
+
+[20]
 Underfull \vbox (badness 3803) has occurred while \output is active []
 
- [14]
-(./Rd2.ind [15]
+ [21]
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.ind [22]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 21.
+(Font)              using `T1/zi4/m/n' instead on input line 23.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.0pt on input line 30.
-[16
+(Font)              scaled to size 10.0pt on input line 33.
+[23
 
 
-]) (./Rd2.aux)
+]) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -555,30 +614,34 @@ L3 programming layer <2026-01-19>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 606BE3C9411C451EE0FA8C2E9CDAA99B;698.
+(rerunfilecheck)             Checksum: 66294BFBF51A5628CBE4EFD4B59D39A0;2048.
  ) 
 Here is how much of TeX's memory you used:
- 10733 strings out of 469514
- 159937 string characters out of 5470072
- 571620 words of memory out of 5000000
- 39110 multiletter control sequences out of 15000+600000
+ 10796 strings out of 469514
+ 161711 string characters out of 5470072
+ 571622 words of memory out of 5000000
+ 39119 multiletter control sequences out of 15000+600000
  666243 words of font info for 87 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 92i,6n,95p,549b,780s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 92i,6n,95p,609b,780s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4
-r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
-xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/font
-s/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
-es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
-/usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (16 pages, 184374 bytes).
+r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (23 pages, 235689 bytes).
 PDF statistics:
- 302 PDF objects out of 1000 (max. 8388607)
- 258 compressed objects within 3 object streams
- 98 named destinations out of 1000 (max. 500000)
- 57 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 444 PDF objects out of 1000 (max. 8388607)
+ 384 compressed objects within 4 object streams
+ 151 named destinations out of 1000 (max. 500000)
+ 113 words of extra memory for PDF output out of 10000 (max. 10000000)
 

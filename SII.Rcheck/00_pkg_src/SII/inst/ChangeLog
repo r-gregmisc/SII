@@ -79,6 +79,6 @@
 	  data/sic.onethird.rda, data/sii.constants.rda, inst, man,
 	  man/SII-package.Rd, man/critical.Rd, man/plot.SII.Rd,
 	  man/print.SII.Rd, man/sii.Rd, man/sii.excel.Rd: Add SII package
-	  implementing ANSI S3.5-1997 Speech Intelligibility Index (SII)
+	  implementing ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)
 	  calculations
 

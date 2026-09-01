@@ -58,3 +58,10 @@
 ^OpenNL_manuscript\.tex$
 ^plot_landscape\.R$
 ^Figure6_LDL_UCL\.png$
+^data_output$
+^manuscript_figures$
+^reproducibility_scripts$
+^reviewer_archive$
+^scratch_archive$
+^\.agents$
+^OpenNL_.*$

@@ -1,3 +1,4 @@
+#' @export
 `print.SII` <-
 function (x, digits=3, ...) 
 {

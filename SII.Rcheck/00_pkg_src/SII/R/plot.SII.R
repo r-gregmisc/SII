@@ -13,7 +13,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                    if (n_bands == 17) "equal" else "octave"
                   
       local_env <- new.env()
-      data(list = data_name, package = "SII", envir = local_env)
+      data(list = data_name, envir = local_env)
       tbl <- get(data_name, envir = local_env)
       
       # Calculate the Bandwidth Correction factor in dB
@@ -75,7 +75,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       y_min <- 0 # Start Y axis at 0 dB SPL
       y_max <- max(c(100, thresh_spl, noise, speech, x$mpo), na.rm=TRUE) + 5
       
-      is_aided <- !is.null(x$prescription)
+      is_aided <- !is.null(x[["prescription"]])
       
       if (grepl("dB SPL", x$vocal_effort)) {
         vocal_effort_str <- paste("Input Level:", x$vocal_effort)
@@ -93,7 +93,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       # Prepare Legend Variables
       leg_names <- c("Speech Level (E'i)", "Hearing Threshold (T'i)")
       if (is_aided) {
-         leg_names[1] <- paste("Aided Speech Level (", x$prescription, ")", sep="")
+         leg_names[1] <- paste("Aided Speech Level (", x$prescription_name, ")", sep="")
       }
       leg_cols <- c("forestgreen", "red")
       leg_pch <- c(NA, 4)
@@ -259,7 +259,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
       
     } else {
       # If clinical=FALSE and the object is aided, show the 3-line Insertion Gain Plot
-      if (!is.null(x$prescription)) {
+      if (!is.null(x[["prescription"]])) {
         
         # Determine which calculation method was used to fetch the correct standard spectra
         n_bands <- length(x$freq)
@@ -272,7 +272,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
         
         # Create a local environment to load the data to avoid cluttering the workspace
         local_env <- new.env()
-        data(list = data_name, package = "SII", envir = local_env)
+        data(list = data_name, envir = local_env)
         tbl <- get(data_name, envir = local_env)
         
         # Calculate overall dB SPL levels of the standard Normal spectrum
@@ -296,7 +296,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      loss = x$loss,
                      freq = tbl$fi,
                      method = method_name,
-                     prescription = x$prescription,
+                     prescription = x[["prescription"]],
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
@@ -304,7 +304,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Dynamically recalculate SII for 65 dB SPL (using Normal LTASS scaled to 65)
         res65 <- sii(speech = tbl$normal + (65 - overall_normal),
@@ -313,7 +314,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      loss = x$loss,
                      freq = tbl$fi,
                      method = method_name,
-                     prescription = x$prescription,
+                     prescription = x[["prescription"]],
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
@@ -321,7 +322,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Dynamically recalculate SII for 80 dB SPL (using Normal LTASS scaled up)
         res80 <- sii(speech = tbl$normal + (80 - overall_normal),
@@ -330,7 +332,7 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      loss = x$loss,
                      freq = tbl$fi,
                      method = method_name,
-                     prescription = x$prescription,
+                     prescription = x[["prescription"]],
                      desensitization = desens,
                      experience = x$experience,
                      gender = x$gender,
@@ -338,7 +340,8 @@ plot.SII <- function(x, clinical = FALSE, legend = TRUE, legend_only = FALSE, ..
                      age = x$age,
                      age_years = x$age_years,
                      coupling = x$coupling,
-                     module = x$module)
+                     module = x$module,
+                     distortion_category = x$distortion_category)
         
         # Call the insertion gain plotting function
         plot_gain(res50, res65, res80, target_nalnl2 = x$target_nalnl2, target_dsl = x$target_dsl, target_cameq2 = x$target_cameq2, target_level = x$target_level, ...)
@@ -383,8 +386,8 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
   }
   
   freq <- res65$freq
-  prescription <- res65$prescription
-  if (is.null(prescription)) prescription <- "Custom"
+  prescription_name <- res65$prescription_name
+  if (is.null(prescription_name)) prescription_name <- "Custom"
   
   # Calculate insertion gain (Aided Speech - Unaided Speech) for each input level
   # Adding robust max(0, x) to ensure we don't plot negative insertion gain curves
@@ -396,6 +399,16 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
   old_par <- par(no.readonly = TRUE)
   on.exit(par(old_par))
   
+  if (is.list(target_nalnl2)) {
+    target_nalnl2 <- target_nalnl2$gain
+  }
+  if (is.list(target_dsl)) {
+    target_dsl <- target_dsl$gain
+  }
+  if (is.list(target_cameq2)) {
+    target_cameq2 <- target_cameq2$gain
+  }
+
   # Determine bounds
   y_max <- max(c(g50, g65, g80, target_nalnl2, target_dsl, target_cameq2), na.rm=TRUE) + 5
   if (y_max < 20) y_max <- 20
@@ -413,10 +426,9 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
     ylim = c(0, y_max),
     xlim = c(250, 8000),
     xaxt = "n",
-    main = paste("Insertion Gain -", prescription),
+    main = paste("Insertion Gain -", prescription_name),
     ...
   )
-  
   # Draw custom octave x-axis
   axis(1, at = c(250, 500, 1000, 2000, 4000, 8000), labels = c(250, 500, 1000, 2000, 4000, 8000))
   
@@ -424,7 +436,6 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
   octaves <- c(250, 500, 1000, 2000, 4000, 8000)
   abline(v = octaves, lty = 3, col = "lightgray")
   
-  # Plot curves
   if (!is.null(target_nalnl2) || !is.null(target_dsl) || !is.null(target_cameq2)) {
     # Preset Benchmark Mode: Plot the specific target_level curve to match UI dropdown
     t_level <- target_level
@@ -432,17 +443,17 @@ plot_gain <- function(res50, res65, res80, target_nalnl2 = NULL, target_dsl = NU
     
     if (t_level == 50) {
       lines(x = freq, y = g50, col = "blue", lwd = 3, lty = 3)
-      leg_names <- c(paste(prescription, "(50 dB SPL)"))
+      leg_names <- c(paste(prescription_name, "(50 dB SPL)"))
       leg_cols <- c("blue")
       leg_lty <- c(3)
     } else if (t_level == 80) {
       lines(x = freq, y = g80, col = "red", lwd = 3, lty = 3)
-      leg_names <- c(paste(prescription, "(80 dB SPL)"))
+      leg_names <- c(paste(prescription_name, "(80 dB SPL)"))
       leg_cols <- c("red")
       leg_lty <- c(2)
     } else {
       lines(x = freq, y = g65, col = "black", lwd = 3, lty = 1)
-      leg_names <- c(paste(prescription, "(65 dB SPL)"))
+      leg_names <- c(paste(prescription_name, "(65 dB SPL)"))
       leg_cols <- c("black")
       leg_lty <- c(1)
     }

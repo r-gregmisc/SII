@@ -119,8 +119,8 @@ sii.C1$sii
 ###################################################
 ### code chunk number 9: LoadData (eval = FALSE)
 ###################################################
-## library(gdata)
-## patInfo <- read.xls("../AI subject list.xls")
+## library(readxl)
+## patInfo <- read_excel("../AI subject list.xls")
 
 
 ###################################################
@@ -217,8 +217,8 @@ sii.C1$sii
 ##     if(verbose)
 ##       cat("\nLoading data file '", infile, "'...\n", sep="")
 ##     ## Load the data
-##     library(gdata)
-##     patInfo <- read.xls(infile)
+##     library(readxl)
+##     patInfo <- read_excel(infile)
 ##     
 ##     ## measured frequencies
 ##     freq <- c(250, 500, 1000, 2000, 3000, 4000, 6000, 8000)

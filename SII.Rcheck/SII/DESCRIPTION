@@ -1,37 +1,56 @@
 Package: SII
 Type: Package
-Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index ('SII')
-Version: 1.1.0
-Date: 2026-07-19
-Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = "aut"),
+Title: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility
+        Index
+Version: 1.2.4
+Date: 2026-08-30
+Authors@R: c(person(given = c("Gregory", "R."), family = "Warnes", role = c("aut", "cph")),
              person(given = "Mark", family = "Shaver", role = c("cre", "aut"), email = "mark.shaver@posteo.net"))
 Description: 
-   Calculates ANSI S3.5-1997 Speech Intelligibility Index
-   ('SII'), a standard method for computing the intelligibility of
-   speech from acoustical measurements of speech, noise, and hearing
-   thresholds. This package includes data frames corresponding to
-   Tables 1 - 4 in the ANSI standard as well as functions utilizing
-   these tables and user-provided hearing threshold and noise level
-   measurements to compute the 'SII' score. The methods implemented
-   here extend the standard computations to allow calculation of 'SII'
-   when the measured frequencies do not match those required by the
-   standard by applying interpolation. Furthermore, the package now
-   includes advanced clinical methods to predict aided 'SII' based on
-   hearing aid prescriptive rationales (such as 'NAL-NL2' and 'DSL'),
-   calculate real-ear insertion gains, estimate maximum power output
-   ('SSPL90'), and prescribe dynamic range compression settings.
-   Development of this package was originally funded by the Center for
-   'Bioscience' Education and Technology ('CBET') of the Rochester
-   Institute of Technology ('RIT').
-Depends:
-Suggests: splines, readxl, xtable, gdata, shiny, bslib
-License: GPL-2
+   Calculates the American National Standards Institute (ANSI) S3.5-1997
+   Speech Intelligibility Index (SII) (ANSI 1997,
+   (ANSI, 1997)), a standard
+   method for computing the intelligibility of speech from acoustical
+   measurements of speech, noise, and hearing thresholds. This package
+   includes data frames corresponding to Tables 1 - 4 in the ANSI standard as
+   well as functions utilizing these tables and user-provided hearing
+   threshold and noise level measurements to compute the SII score. The
+   methods implemented here extend the standard computations to allow
+   calculation of SII when the measured frequencies do not match those
+   required by the standard by applying interpolation. Furthermore, the
+   package now includes a native, highly optimized C++ implementation of the
+   canonical Moore & Glasberg (2004) specific loudness model for impaired
+   hearing, which structurally mirrors the bramslow2004 implementation from
+   the Auditory Modeling Toolbox (AMT) to calculate loudness in perceptual
+   sones. It also includes advanced methods to predict aided SII based on
+   hearing aid prescriptive rationales, introducing Open-NL (Open Non-Linear),
+   a novel theoretical optimization framework. Open-NL utilizes a Nelder-Mead
+   simplex algorithm to maximize the ANSI SII metric, subject to computational
+   physiological loudness penalties and simulated hardware Maximum Power
+   Output (MPO) constraints, to derive theoretical gain targets. The package
+   also provides functions to calculate real-ear insertion gains, estimate
+   maximum power output (SSPL90), and prescribe dynamic range compression.
+   NOTE: This package is explicitly flagged as a non-clinical academic tool
+   designed exclusively for theoretical modeling and simulation. It has not
+   undergone clinical validation and is strictly contraindicated for general
+   clinical fitting. Unapproved use for direct patient care is prohibited. Any
+   application of this tool to human subjects must occur exclusively within
+   the strictly controlled context of Institutional Review Board (IRB)
+   approved research studies. Development of this package was originally
+   funded by the Center for Bioscience Education and Technology (CBET) of the
+   Rochester Institute of Technology (RIT).
+Depends: R (>= 3.5.0)
+Imports: Rcpp
+LinkingTo: Rcpp
+Suggests: splines, readxl, xtable, testthat
+License: GPL-3 | file LICENSE
 LazyLoad: yes
-Packaged: 2026-07-25 21:41:51 UTC; mark
-NeedsCompilation: no
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2018-11-18 09:56:48 UTC
-Author: Gregory R. Warnes [aut],
+Config/roxygen2/version: 8.0.0
+Encoding: UTF-8
+Packaged: 2026-09-01 00:01:13 UTC; mark
+Author: Gregory R. Warnes [aut, cph],
   Mark Shaver [cre, aut]
 Maintainer: Mark Shaver <mark.shaver@posteo.net>
-Built: R 4.5.2; ; 2026-07-25 21:48:15 UTC; unix
+Built: R 4.5.2; x86_64-pc-linux-gnu; 2026-09-01 00:01:55 UTC; unix

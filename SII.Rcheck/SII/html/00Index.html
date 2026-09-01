@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head><title>R: Calculate ANSI S3.5-1997 Speech Intelligibility Index ('SII')</title>
+<head><title>R: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility
+Index</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" type="text/css" href="R.css">
 </head><body><div class="container">
-<h1> Calculate ANSI S3.5-1997 Speech Intelligibility Index ('SII')
+<h1> Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility
+Index
 <img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]">
 </h1>
 <hr>
 <div style="text-align: center;">
 <a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]"></a>
 <a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]"></a>
-</div><h2>Documentation for package &lsquo;SII&rsquo; version 1.1.0</h2>
+</div><h2>Documentation for package &lsquo;SII&rsquo; version 1.2.4</h2>
 
-<ul><li><a href="../DESCRIPTION" type="text/plain">DESCRIPTION file</a>.</li>
+<ul><li><a href="../DESCRIPTION" type="text/plain; charset=utf-8">DESCRIPTION file</a>.</li>
 <li><a href="../doc/index.html">User guides, package vignettes and other documentation.</a></li>
 <li><a href="../NEWS">Package NEWS</a>.</li>
 </ul>
@@ -24,36 +26,56 @@
 
 <table style="width: 100%;">
 <tr><td style="width: 25%;"><a href="SII-package.html">SII-package</a></td>
-<td>Calculate ANSI S3.5-1997 Speech Intelligibility Index</td></tr>
+<td>Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index</td></tr>
+<tr><td style="width: 25%;"><a href="calculate_binaural_loudness.html">calculate_binaural_loudness</a></td>
+<td>Calculate Psychoacoustic Binaural Loudness (Sones)</td></tr>
 <tr><td style="width: 25%;"><a href="calculate_loudness.html">calculate_loudness</a></td>
 <td>Calculate Loudness (Sones)</td></tr>
+<tr><td style="width: 25%;"><a href="calculate_loudness_bramslow2004.html">calculate_loudness_bramslow2004</a></td>
+<td>Calculate Loudness for Cochlear Hearing Loss</td></tr>
+<tr><td style="width: 25%;"><a href="calculate_loudness_cpp.html">calculate_loudness_cpp</a></td>
+<td>Calculate Canonical Loudness (Native C++ Engine)</td></tr>
+<tr><td style="width: 25%;"><a href="convert_1_3_octave_to_density.html">convert_1_3_octave_to_density</a></td>
+<td>Convert 1/3-octave band levels to 1 Hz spectrum density</td></tr>
 <tr><td style="width: 25%;"><a href="critical.html">critical</a></td>
-<td>Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
 <tr><td style="width: 25%;"><a href="critical.html">equal</a></td>
-<td>Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
-<tr><td style="width: 25%;"><a href="launch_app.html">launch_app</a></td>
-<td>Launch the SII Interactive Dashboard</td></tr>
+<td>Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
+<tr><td style="width: 25%;"><a href="export_gains.html">export_gains</a></td>
+<td>Export prescribed insertion gains for 50, 65, and 80 dB SPL input levels</td></tr>
+<tr><td style="width: 25%;"><a href="get_specific_loudness.html">get_specific_loudness</a></td>
+<td>Calculate Psychoacoustic Loudness (Sones)</td></tr>
 <tr><td style="width: 25%;"><a href="critical.html">octave</a></td>
-<td>Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
 <tr><td style="width: 25%;"><a href="critical.html">onethird</a></td>
-<td>Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
+<tr><td style="width: 25%;"><a href="open_nl.html">open_nl</a></td>
+<td>Open-NL WDRC Gain Prescription</td></tr>
 <tr><td style="width: 25%;"><a href="critical.html">overall.spl</a></td>
-<td>Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
+<tr><td style="width: 25%;"><a href="open_nl.html">plot.prescription_target</a></td>
+<td>Open-NL WDRC Gain Prescription</td></tr>
 <tr><td style="width: 25%;"><a href="sii.html">plot.SII</a></td>
-<td>Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
+<tr><td style="width: 25%;"><a href="prescribe_compression.html">prescribe_compression</a></td>
+<td>Prescribe Compression Settings based on Hearing Loss</td></tr>
+<tr><td style="width: 25%;"><a href="open_nl.html">print.prescription_target</a></td>
+<td>Open-NL WDRC Gain Prescription</td></tr>
 <tr><td style="width: 25%;"><a href="sii.html">print.SII</a></td>
-<td>Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
 <tr><td style="width: 25%;"><a href="sic.critical.html">sic.critical</a></td>
-<td>Alternative ANSI S3.5-1997 SII Transfer Function Weights</td></tr>
+<td>Alternative ANSI/ASA S3.5-1997 (R2024) SII Transfer Function Weights</td></tr>
 <tr><td style="width: 25%;"><a href="sic.critical.html">sic.octave</a></td>
-<td>Alternative ANSI S3.5-1997 SII Transfer Function Weights</td></tr>
+<td>Alternative ANSI/ASA S3.5-1997 (R2024) SII Transfer Function Weights</td></tr>
 <tr><td style="width: 25%;"><a href="sic.critical.html">sic.onethird</a></td>
-<td>Alternative ANSI S3.5-1997 SII Transfer Function Weights</td></tr>
+<td>Alternative ANSI/ASA S3.5-1997 (R2024) SII Transfer Function Weights</td></tr>
 <tr><td style="width: 25%;"><a href="SII-package.html">SII</a></td>
-<td>Calculate ANSI S3.5-1997 Speech Intelligibility Index</td></tr>
+<td>Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index</td></tr>
 <tr><td style="width: 25%;"><a href="sii.html">sii</a></td>
-<td>Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
+<tr><td style="width: 25%;"><a href="open_nl.html">summary.prescription_target</a></td>
+<td>Open-NL WDRC Gain Prescription</td></tr>
 <tr><td style="width: 25%;"><a href="sii.html">summary.SII</a></td>
-<td>Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)</td></tr>
+<td>Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index (SII)</td></tr>
 </table>
 </div></body></html>

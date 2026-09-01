@@ -1,0 +1,10 @@
+source("R/nalr.R")
+source("R/open_nl.R")
+source("R/sii.R")
+source("R/RcppExports.R")
+source("data_output/generate_open_nl_metrics.R")
+
+abg <- rep(50, 6)
+htl <- rep(50, 6)
+res <- open_nl(speech = 65, threshold = htl, freq = hl_freqs, loss = abg)
+print(res$gain)

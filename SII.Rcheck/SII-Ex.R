@@ -25,13 +25,14 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: SII-package
-### Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
+### Title: Calculate ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility
+###   Index
 ### Aliases: SII-package SII
 ### Keywords: package
 
 ### ** Examples
 
-## Example C.1 from ANSI S3.5-1997 Annex C
+## Example C.1 from ANSI/ASA S3.5-1997 (R2024) Annex C
 sii.C1 <- sii(
               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
@@ -76,8 +77,8 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: critical
-### Title: Constants Tables for ANSI S3.5-1997 Speech Intelligibility Index
-###   (SII)
+### Title: Constants Tables for ANSI/ASA S3.5-1997 (R2024) Speech
+###   Intelligibility Index (SII)
 ### Aliases: critical equal onethird octave overall.spl
 ### Keywords: datasets
 
@@ -104,29 +105,6 @@ overall.spl
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("critical", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("launch_app")
-### * launch_app
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: launch_app
-### Title: Launch the SII Interactive Dashboard
-### Aliases: launch_app
-### Keywords: misc
-
-### ** Examples
-
-## Not run: 
-##D   # Launch the interactive SII dashboard in your web browser
-##D   launch_app()
-## End(Not run)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("launch_app", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
 nameEx("sic.critical")
 ### * sic.critical
 
@@ -134,7 +112,8 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: sic.critical
-### Title: Alternative ANSI S3.5-1997 SII Transfer Function Weights
+### Title: Alternative ANSI/ASA S3.5-1997 (R2024) SII Transfer Function
+###   Weights
 ### Aliases: sic.critical sic.onethird sic.octave
 ### Keywords: datasets
 
@@ -164,7 +143,7 @@ legend(
        col=rainbow(ngroup)
        )
 
-data(threeoctave)
+data(onethird)
 data(octave)
 
 
@@ -179,14 +158,15 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: sii
-### Title: Compute ANSI S3.5-1997 Speech Intelligibility Index (SII)
+### Title: Compute ANSI/ASA S3.5-1997 (R2024) Speech Intelligibility Index
+###   (SII)
 ### Aliases: sii print.SII plot.SII summary.SII
 ### Keywords: math
 
 ### ** Examples
 
 
-## Example C.1 from ANSI S3.5-1997 Annex C
+## Example C.1 from ANSI/ASA S3.5-1997 (R2024) Annex C
 sii.C1 <- sii(
               speech   = c(50.0, 40.0, 40.0, 30.0, 20.0,  0.0),
               noise    = c(70.0, 65.0, 45.0, 25.0,  1.0,-15.0),
@@ -225,7 +205,7 @@ sii.CST <- sii(
 round(sii.CST$table[,-c(5:7,13)],2)
 sii.CST$sii
 
-## Example C.2 from ANSI S3.5-1997 Annex C
+## Example C.2 from ANSI/ASA S3.5-1997 (R2024) Annex C
 
 sii.C2 <- sii(
               speech   = rep(54.0, 18),

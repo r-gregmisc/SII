@@ -1,3 +1,12 @@
+VERSION 1.2.2 (2026-08-30)
+--------------------------
+
+- Implemented C++ core for `calculate_loudness` to significantly improve performance.
+- Fixed CRAN submission formatting issues (single quotes in DESCRIPTION, missing \value tags, and undocumented ellipsis args).
+- Removed interactive Shiny app (`launch_app`) to streamline package scope for CRAN.
+- Fixed a bug in `plot.SII` where unaided objects threw an error due to partial matching of the `prescription` argument.
+- Open-NL engine updated: pure conductive hearing losses now output exact linear gain (37.5 dB) without WDRC compression.
+
 VERSION 1.2.1 (2026-08-23)
 --------------------------
 

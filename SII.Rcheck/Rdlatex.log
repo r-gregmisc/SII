@@ -1,15 +1,13 @@
 Hmm ... looks like a package
-Converting parsed Rd's to LaTeX 
+Converting parsed Rd's to LaTeX .
 Creating pdf output from LaTeX ...
-Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
-  texi2dvi script/program not available, using emulation
+
 This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
-(./Rd2.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
-
+(./Rd2.tex
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
@@ -72,40 +70,83 @@ Writing index file Rd2.idx
 No file Rd2.aux.
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texm
+f-dist/fonts/enc/dvips/base/8r.enc}]
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 No file Rd2.toc.
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
-dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips
-/inconsolata/i4-t1-0.enc}]
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [2]
-Overfull \hbox (7.89801pt too wide) in paragraph at lines 163--165
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[2{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
+[3] [4] [5] [6]
+Overfull \hbox (7.89801pt too wide) in paragraph at lines 331--333
 []\T1/ptm/m/n/10 Standard spec-trum lev-els for vo-cal ef-fort lev-els "nor-mal
 ", "raised",
-[3] [4] [5] [6] [7]
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [8{/usr/share/t
-exlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-Overfull \hbox (24.24825pt too wide) in paragraph at lines 455--456
-\T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
-nt_2mm_solid",
 
-Overfull \hbox (26.63834pt too wide) in paragraph at lines 455--456
-\T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
-m_hollow").
-[9] [10]
-Overfull \hbox (118.22133pt too wide) in paragraph at lines 584--585
-\T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
-om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
-f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
-T1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \OT1/
-cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/cmr/
-m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
-10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (
-8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 361--364
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 367--370
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[7] [8] [9] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+[10{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (25.07813pt too wide) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 Acoustic cou-pling ("cus-tom_occluded", "open_dome", "tulip_do
+me", "dou-ble_dome",
+
+Overfull \hbox (3.4365pt too wide) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 Provides rec-om-men-da-tions for com-pres-sion speed (fast vs 
+slow act-ing) and com-pres-sion ra-tio/release
 [11]
-Overfull \hbox (7.60295pt too wide) in paragraph at lines 585--586
+Underfull \hbox (badness 1789) in paragraph at lines 596--596
+[]\T1/ptm/m/it/10 Alternative ANSI/ASA S3.5-1997 (R2024) SII Trans-fer Func-tio
+n
+
+Overfull \hbox (7.34593pt too wide) in paragraph at lines 602--604
+[]\T1/ptm/m/n/10 Alternative ANSI/ASA S3.5-1997 (R2024) Speech In-tel-li-gi-bil
+-ity In-dex (SII) trans-fer func-tion weights
+[12]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 659--662
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 667--670
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[13] [14]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 790--791
+\T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
+nt_2mm_solid",
+
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 790--791
+\T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
+m_hollow").
+[15]
+Overfull \hbox (6.42873pt too wide) in paragraph at lines 796--797
+\T1/ptm/m/n/10 speech dis-tor-tion. If []\T1/zi4/m/n/10 NULL[]\T1/ptm/m/n/10 , 
+it is es-ti-mated based on []\T1/zi4/m/n/10 measured_wrs []\T1/ptm/m/n/10 and [
+]\T1/zi4/m/n/10 wrs_level[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (5.53693pt too wide) in paragraph at lines 810--817
+[]\T1/ptm/m/n/10 American Na-tional Stan-dard ANSI/ASA S3.5-1997 (R2024) ("Meth
+-ods for Cal-cu-la-tion of the Speech
+[16] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [17]
+Overfull \hbox (118.22133pt too wide) in paragraph at lines 924--925
+\T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
+om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
+f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
+T1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/cmr/
+m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
+10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (
+8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
+[18]
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 925--926
 []\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
 r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
 OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
@@ -114,42 +155,37 @@ r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
 0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
 S/cmsy/m/n/10 g$
 
-Overfull \hbox (73.56828pt too wide) in paragraph at lines 605--606
+Overfull \hbox (41.86882pt too wide) in paragraph at lines 944--945
 []\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
-t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
-/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
-10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
-1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
-\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
-mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
-it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
+t/10 g[]$\T1/ptm/m/n/10 . In-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (2
+50\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 7)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6\OML/cmm
+/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/cmm/m/it/
+10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
 
-Overfull \hbox (58.21927pt too wide) in paragraph at lines 614--615
+Overfull \hbox (30.03952pt too wide) in paragraph at lines 953--954
 []\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
 rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
-. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
-n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
-n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
-0 .
+: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/n/10 30
+\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (1
+00\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
 
-Overfull \hbox (49.09967pt too wide) in paragraph at lines 623--624
-[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
-es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
-/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
- ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
-OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
-cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
-
-Overfull \hbox (6.78781pt too wide) in paragraph at lines 625--626
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 964--965
 []\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
 e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
 cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
 y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
 /n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
 \OMS/cmsy/m/n/10 g$
-[12] [13]
+[19]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 989--992
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[20]
 No file Rd2.ind.
-[14] (./Rd2.aux)
+[21] (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -158,30 +194,33 @@ Package rerunfilecheck Warning: File `Rd2.out' has changed.
  )
 (see the transcript file for additional information)</usr/share/texlive/texmf-d
 ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (14 pages, 180124 bytes).
+mf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on Rd2.pdf (21 pages, 230827 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2025] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
-Sorting entries....done (138 comparisons).
-Generating output file Rd2.ind....done (58 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (33 entries accepted, 0 rejected).
+Sorting entries....done (178 comparisons).
+Generating output file Rd2.ind....done (69 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
-(./Rd2.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
-
+(./Rd2.tex
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
@@ -241,31 +280,77 @@ For additional information on amsmath, use the `?' option.
 Writing index file Rd2.idx
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-) (./Rd2.out) (./Rd2.out)
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (./Rd2.toc
+) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out) [1{/var/lib/texmf/fonts/map/pdfte
+x/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
+] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
-onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
-s/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-
-0.enc}]) [2] [3]
-Overfull \hbox (7.89801pt too wide) in paragraph at lines 163--165
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)) [2{/usr/share/texl
+ive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[3] [4] [5] [6]
+Overfull \hbox (7.89801pt too wide) in paragraph at lines 331--333
 []\T1/ptm/m/n/10 Standard spec-trum lev-els for vo-cal ef-fort lev-els "nor-mal
 ", "raised",
-[4] [5] [6] [7] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
-[8{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-Overfull \hbox (24.24825pt too wide) in paragraph at lines 455--456
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 361--364
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 367--370
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[7] [8] [9] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+[10{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (25.07813pt too wide) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 Acoustic cou-pling ("cus-tom_occluded", "open_dome", "tulip_do
+me", "dou-ble_dome",
+
+Overfull \hbox (3.4365pt too wide) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 Provides rec-om-men-da-tions for com-pres-sion speed (fast vs 
+slow act-ing) and com-pres-sion ra-tio/release
+[11]
+Underfull \hbox (badness 1789) in paragraph at lines 596--596
+[]\T1/ptm/m/it/10 Alternative ANSI/ASA S3.5-1997 (R2024) SII Trans-fer Func-tio
+n
+
+Overfull \hbox (7.34593pt too wide) in paragraph at lines 602--604
+[]\T1/ptm/m/n/10 Alternative ANSI/ASA S3.5-1997 (R2024) Speech In-tel-li-gi-bil
+-ity In-dex (SII) trans-fer func-tion weights
+[12]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 659--662
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 667--670
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[13] [14]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
 nt_2mm_solid",
 
-Overfull \hbox (26.63834pt too wide) in paragraph at lines 455--456
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
 m_hollow").
-[9] [10] [11]
-Overfull \hbox (118.22133pt too wide) in paragraph at lines 584--585
+[15]
+Overfull \hbox (6.42873pt too wide) in paragraph at lines 796--797
+\T1/ptm/m/n/10 speech dis-tor-tion. If []\T1/zi4/m/n/10 NULL[]\T1/ptm/m/n/10 , 
+it is es-ti-mated based on []\T1/zi4/m/n/10 measured_wrs []\T1/ptm/m/n/10 and [
+]\T1/zi4/m/n/10 wrs_level[]\T1/ptm/m/n/10 . 
+
+Overfull \hbox (5.53693pt too wide) in paragraph at lines 810--817
+[]\T1/ptm/m/n/10 American Na-tional Stan-dard ANSI/ASA S3.5-1997 (R2024) ("Meth
+-ods for Cal-cu-la-tion of the Speech
+[16] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [17]
+Overfull \hbox (118.22133pt too wide) in paragraph at lines 924--925
 \T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
 om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
 f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
@@ -274,8 +359,8 @@ cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/cmr/
 m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
 10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (
 8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
-
-Overfull \hbox (7.60295pt too wide) in paragraph at lines 585--586
+[18]
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 925--926
 []\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
 r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
 OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
@@ -284,47 +369,40 @@ r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
 0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
 S/cmsy/m/n/10 g$
 
-Overfull \hbox (73.56828pt too wide) in paragraph at lines 605--606
+Overfull \hbox (41.86882pt too wide) in paragraph at lines 944--945
 []\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
-t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
-/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
-10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
-1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
-\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
-mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
-it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
-[12]
-Overfull \hbox (58.21927pt too wide) in paragraph at lines 614--615
+t/10 g[]$\T1/ptm/m/n/10 . In-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (2
+50\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 7)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6\OML/cmm
+/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/cmm/m/it/
+10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
+
+Overfull \hbox (30.03952pt too wide) in paragraph at lines 953--954
 []\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
 rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
-. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
-n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
-n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
-0 .
+: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/n/10 30
+\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (1
+00\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
 
-Overfull \hbox (49.09967pt too wide) in paragraph at lines 623--624
-[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
-es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
-/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
- ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
-OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
-cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
-
-Overfull \hbox (6.78781pt too wide) in paragraph at lines 625--626
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 964--965
 []\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
 e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
 cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
 y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
 /n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
 \OMS/cmsy/m/n/10 g$
-[13]
-Underfull \vbox (badness 3803) has occurred while \output is active [14]
-(./Rd2.ind [15]
+[19]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 989--992
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[20] (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.ind [21]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 21.
+(Font)              using `T1/zi4/m/n' instead on input line 23.
 
-[16]) (./Rd2.aux)
+[22]) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -336,30 +414,33 @@ Package rerunfilecheck Warning: File `Rd2.out' has changed.
  )
 (see the transcript file for additional information)</usr/share/texlive/texmf-d
 ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (16 pages, 184195 bytes).
+mf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on Rd2.pdf (22 pages, 235158 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2025] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
-Sorting entries....done (138 comparisons).
-Generating output file Rd2.ind....done (58 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (33 entries accepted, 0 rejected).
+Sorting entries....done (178 comparisons).
+Generating output file Rd2.ind....done (69 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
-(./Rd2.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
-
+(./Rd2.tex
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
@@ -419,31 +500,76 @@ For additional information on amsmath, use the `?' option.
 Writing index file Rd2.idx
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-) (./Rd2.out) (./Rd2.out)
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (./Rd2.toc
+) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out) [1{/var/lib/texmf/fonts/map/pdfte
+x/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
+] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
-onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
-s/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-
-0.enc}]) [2] [3]
-Overfull \hbox (7.89801pt too wide) in paragraph at lines 163--165
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)) [2{/usr/share/texl
+ive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[3] [4] [5] [6]
+Overfull \hbox (7.89801pt too wide) in paragraph at lines 331--333
 []\T1/ptm/m/n/10 Standard spec-trum lev-els for vo-cal ef-fort lev-els "nor-mal
 ", "raised",
-[4] [5] [6] [7] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
-[8{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-Overfull \hbox (24.24825pt too wide) in paragraph at lines 455--456
+[7]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 361--364
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 367--370
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[8] [9] [10] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+Overfull \hbox (25.07813pt too wide) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 Acoustic cou-pling ("cus-tom_occluded", "open_dome", "tulip_do
+me", "dou-ble_dome",
+[11{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (3.4365pt too wide) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 Provides rec-om-men-da-tions for com-pres-sion speed (fast vs 
+slow act-ing) and com-pres-sion ra-tio/release
+
+Underfull \hbox (badness 1789) in paragraph at lines 596--596
+[]\T1/ptm/m/it/10 Alternative ANSI/ASA S3.5-1997 (R2024) SII Trans-fer Func-tio
+n
+
+Overfull \hbox (7.34593pt too wide) in paragraph at lines 602--604
+[]\T1/ptm/m/n/10 Alternative ANSI/ASA S3.5-1997 (R2024) Speech In-tel-li-gi-bil
+-ity In-dex (SII) trans-fer func-tion weights
+[12]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 659--662
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 667--670
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[13] [14] [15]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
 nt_2mm_solid",
 
-Overfull \hbox (26.63834pt too wide) in paragraph at lines 455--456
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 790--791
 \T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
 m_hollow").
-[9] [10] [11]
-Overfull \hbox (118.22133pt too wide) in paragraph at lines 584--585
+
+Overfull \hbox (6.42873pt too wide) in paragraph at lines 796--797
+\T1/ptm/m/n/10 speech dis-tor-tion. If []\T1/zi4/m/n/10 NULL[]\T1/ptm/m/n/10 , 
+it is es-ti-mated based on []\T1/zi4/m/n/10 measured_wrs []\T1/ptm/m/n/10 and [
+]\T1/zi4/m/n/10 wrs_level[]\T1/ptm/m/n/10 . 
+[16]
+Overfull \hbox (5.53693pt too wide) in paragraph at lines 810--817
+[]\T1/ptm/m/n/10 American Na-tional Stan-dard ANSI/ASA S3.5-1997 (R2024) ("Meth
+-ods for Cal-cu-la-tion of the Speech
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [17] [18]
+Overfull \hbox (118.22133pt too wide) in paragraph at lines 924--925
 \T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
 om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
 f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
@@ -453,7 +579,7 @@ m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
 10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (
 8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
 
-Overfull \hbox (7.60295pt too wide) in paragraph at lines 585--586
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 925--926
 []\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
 r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
 OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
@@ -462,64 +588,279 @@ r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
 0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
 S/cmsy/m/n/10 g$
 
-Overfull \hbox (73.56828pt too wide) in paragraph at lines 605--606
+Overfull \hbox (41.86882pt too wide) in paragraph at lines 944--945
 []\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
-t/10 g[]$\T1/ptm/m/n/10 . Adults: in-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m
-/n/10 (250\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/
-10 7)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 
-1\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6
-\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/c
-mm/m/it/10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/
-it/10 :\OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 .
-[12]
-Overfull \hbox (58.21927pt too wide) in paragraph at lines 614--615
+t/10 g[]$\T1/ptm/m/n/10 . In-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (2
+50\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 7)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6\OML/cmm
+/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/cmm/m/it/
+10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
+[19]
+Overfull \hbox (30.03952pt too wide) in paragraph at lines 953--954
 []\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
 rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
-. Adult: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/
-n/10 30\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/
-n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/1
-0 .
+: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/n/10 30
+\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (1
+00\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
 
-Overfull \hbox (49.09967pt too wide) in paragraph at lines 623--624
-[]\T1/ptm/m/it/10 Demographic Boosts: \T1/ptm/m/n/10 Child Boost: In-ter-po-lat
-es $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; Boost\OT1/cmr/m/n/10 ) = \OMS/cmsy/m
-/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10
- ; \OT1/cmr/m/n/10 (50\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \
-OT1/cmr/m/n/10 (80\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 2)\OML/cmm/m/it/10 ; \OT1/
-cmr/m/n/10 (100\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g$
-
-Overfull \hbox (6.78781pt too wide) in paragraph at lines 625--626
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 964--965
 []\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
 e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
 cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
 y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
 /n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
 \OMS/cmsy/m/n/10 g$
-[13]
-Underfull \vbox (badness 3803) has occurred while \output is active [14]
-(./Rd2.ind [15]
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 989--992
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[20]
+Underfull \vbox (badness 3803) has occurred while \output is active [21]
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.ind [22]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 21.
+(Font)              using `T1/zi4/m/n' instead on input line 23.
 
-[16]) (./Rd2.aux)
+[23]) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  )
 (see the transcript file for additional information)</usr/share/texlive/texmf-d
 ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (16 pages, 184374 bytes).
+mf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on Rd2.pdf (23 pages, 235509 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.17 [TeX Live 2025] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (33 entries accepted, 0 rejected).
+Sorting entries....done (178 comparisons).
+Generating output file Rd2.ind....done (69 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+(./Rd2.tex
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.out) [1{/var/lib/texmf/fonts/map/pdfte
+x/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
+] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)) [2{/usr/share/texl
+ive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[3] [4] [5] [6]
+Overfull \hbox (7.89801pt too wide) in paragraph at lines 331--333
+[]\T1/ptm/m/n/10 Standard spec-trum lev-els for vo-cal ef-fort lev-els "nor-mal
+", "raised",
+[7]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 361--364
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 367--370
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[8] [9] [10] (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
+Overfull \hbox (25.07813pt too wide) in paragraph at lines 526--527
+[]\T1/ptm/m/n/10 Acoustic cou-pling ("cus-tom_occluded", "open_dome", "tulip_do
+me", "dou-ble_dome",
+[11{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (3.4365pt too wide) in paragraph at lines 573--575
+[]\T1/ptm/m/n/10 Provides rec-om-men-da-tions for com-pres-sion speed (fast vs 
+slow act-ing) and com-pres-sion ra-tio/release
+
+Underfull \hbox (badness 1789) in paragraph at lines 596--596
+[]\T1/ptm/m/it/10 Alternative ANSI/ASA S3.5-1997 (R2024) SII Trans-fer Func-tio
+n
+
+Overfull \hbox (7.34593pt too wide) in paragraph at lines 602--604
+[]\T1/ptm/m/n/10 Alternative ANSI/ASA S3.5-1997 (R2024) Speech In-tel-li-gi-bil
+-ity In-dex (SII) trans-fer func-tion weights
+[12]
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 659--662
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 667--670
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[13] [14] [15]
+Overfull \hbox (24.24825pt too wide) in paragraph at lines 790--791
+\T1/ptm/m/n/10 "dou-ble_dome", "tulip_dome", "open_dome", "vent_1mm_solid", "ve
+nt_2mm_solid",
+
+Overfull \hbox (26.63834pt too wide) in paragraph at lines 790--791
+\T1/ptm/m/n/10 "vent_3mm_solid", "vent_1mm_hollow", "vent_2mm_hollow", "vent_3m
+m_hollow").
+
+Overfull \hbox (6.42873pt too wide) in paragraph at lines 796--797
+\T1/ptm/m/n/10 speech dis-tor-tion. If []\T1/zi4/m/n/10 NULL[]\T1/ptm/m/n/10 , 
+it is es-ti-mated based on []\T1/zi4/m/n/10 measured_wrs []\T1/ptm/m/n/10 and [
+]\T1/zi4/m/n/10 wrs_level[]\T1/ptm/m/n/10 . 
+[16]
+Overfull \hbox (5.53693pt too wide) in paragraph at lines 810--817
+[]\T1/ptm/m/n/10 American Na-tional Stan-dard ANSI/ASA S3.5-1997 (R2024) ("Meth
+-ods for Cal-cu-la-tion of the Speech
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [17] [18]
+Overfull \hbox (118.22133pt too wide) in paragraph at lines 924--925
+\T1/ptm/m/n/10 WDRC is by-passed. Ap-plies flat lin-ear gain in-ter-po-lated fr
+om $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 f; G\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 
+f\OT1/cmr/m/n/10 (250\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \O
+T1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; \OT1/
+cmr/m/n/10 (1\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 3)\OML/cmm/m/it/10 ; \OT1/cmr/
+m/n/10 (2\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/
+10 (4\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 (
+8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (7.60295pt too wide) in paragraph at lines 925--926
+[]\T1/ptm/b/n/10 Base An-chor (65 dB SPL In-put): $\OML/cmm/m/it/10 g[] \OT1/cm
+r/m/n/10 = [](0\OML/cmm/m/it/10 ; m \OMS/cmsy/m/n/10 ^^B \OML/cmm/m/it/10 HTL \
+OT1/cmr/m/n/10 + \OML/cmm/m/it/10 C\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 , where $\O
+ML/cmm/m/it/10 m \OMS/cmsy/m/n/10 2 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cm
+r/m/n/10 40\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
+0 45\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 50\OM
+S/cmsy/m/n/10 g$
+
+Overfull \hbox (41.86882pt too wide) in paragraph at lines 944--945
+[]\T1/ptm/m/it/10 Bandwidth Roll-off: \T1/ptm/m/n/10 Mul-ti-plies $\OML/cmm/m/i
+t/10 g[]$\T1/ptm/m/n/10 . In-ter-po-lates $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (2
+50\OML/cmm/m/it/10 Hz; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 7)\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 (500\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 1\OML/cm
+m/m/it/10 :\OT1/cmr/m/n/10 0)\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (6\OML/cmm
+/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8)\OML/cmm/m/it/
+10 ; \OT1/cmr/m/n/10 (8\OML/cmm/m/it/10 k; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 5)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
+[19]
+Overfull \hbox (30.03952pt too wide) in paragraph at lines 953--954
+[]\T1/ptm/m/it/10 Compression Thresh-old (CT): \T1/ptm/m/n/10 In-ter-po-lated f
+rom $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 HTL; CT\OT1/cmr/m/n/10 )$\T1/ptm/m/n/10 
+: $\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 (20\OML/cmm/m/it/10 HL; \OT1/cmr/m/n/10 30
+\OML/cmm/m/it/10 SPL\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; :::; \OT1/cmr/m/n/10 (1
+00\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 45)\OMS/cmsy/m/n/10 g$\T1/ptm/m/n/10 . 
+
+Overfull \hbox (6.78781pt too wide) in paragraph at lines 964--965
+[]\T1/ptm/m/it/10 Acoustic Cou-pling: \T1/ptm/m/n/10 Sub-tracts vent leak-age (
+e.g., Open Dome $\OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f^^@\OT1/cmr/m/n/10 35\OML/
+cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 28\OML/cmm/m/it/10 ; \OMS/cms
+y/m/n/10 ^^@\OT1/cmr/m/n/10 15\OML/cmm/m/it/10 ; \OMS/cmsy/m/n/10 ^^@\OT1/cmr/m
+/n/10 2\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0
+\OMS/cmsy/m/n/10 g$
+
+Overfull \hbox (4.82697pt too wide) in paragraph at lines 989--992
+[]\T1/ptm/m/n/10 ANSI/ASA S3.5-1997 (R2024), "Amer-i-can Na-tional Stan-dard Me
+th-ods for Cal-cu-la-tion of the Speech
+[20]
+Underfull \vbox (badness 3803) has occurred while \output is active [21]
+(/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.ind [22]
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 23.
+
+[23]) (/tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3/Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on Rd2.pdf (23 pages, 235689 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘SII-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /tmp/Rtmp2A7CnB/Rd2pdf2174dcaaab3b'
+You may want to clean up by 'rm -Rf /tmp/RtmpKQsZHw/Rd2pdf79f2b4a645dc3'

@@ -1,0 +1,6 @@
+devtools::load_all(".")
+freq <- c(250, 500, 1000, 2000, 4000, 8000)
+threshold <- c(50, 50, 50, 50, 50, 50)
+loss <- c(50, 50, 50, 50, 50, 50)
+presc <- open_nl(speech = 65, threshold = threshold, freq = freq, loss = loss)
+cat("Gain:", presc$gain, "\n")

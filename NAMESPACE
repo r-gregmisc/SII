@@ -3,7 +3,6 @@ export(
        plot.SII,
        print.SII,
        summary.SII,
-       launch_app,
        calculate_loudness,
        calculate_loudness_cpp
        )

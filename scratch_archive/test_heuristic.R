@@ -1,0 +1,6 @@
+library(SII)
+source("R/nalr.R")
+htl <- c(15, 20, 30, 40, 50, 60)
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+gain <- calculate_open_nl_gain(freq=freqs, threshold=htl, input_level=65)
+cat("Heuristic Gain:", round(gain, 2), "\n")
