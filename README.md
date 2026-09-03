@@ -1,92 +1,184 @@
-# SII: Speech Intelligibility Index and Loudness Calculation in R
+# SII: Speech Intelligibility Index, Loudness Modeling, and Open-NL Prescriptive Testbed
 
 [![R-CMD-check](https://github.com/r-gregmisc/SII/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-gregmisc/SII/actions/workflows/R-CMD-check.yaml)
-![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen.svg)
+[![CRAN status](https://www.r-pkg.org/badges/version/SII)](https://cran.r-project.org/package=SII)
+![License](https://img.shields.io/badge/License-GPL--3-blue.svg)
 
-The `SII` package calculates the ANSI S3.5-1997 Speech Intelligibility Index (SII), a standard method for computing the intelligibility of speech from acoustical measurements of speech, noise, and hearing thresholds. 
+The **`SII`** R package provides an open-source, mathematically inspectable implementation of the **ANSI S3.5-1997 Speech Intelligibility Index (SII)**, an integrated high-performance **C++ Moore & Glasberg (2004) impaired physiological loudness model**, and **Open-NL**, a modular computational testbed for hearing aid prescriptive optimization.
 
-It also provides an integrated physiological loudness model based on Moore & Glasberg (2004) and Chen et al. (2011), enabling hearing scientists to estimate loudness in sones simultaneously with speech intelligibility.
+---
 
-## Statement of Need
+## 📖 Manuscript & Scientific Documentation
 
-Historically, hearing science and audiology researchers have lacked access to open, fully inspectable implementations of foundational acoustical metrics in R, leading to the archival of earlier, limited toolsets like the original `SII` package. While some implementations exist in other languages (e.g., Python's `acoustics` library which lacks Moore-Glasberg loudness or closed MATLAB scripts), researchers requiring robust SII and impaired physiological loudness modeling within the R ecosystem have had to rely on fragmented or proprietary tools. The clinical standard for hearing aid prescriptive modeling is dominated by rationales such as NAL-NL2 and DSL v5.0, which are distributed as compiled, closed-source dynamic-link libraries (DLLs) to manufacturers. 
+This repository hosts both the R package codebase and the companion manuscript submitted to the *Journal of the Acoustical Society of America* (JASA):
 
-The `SII` package addresses this gap by exposing a transparent computational engine for ANSI S3.5 calculations alongside physiological loudness predictions. This promotes reproducibility in audiological research, allowing independent laboratories to natively verify how algorithmic parameter shifts influence speech intelligibility and loudness outcomes without relying on proprietary black boxes.
+* **Main Manuscript:** [`OpenNL_manuscript.pdf`](OpenNL_manuscript.pdf) (Markdown source: [`OpenNL_manuscript.md`](OpenNL_manuscript.md))  
+  *Title:* *"Open-NL: An Open-Source Intelligibility-Maximizing Prescriptive Testbed with Embedded Physiological Loudness Constraints"*
+* **Supplementary Material:** [`OpenNL_Supplementary_Material.pdf`](OpenNL_Supplementary_Material.pdf) (Markdown source: [`OpenNL_Supplementary_Material.md`](OpenNL_Supplementary_Material.md))  
+  *Contains full step-by-step mathematical derivations, filterbank equations, and heuristic formulas for Sections II.C through II.N.*
+* **Peer-Review Reproducibility Suite:** [`reproducibility_scripts/`](reproducibility_scripts/)  
+  *Standalone scripts to reproduce all tables, figures, and numerical validations reported in the paper.*
 
-## Installation
+---
 
-You can install the development version from GitHub:
+## 🎯 Statement of Need & Core Thesis
 
-```r
-# install.packages("devtools")
-devtools::install_github("r-gregmisc/SII")
+Clinical hearing aid fitting is dominated by rationales such as NAL-NL2 and DSL m[i/o] v5.0. While their optimization philosophies are published in broad strokes, their compiled fitting software is distributed as closed-source binary dynamic-link libraries (DLLs). Consequently, hearing scientists and audiology researchers cannot "pop the hood" to test, isolate, or ablate individual prescriptive heuristics without reverse-engineering an entire proprietary pipeline.
+
+**The `SII` package and Open-NL solve this dilemma by:**
+1. **Coupling Speech Intelligibility with Physiological Loudness:** Pairing ANSI S3.5 calculation with a compiled C++ implementation of the canonical Moore & Glasberg (2004) specific-loudness model via `Rcpp` (~13 ms per evaluation).
+2. **Multi-Level Optimization:** Using Nelder-Mead simplex search to simultaneously maximize Speech Intelligibility (Effective SII) across soft (50 dB SPL), conversational (65 dB SPL), and loud (80 dB SPL) speech inputs.
+3. **Emergent WDRC:** Allowing wide dynamic range compression ratios to emerge naturally from physiological loudness ceilings, while auditing outputs against clinical distortion boundaries (CR $\le$ 3.0:1).
+4. **Transparent Ablation:** Providing modular switches for severe-loss boosters, dead-region roll-offs, slope-dependent low-frequency penalties (SD-LFP), and air-bone gap (ABG) mechanical restoration.
+
+---
+
+## 📦 Installation
+
+### From CRAN (v1.2.4 incoming)
+Once the incoming review clears:
+```R
+install.packages("SII")
 ```
 
-## Example Usage
+### From GitHub (Development Version)
+To install the latest release directly from GitHub:
+```R
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+remotes::install_github("r-gregmisc/SII")
+```
+*(Note: Because the physiological loudness engine is written in compiled C++, installing from GitHub requires a C++ compiler such as Rtools on Windows or Xcode Command Line Tools on macOS).*
 
-### 1. Basic ANSI S3.5 Calculation
+---
 
-```r
+## 🚀 Quickstart Usage
+
+### 1. Standard ANSI S3.5 SII Calculation
+```R
 library(SII)
 
-# Calculate SII for normal hearing
-sii_result <- sii(speech = 65, noise = 30, threshold = rep(0, 6), freq = c(250, 500, 1000, 2000, 4000, 8000))
+# Compute SII for normal hearing at 65 dB SPL
+sii_result <- sii(
+  speech = 65,
+  noise = 30,
+  threshold = rep(0, 6),
+  freq = c(250, 500, 1000, 2000, 4000, 8000)
+)
 print(sii_result$sii)
 ```
 
-### 2. Generating a WDRC Prescription Target
+### 2. Generating Open-NL Prescriptive Targets
+```R
+library(SII)
 
-The package includes `Open-NL`, an experimental open-source prescriptive algorithm for exploring Wide Dynamic Range Compression (WDRC) heuristics. (Note: this is strictly an experimental heuristic for research purposes; it lacks human listener validation data and is not intended for clinical fitting).
+# Prescribe WDRC targets for a moderate-to-severe sloping hearing loss
+audiogram <- c(20, 25, 40, 60, 75, 80)
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
 
-```r
-# Generate a WDRC target for a moderate hearing loss
-target <- open_nl(speech = 65, 
-                  threshold = c(20, 25, 40, 60, 75, 80), 
-                  freq = c(250, 500, 1000, 2000, 4000, 8000))
+target <- open_nl(
+  speech = 65,
+  threshold = audiogram,
+  freq = freqs
+)
 
-# The target object supports standard S3 methods
+# Print prescription and extract target gains
 print(target)
-plot(target)
+target$gain  # Insertion gain targets (dB)
+target$mpo   # Maximum Power Output ceiling (dB SPL)
 
-# Evaluate the SII of the proposed target using the object API
-aided_sii <- sii(target, speech = 65)
-print(aided_sii$sii)
+# Evaluate aided Effective SII and monaural loudness
+aided <- sii(target, speech = 65)
+cat(sprintf("Effective SII: %.3f\n", aided$sii))
+
+loudness <- calculate_loudness(target)
+cat(sprintf("Monaural Loudness: %.2f sones\n", loudness$total))
 ```
 
+### 3. Exploring Heuristic Ablations
+```R
+# Test the aggressive severe-loss booster (from paper's stress-test analysis)
+aggressive_target <- open_nl(
+  speech = 65,
+  threshold = audiogram,
+  freq = freqs,
+  enable_severe_booster = TRUE,
+  booster_onset = 60,
+  disable_sdlfp = TRUE  # Disable slope-dependent low-frequency penalty
+)
+```
 
+---
 
-## API Documentation
+## 🔬 Reproducing Manuscript Results
 
-Core functions:
-- `sii()`: Computes the ANSI S3.5-1997 Speech Intelligibility Index.
-- `calculate_loudness()`: Estimates physiological loudness in sones using the Moore & Glasberg (2004) impaired loudness model.
-- `open_nl()`: Generates dynamic WDRC prescription targets.
+All tables, figures, and computational benchmarks from the JASA manuscript can be replicated using the scripts located in [`reproducibility_scripts/`](reproducibility_scripts/):
 
-Detailed parameter definitions and methodologies can be found in the package R documentation (e.g., `?sii`, `?open_nl`).
+```bash
+# 1. Regenerate Figure 1 (ANSI vs. Effective SII)
+Rscript reproducibility_scripts/plot_fig1_sii_grouped.R
 
-## Community Guidelines
+# 2. Regenerate Figure 2 (Multi-Level Insertion Gain Targets across A1-A7)
+Rscript reproducibility_scripts/plot_final_gains.R
 
-We welcome community contributions to the `SII` package!
+# 3. Print Table III (Emergent Compression Ratios)
+Rscript reproducibility_scripts/generate_table3_cr.R
 
-- **Issue Reporting**: If you encounter a bug, have a feature request, or need support, please open an issue on the [GitHub Issues](https://github.com/r-gregmisc/SII/issues) page. Please include reproducible code examples if reporting a bug.
-- **Contributing**: To contribute code, please fork the repository, create a feature branch, and submit a Pull Request. Please ensure that all `testthat` unit tests pass and that your code adheres to standard R style guidelines.
-- **Support**: For general questions, feel free to start a discussion on the GitHub repository or contact the maintainer directly.
+# 4. Print Tables VI and VII (Loudness, SII, and Insertion Gains)
+Rscript reproducibility_scripts/generate_tables.R
 
-## Authors and Acknowledgment
+# 5. Run the 256-parameter sensitivity sweep & Figure 4
+Rscript reproducibility_scripts/generate_sensitivity_fig.R
 
-The core ANSI engine of the `SII` package was originally developed by Gregory R. Warnes. Maintainership formally transferred to Mark Shaver starting with version 1.1.0. All subsequent physiological loudness modeling, the S3 API refactoring, the WebAssembly implementation, and the `Open-NL` prescriptive logic were independently developed by Mark Shaver.
+# 6. Run SD-LFP ablation demonstration
+Rscript reproducibility_scripts/run_sdlfp_ablation.R
+```
 
-Development of the original package was funded by the Center for Bioscience Education and Technology (CBET) of the Rochester Institute of Technology (RIT).
+Detailed documentation and parameter mappings are available in [`reproducibility_scripts/README.md`](reproducibility_scripts/README.md).
 
-## Methodology & Architectural Notes
+---
 
-### 1. Open-NL Optimization Architecture (R vs. MATLAB)
-While foundational psychoacoustic models (e.g., AMToolbox) frequently originate as MATLAB reference scripts, the **Open-NL** prescriptive framework was intentionally engineered natively in R. This architectural decision guarantees that the framework remains completely free and open-source (FOSS), preventing the "black box" siloing that occurs with proprietary algorithms (NAL-NL2, DSL) or algorithms dependent on expensive commercial MATLAB licenses.
+## 📂 Repository Structure
 
-Furthermore, R's robust statistical and optimization ecosystem is fundamentally superior for this class of problem. Open-NL uses a highly efficient Nelder-Mead optimization loop to maximize the ANSI S3.5 Effective SII subject to dynamic loudness penalties. To overcome R's interpretive overhead during intensive looped evaluations, the Moore & Glasberg (2004) loudness model was natively ported to compiled C++ and directly integrated via `Rcpp`. This enables the optimization loop to evaluate tens of thousands of candidate gain curves in seconds rather than minutes, unlocking dynamic, real-time prescription modeling previously unattainable in standard scripting environments.
+```text
+├── DESCRIPTION               # R package metadata (v1.2.4)
+├── NAMESPACE                 # Exported package functions and C++ imports
+├── R/                        # Core R package source code
+│   ├── benchmark_targets.R   # Canonical A1–A7 profiles & NAL-NL2 targets
+│   ├── moore_glasberg.R      # R wrapper for specific loudness engine
+│   ├── nalr.R                # NAL-R anchors & SSPL90/MPO calculation
+│   ├── open_nl.R             # Nelder-Mead optimization testbed
+│   ├── plot.SII.R            # Diagnostic S3 plotting methods
+│   └── sii.R                 # ANSI S3.5-1997 calculation engine
+├── src/                      # High-performance C++ implementation
+│   ├── bramslow2004.cpp      # Moore & Glasberg (2004) loudness model
+│   └── RcppExports.cpp       # Rcpp glue code
+├── OpenNL_manuscript.md      # JASA main manuscript (Markdown)
+├── OpenNL_manuscript.pdf     # JASA main manuscript (Compiled PDF)
+├── OpenNL_Supplementary_Material.md  # Step-by-step math derivations
+├── OpenNL_Supplementary_Material.pdf # Supplementary Material (PDF)
+├── manuscript_figures/       # Publication-quality figures (300 DPI)
+├── reproducibility_scripts/  # Independent replication scripts
+└── tests/                    # testthat regression and validation tests
+```
 
-### 2. Inner and Outer Hair Cell (IHC/OHC) Loss Differentiation
-Consistent with physiological models of sensorineural hearing loss, the C++ loudness engine explicitly isolates outer hair cell (OHC) damage from inner hair cell (IHC) damage. By default, hearing loss (dB HL) up to 65 dB is attributed to OHC dysfunction, which drives the filter widening (reduced frequency selectivity) simulated in the cochlear model. Loss exceeding 65 dB is attributed to IHC dysfunction, which attenuates the overall signal gain but does not cause further filter widening. This differentiation prevents the artificial "runaway" filter widening that can corrupt loudness estimates in severe-to-profound hearing losses.
+---
 
-### 3. Spectral Density Conservation
-The ANSI S3.5 calculation relies on 1/3-octave band energies, while the physiological loudness model operates on a dense 1-Hz spectral density grid prior to excitation summation. The package ensures mathematical fidelity by natively passing the Equivalent Speech Spectrum Levels (spectrum densities in dB/Hz) directly through the R pipeline, preventing artificial energy inflation associated with double-conversion algorithms.
+## ⚠️ Non-Clinical Research Disclaimer
+
+**The `SII` package and `Open-NL` are explicitly designed and flagged as non-clinical computational tools for theoretical modeling and simulation only.** 
+
+`Open-NL` targets have not undergone clinical trials or human listener validation, and the software is strictly contraindicated for direct clinical hearing aid fitting. Applying raw uncalibrated targets to human subjects carries an inherent risk of loudness discomfort or acoustic over-amplification. Any deployment on human subjects mandates Institutional Review Board (IRB) approval, real-ear verification, and strict loudness discomfort testing.
+
+---
+
+## 👥 Authors & Maintainership
+
+* **Original ANSI Engine:** Gregory R. Warnes
+* **Open-NL Testbed, C++ Loudness Engine, & Package Maintainer:** Mark Shaver (`mark.shaver@posteo.net`)
+* **Original Funding:** Center for Bioscience Education and Technology (CBET) at the Rochester Institute of Technology (RIT).
+
+## 📄 License
+
+This software is released under the **GNU General Public License, Version 3 (GPL-3)**.
