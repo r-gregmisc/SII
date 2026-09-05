@@ -95,4 +95,3 @@ p <- ggplot(df, aes(x = Frequency, y = Gain, color = Method, linetype = Level, g
 
 dir.create("/home/mark/Development/SII-github/manuscript_figures", showWarnings = FALSE)
 ggsave("/home/mark/Development/SII-github/manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png", plot = p, width = 12, height = 10, dpi = 300)
-ggsave("/home/mark/.gemini/antigravity/brain/d1572c05-6279-48ca-983d-ed6e97ed4c47/OpenNL_vs_NALNL2_Gain_Final.png", plot = p, width = 12, height = 10, dpi = 300)

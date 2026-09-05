@@ -1,0 +1,949 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Supplementary Material: Open-NL Algorithmic Pipeline and
+Complete Parameter
+Specification}\label{supplementary-material-open-nl-algorithmic-pipeline-and-complete-parameter-specification}
+
+This supplementary document provides the exact mathematical
+formulations, closed-form piecewise functions, and complete numerical
+parameter specifications governing the twelve internal processing stages
+of the Open-NL algorithmic cascade.
+
+\subsection{C. The Twelve-Stage Execution
+Cascade}\label{c.-the-twelve-stage-execution-cascade}
+
+Open-NL operates as a multi-stage parameterized shape generator. Rather
+than relying on static compiled lookup tables, Open-NL calculates target
+insertion gains dynamically through a series of twelve explicitly
+defined, cascaded mathematical modules. Each step in the gain derivation
+process is exposed natively in R, available for researchers to inspect,
+modify, and tune.
+
+\emph{Terminology Note:} Throughout this framework, the algorithm
+utilizes two distinct discomfort predictors for different theoretical
+purposes: an HL-domain ``LDL'' (Loudness Discomfort Level) predictor
+used for estimating clinical audiometric dynamic range (Stage 8), and an
+SPL-domain ``UCL'' (Uncomfortable Loudness Level) predictor for
+establishing physical device saturation limits (Stage 11). A visual
+flowchart mapping each predictor to its downstream algorithm function is
+provided in Diagram 1.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{===========================================================================}
+\NormalTok{                  DIAGRAM 1. Open{-}NL Discomfort Predictors}
+\NormalTok{===========================================================================}
+
+\NormalTok{       [ CLINICAL DYNAMIC RANGE ]          [ PHYSICAL DEVICE LIMITS ]}
+\NormalTok{                   |                                   |}
+\NormalTok{                   v                                   v}
+\NormalTok{             LDL Predictor                       UCL Predictor}
+\NormalTok{                (dB HL)                            (dB SPL)}
+\NormalTok{                   |                                   |}
+\NormalTok{    100 + max(0, HTL {-} 40)*0.5 + Loss\_cond    105 + 0.5 * max(0, HTL {-} 20)}
+\NormalTok{                   |                                   |}
+\NormalTok{                   v                                   v}
+\NormalTok{        Dynamic Range "Squeeze"            Maximum Power Output (MPO) }
+\NormalTok{      (Insertion Gain Attenuation)       (Saturation Limit \& CR Calc)}
+
+\NormalTok{===========================================================================}
+\end{Highlighting}
+\end{Shaded}
+
+The twelve modules operate in a strictly defined cascaded execution
+order to prevent unintended interactions between additive boosters and
+soft limiters:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Stage 1: Conductive Component Separation \& Dynamic Range
+  Baseline} (Section II.D)
+\item
+  \textbf{Stage 2: Decoupled Half-Gain Base Anchor Calculation} (Section
+  II.E)
+\item
+  \textbf{Stage 3: Experience-Level Shaping \& Log-Frequency
+  \(C_{vals}\) Interpolation} (Section II.F)
+\item
+  \textbf{Stage 4: Reverse-Slope Low-Frequency Attenuation Floor}
+  (Section II.G)
+\item
+  \textbf{Stage 5: Slope-Dependent Low-Frequency Penalty (SD-LFP) with
+  Profound HF Bypass} (Section II.H)
+\item
+  \textbf{Stage 6: Severe-Loss Audibility Booster} (Section II.I)
+\item
+  \textbf{Stage 7: Soft-Compression High-Frequency Desensitization}
+  (Section II.J)
+\item
+  \textbf{Stage 8: Dynamic Range Mapping (LDL Squeeze)} (Section II.K)
+\item
+  \textbf{Stage 9: Transducer Bandwidth Roll-off} (Section II.L)
+\item
+  \textbf{Stage 10: Multi-Channel WDRC Mapping, Input/Output Pivot, and
+  Demographic Adjustments} (Section II.M)
+\item
+  \textbf{Stage 11: Acoustic Venting, Coupling Loss, and Receiver
+  Saturation Limits} (Section II.N)
+\item
+  \textbf{Stage 12: Embedded Nelder-Mead Simplex Optimization \&
+  Physiological Loudness Ceilings} (Section II.O)
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{D. Stage 1: Conductive Component Separation \& Dynamic Range
+Baseline}\label{d.-stage-1-conductive-component-separation-dynamic-range-baseline}
+
+The algorithm first decomposes total hearing threshold levels
+(\(\text{HTL}\)) into their physiological constituents: the
+sensorineural threshold (\(\text{HTL}_{sn}\)) and the conductive
+component (\(\text{Loss}_{cond}\), corresponding to the air-bone gap,
+ABG):
+
+\begin{equation}
+\text{Loss}_{cond}(f) = \text{ABG}(f)
+\end{equation}
+
+\begin{equation}
+\text{HTL}_{sn}(f) = \max\left(0, \text{HTL}(f) - \text{Loss}_{cond}(f)\right)
+\end{equation}
+
+To ensure that equal-loudness reshaping penalties apply only to
+sensorineural pathology, the algorithm computes a frequency-specific
+sensorineural ratio \(R_{sn}(f)\):
+
+\begin{equation}
+R_{sn}(f) = \begin{cases} 
+\frac{\text{HTL}_{sn}(f)}{\text{HTL}(f)}, & \text{if } \text{HTL}(f) > 0 \\ 
+0, & \text{otherwise} 
+\end{cases}
+\end{equation}
+
+Pure conductive losses (\(\text{Loss}_{cond} = \text{HTL}\)) have normal
+outer and inner hair cell functioning and intact basilar membrane
+mechanics; thus, \(R_{sn} = 0\), bypassing cochlear recruitment and
+equal-loudness correction arrays.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{E. Stage 2: Decoupled Half-Gain Base Anchor
+Calculation}\label{e.-stage-2-decoupled-half-gain-base-anchor-calculation}
+
+The foundational WDRC anchor for average conversational speech (65 dB
+SPL) is derived using a frequency-specific adaptation of the half-gain
+rule (Lybarger, 1944). Unlike linear prescriptions that anchor to a
+broadband Pure Tone Average (PTA), this anchor is decoupled
+frequency-by-frequency:
+
+\begin{equation}
+G_{base}(f) = \alpha \cdot \text{HTL}_{sn}(f) + C_{interp}(f)
+\end{equation}
+
+where \(\alpha = 0.46\) is the nominal half-gain multiplier (loosely
+derived from Byrne \& Dillon, 1986), and \(C_{interp}(f)\) is the
+frequency-shaping correction array derived in Stage 3.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{F. Stage 3: Experience-Level Shaping \&
+Log-Frequency \(C_{vals}\)
+Interpolation}{F. Stage 3: Experience-Level Shaping \& Log-Frequency C\_\{vals\} Interpolation}}\label{f.-stage-3-experience-level-shaping-log-frequency-c_vals-interpolation}
+
+To account for listener acclimatization and preferred listening levels
+(Keidser et al., 2012), Open-NL modulates the frequency-shaping array
+\(C_{interp}\) across eight discrete anchor frequencies:
+\begin{equation}
+\mathbf{f}_c = [250, 500, 1000, 2000, 3000, 4000, 6000, 8000]\text{ Hz}
+\end{equation}
+
+The discrete shaping vectors \(\mathbf{C}\) are defined as: -
+\textbf{Experienced Users} (standard baseline): \begin{equation}
+  \mathbf{C}_{exp} = [-8, -1, 3, 1, 0, 0, 0, 0]\text{ dB}
+  \end{equation} - \textbf{New Users} (nominal \(-3\) dB reduction to
+combat occlusion and sharpness): \begin{equation}
+  \mathbf{C}_{new} = \mathbf{C}_{exp} - 3 = [-11, -4, 0, -2, -3, -3, -3, -3]\text{ dB}
+  \end{equation} - \textbf{Power Users} (prioritizes raw audibility over
+acoustic comfort): \begin{equation}
+  \mathbf{C}_{power} = \mathbf{C}_{exp} + 3 = [-5, +2, 6, 4, 3, 3, 3, 3]\text{ dB}
+  \end{equation}
+
+For any calculation frequency \(f\), \(C_{interp}(f)\) is evaluated via
+piecewise log-linear interpolation across \(\mathbf{f}_c\) and scaled by
+the sensorineural proportion \(R_{sn}(f)\):
+
+\begin{equation}
+C_{interp}(f) = \text{interp}_{\log_{10}}\left(f, \mathbf{f}_c, \mathbf{C}\right) \cdot R_{sn}(f)
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{G. Stage 4: Reverse-Slope Low-Frequency Attenuation
+Floor}\label{g.-stage-4-reverse-slope-low-frequency-attenuation-floor}
+
+For reverse-slope configurations (where low frequencies are
+significantly worse than high frequencies), attempting to fully restore
+low-frequency audibility risks upward spread of masking, where
+high-energy low-frequency vowels mask low-energy high-frequency
+consonants. The algorithm calculates the low-to-high sensorineural
+threshold difference:
+
+\begin{equation}
+\text{Diff}_{rs} = \max\left(0, \overline{\text{HTL}}_{sn, \le 500} - \overline{\text{HTL}}_{sn, \ge 2000}\right)
+\end{equation}
+
+where \(\overline{\text{HTL}}_{sn, \le 500}\) is the mean threshold
+across \(f \le 500\) Hz, and \(\overline{\text{HTL}}_{sn, \ge 2000}\) is
+the mean threshold across \(f \ge 2000\) Hz. If
+\(\text{Diff}_{rs} > 15\) dB, a transition factor
+\(RS_{factor} \in [0, 1]\) is computed:
+
+\begin{equation}
+RS_{factor} = \max\left(0, \min\left(1, \frac{\text{Diff}_{rs} - 15}{20}\right)\right)
+\end{equation}
+
+A log-linear low-frequency taper \(W_{LF}(f)\) is applied below 1000 Hz:
+
+\begin{equation}
+W_{LF}(f) = \max\left(0, \min\left(1, 1 - \frac{\log_{10}(f) - \log_{10}(250)}{\log_{10}(1000/250)}\right)\right)
+\end{equation}
+
+Across octave bands, \(W_{LF}(f)\) evaluates to \(1.0\) at 250 Hz,
+\(0.5\) at 500 Hz, and \(0.0\) at \(f \ge 1000\) Hz. The
+frequency-shaping array is then dynamically flattened toward a \(-10\)
+dB floor:
+
+\begin{equation}
+C'_{interp}(f) = C_{interp}(f) \cdot \left(1 - RS_{factor} \cdot W_{LF}(f)\right) + \left(-10 \cdot RS_{factor} \cdot W_{LF}(f)\right)
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{H. Stage 5: Slope-Dependent Low-Frequency Penalty (SD-LFP)
+with Profound HF
+Bypass}\label{h.-stage-5-slope-dependent-low-frequency-penalty-sd-lfp-with-profound-hf-bypass}
+
+For sloping high-frequency losses, applying excessive low-frequency gain
+causes normal low frequencies to dominate broadband loudness. Open-NL
+computes the high-frequency slope:
+
+\begin{equation}
+\text{Slope} = \max\left(0, \overline{\text{HTL}}_{sn, \ge 2000} - \overline{\text{HTL}}_{sn, \le 500}\right)
+\end{equation}
+
+To operationalize the empirical findings of Byrne, Parkinson, and Newall
+(1990)---who showed that listeners with high-frequency losses exceeding
+70--95 dB HL require low-frequency speech cues---Open-NL incorporates a
+\textbf{Profound High-Frequency Bypass}:
+
+\begin{equation}
+PF_{bypass} = \max\left(0, \min\left(1, \frac{95 - \overline{\text{HTL}}_{sn, \ge 2000}}{25}\right)\right)
+\end{equation}
+
+The low-frequency penalty is scaled over a 20 dB slope window, capped at
+15 dB:
+
+\begin{equation}
+\text{LF}_{penalty} = \max\left(0, \min\left(1, \frac{\text{Slope} - 15}{20}\right)\right) \cdot 15 \cdot PF_{bypass}
+\end{equation}
+
+The penalty is then tapered below 1000 Hz using \(W_{LF}(f)\):
+
+\begin{equation}
+C''_{interp}(f) = C'_{interp}(f) - \left(\text{LF}_{penalty} \cdot W_{LF}(f)\right)
+\end{equation}
+
+The resulting baseline target at 65 dB SPL is: \begin{equation}
+G_{65}^{(0)}(f) = 0.46 \cdot \text{HTL}_{sn}(f) + C''_{interp}(f)
+\end{equation}
+
+\subsubsection{Ablation of SD-LFP
+Constraints}\label{ablation-of-sd-lfp-constraints}
+
+Table I provides the reference audiometric profiles (A1--A7, Johnson \&
+Dillon, 2011). Table II demonstrates the mechanical impact of the SD-LFP
+constraint on the initial heuristic seeds.
+
+\textbf{TABLE I. Reference Audiometric Profiles (Adapted from Johnson \&
+Dillon, 2011).} \emph{Thresholds are in dB HL. Profiles A1--A5 are
+purely sensorineural. A6 is mixed (30 dB ABG). A7 is conductive (50 dB
+ABG).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0930}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0930}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}
+  >{\centering\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1163}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Profile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+250 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+500 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+1000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+2000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+4000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+8000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+ABG
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{A1} & Flat moderate & 15 & 20 & 30 & 40 & 50 & 60 & 0 dB \\
+\textbf{A2} & Reverse slope & 60 & 50 & 40 & 30 & 20 & 15 & 0 dB \\
+\textbf{A3} & Moderately sloping & 10 & 20 & 40 & 50 & 55 & 60 & 0 dB \\
+\textbf{A4} & Steeply sloping & 0 & 0 & 10 & 40 & 70 & 80 & 0 dB \\
+\textbf{A5} & Steeply sloping & 10 & 10 & 20 & 60 & 80 & 100 & 0 dB \\
+\textbf{A6} & Mixed & 50 & 55 & 60 & 65 & 75 & 80 & 30 dB \\
+\textbf{A7} & Conductive & 50 & 50 & 50 & 50 & 50 & 50 & 50 dB \\
+\end{longtable}
+
+\textbf{TABLE II. Ablation of SD-LFP Constraints on Optimizer Seed (65
+dB SPL Input).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Profile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Unconstrained Seed SII
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Unconstrained Seed Sones
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+SD-LFP Seed SII
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+SD-LFP Seed Sones
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A1 (Flat mod) & 0.86 & 7.2 & 0.86 & 7.2 \\
+A2 (Reverse) & 0.88 & 6.3 & 0.88 & 6.0 \\
+A3 (Mod sloping) & 0.79 & 6.8 & 0.79 & 6.8 \\
+A4 (Steeply) & 0.81 & 6.9 & 0.81 & 6.9 \\
+A5 (Steeply) & 0.68 & 7.1 & 0.68 & 6.0 \\
+A6 (Mixed) & 0.82 & 3.0 & 0.82 & 3.0 \\
+A7 (Conductive) & 0.97 & 1.0 & 0.97 & 1.0 \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{I. Stage 6: Severe-Loss Audibility
+Booster}\label{i.-stage-6-severe-loss-audibility-booster}
+
+To overcome inner hair cell loss in severe impairments, an opt-in,
+bounded \textbf{Severe-Loss Booster} can be applied:
+
+\begin{equation}
+G_{slb}(f) = B_{en} \cdot 0.15 \cdot \max\left(0, \min(80, \text{HTL}_{sn}(f)) - T_{onset}\right)
+\end{equation}
+
+where \(B_{en} \in \{0, 1\}\) (default: 0, disabled), and
+\(T_{onset} = 70\) dB HL (conservative default) or \(60\) dB HL
+(aggressive ablation mode). The intermediate target is:
+
+\begin{equation}
+G_{65}^{(1)}(f) = G_{65}^{(0)}(f) + G_{slb}(f)
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{J. Stage 7: Soft-Compression High-Frequency
+Desensitization}\label{j.-stage-7-soft-compression-high-frequency-desensitization}
+
+To prevent unconstrained audibility maximization from prescribing
+intolerable high-frequency gain in steeply sloping losses, Open-NL
+applies a dynamic soft-compression envelope (\(L_{gain}\)):
+
+\begin{equation}
+L_{gain}(f) = 30 + 0.4 \cdot \max\left(0, \text{HTL}_{sn}(f) - 60\right)
+\end{equation}
+
+\emph{(Note: For patients in ``Moderate'' or ``High'' distortion
+categories, \(L_{gain}\) is reduced by 10 dB).}
+
+Excess gain above this dynamic limit is: \begin{equation}
+\text{Excess}(f) = \max\left(0, G_{65}^{(1)}(f) - L_{gain}(f)\right)
+\end{equation}
+
+The sloping factor \(S_{factor}(f)\) relative to the best low-frequency
+threshold
+(\(\text{HTL}_{bestlow} = \min_{f' \le 1000} \text{HTL}_{sn}(f')\)) and
+the high-frequency fade-in weight \(W_{hf}(f)\) are:
+
+\begin{equation}
+S_{factor}(f) = \max\left(0, \min\left(1, \frac{\text{HTL}_{sn}(f) - \text{HTL}_{bestlow} - 25}{20}\right)\right)
+\end{equation}
+
+\begin{equation}
+W_{hf}(f) = \max\left(0, \min\left(1, \frac{f - 2000}{2000}\right)\right)
+\end{equation}
+
+Applying 2:1 soft compression to the excess yields:
+
+\begin{equation}
+G_{65}^{(2)}(f) = G_{65}^{(1)}(f) - \left(W_{hf}(f) \cdot S_{factor}(f) \cdot 0.50 \cdot \text{Excess}(f)\right)
+\end{equation}
+
+If explicit cochlear dead regions (\(f_{e\_hf}\), \(f_{e\_lf}\)) or
+distortion categories (Margolis et al., 2025) are defined, steep
+parametric roll-offs are applied: \begin{equation}
+G_{65}^{(2)}(f) \leftarrow G_{65}^{(2)}(f) - \max\left(0, \log_2\left(\frac{f}{1.7 f_{e\_hf}}\right)\right) \cdot 30 - \max\left(0, \log_2\left(\frac{0.57 f_{e\_lf}}{f}\right)\right) \cdot 30
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{K. Stage 8: Dynamic Range Mapping (LDL
+Squeeze)}\label{k.-stage-8-dynamic-range-mapping-ldl-squeeze}
+
+To accommodate reduced clinical dynamic ranges (DSL v5.0 philosophy;
+Scollie et al., 2005), Open-NL predicts an HL-domain Loudness Discomfort
+Level:
+
+\begin{equation}
+\text{LDL}_{pred}(f) = 100 + 0.5 \cdot \max\left(0, \text{HTL}_{sn}(f) - 40\right) + \text{Loss}_{cond}(f)
+\end{equation}
+
+When measured \(\text{LDL}_{meas}(f)\) is lower than predicted, the
+dynamic range discrepancy \(\Delta_{LDL}(f)\) is quantified:
+
+\begin{equation}
+\Delta_{LDL}(f) = \text{LDL}_{meas}(f) - \text{LDL}_{pred}(f)
+\end{equation}
+
+Target gain is attenuated by 0.2 dB per dB of dynamic range squeeze:
+
+\begin{equation}
+G_{65}^{(3)}(f) = G_{65}^{(2)}(f) + \left(0.2 \cdot \Delta_{LDL}(f)\right)
+\end{equation}
+
+Simultaneously, the baseline compression ratio increases by \(+0.02\)
+per dB of squeeze (Stage 10).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{L. Stage 9: Transducer Bandwidth
+Roll-off}\label{l.-stage-9-transducer-bandwidth-roll-off}
+
+Acoustic transducers physically struggle to reproduce frequencies at the
+extremes of the spectrum (\(\le 250\) Hz and \(\ge 6000\) Hz), where
+massive gain leads to distortion and feedback. Open-NL applies a
+continuous fractional bandwidth roll-off multiplier \(M_{bw}(f)\)
+defined over seven anchor frequencies:
+
+\begin{equation}
+\mathbf{f}_{bw} = [250, 500, 1000, 2000, 4000, 6000, 8000]\text{ Hz}
+\end{equation} \begin{equation}
+\mathbf{w}_{bw} = [0.7, 1.0, 1.0, 1.0, 1.0, 0.8, 0.5]
+\end{equation}
+
+The closed-form continuous multiplier is obtained via piecewise
+log-linear interpolation:
+
+\begin{equation}
+M_{bw}(f) = \text{interp}_{\log_{10}}\left(f, \mathbf{f}_{bw}, \mathbf{w}_{bw}\right)
+\end{equation}
+
+\begin{equation}
+G_{65}^{(4)}(f) = G_{65}^{(3)}(f) \cdot M_{bw}(f)
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{M. Stage 10: Multi-Channel WDRC Mapping, Input/Output Pivot,
+and Demographic
+Adjustments}\label{m.-stage-10-multi-channel-wdrc-mapping-inputoutput-pivot-and-demographic-adjustments}
+
+Target gain at arbitrary overall input level \(L_{in}\) (e.g., 50, 65,
+80 dB SPL) is computed using a multi-channel wide dynamic range
+compression architecture pivoted around the Long-Term Average Speech
+Spectrum (LTASS).
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Speech Spectrum Pivot}: Let \(P(f)\) be the critical-band
+  normal speech level at 65 dB SPL overall. The band-specific input
+  level is: \begin{equation}
+  L_{band}(f) = P(f) + (L_{in} - 65)
+  \end{equation}
+\item
+  \textbf{Dynamic Compression Ratio Calculation}: \begin{equation}
+  \text{CR}_{base}(f) = 1 + \frac{\max\left(0, \text{HTL}_{sn}(f) - 20\right)}{40} - \left(0.02 \cdot \Delta_{LDL}(f)\right)
+  \end{equation} For severe loss (\(\text{HTL}_{sn} > 65\) dB HL),
+  compression reduces back toward linear to preserve the temporal speech
+  envelope (Keidser et al., 2007): \begin{equation}
+  W_{freq}(f) = \max\left(0, \min\left(1, \frac{f - 500}{2500}\right)\right)
+  \end{equation} \begin{equation}
+  \text{CR}_{loud}(f) = \text{CR}_{base}(f) - \left(\frac{\max(0, \text{HTL}_{sn}(f) - 65)}{30} \cdot (1.5 - 0.5 \cdot W_{freq}(f))\right)
+  \end{equation} \(\text{CR}_{loud}(f)\) is clamped between \(1.0\) and
+  a maximum \(\text{CR}_{max}(f) = 1.5 + 0.9 \cdot W_{freq}(f)\)
+  (further relaxed for age \(> 60\)). In Comfort in Noise (CIN) mode,
+  \(\text{CR}_{loud}\) is clamped to \(\le 1.5\).
+\item
+  \textbf{Variable Compression Threshold (CT)}: Overall CT
+  (\(\text{CT}_{overall}\)) scales from 30 to 45 dB SPL as a function of
+  threshold. The band-level threshold is
+  \(\text{CT}_{band}(f) = P(f) + (\text{CT}_{overall} - 65)\) (reduced
+  by 10 dB in CIN mode).
+\item
+  \textbf{Piecewise Linear-Compressive Spline}: Gain at the compression
+  threshold is: \begin{equation}
+  G_{CT}(f) = \begin{cases} 
+  G_{65}^{(4)}(f), & \text{if } \text{CT}_{band}(f) > P(f) \\ 
+  G_{65}^{(4)}(f) + \left(P(f) - \text{CT}_{band}(f)\right)\left(1 - \frac{1}{\text{CR}_{loud}(f)}\right), & \text{if } \text{CT}_{band}(f) \le P(f) 
+  \end{cases}
+  \end{equation} The level-dependent WDRC target gain is:
+  \begin{equation}
+  G_{target}(f, L_{in}) = \begin{cases} 
+  G_{CT}(f), & \text{if } L_{band}(f) \le \text{CT}_{band}(f) \\ 
+  G_{CT}(f) - \left(L_{band}(f) - \text{CT}_{band}(f)\right)\left(1 - \frac{1}{\text{CR}_{loud}(f)}\right), & \text{if } L_{band}(f) > \text{CT}_{band}(f) 
+  \end{cases}
+  \end{equation}
+\item
+  \textbf{Demographic Adjustments}: \begin{equation}
+  G_{target}(f, L_{in}) \leftarrow G_{target}(f, L_{in}) + \Delta_{gender} + \Delta_{config} + \Delta_{exp}
+  \end{equation} where \(\Delta_{gender} = -1.5\) dB (female),
+  \(\Delta_{config} = +3.0\) dB (unilateral), and
+  \(\Delta_{exp} = -\min\left(6.0, 0.3 \cdot \max\left(0, \text{PTA}_{500,1k,2k} - 40\right)\right)\)
+  for new users.
+\end{enumerate}
+
+\textbf{TABLE III. Effective Compression Ratios (Gain50 / Gain80) across
+A1-A7 Audiograms.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1053}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1053}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}
+  >{\centering\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1316}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Profile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Formula
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+250 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+500 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+1000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+2000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+4000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+8000 Hz
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A1 & NAL-NL2 & - & - & 62.00 & 7.22 & 3.66 & 2.74 \\
+A1 & Open-NL & - & 1.00 & 2.02 & 2.84 & 2.60 & 8.45 \\
+A2 & NAL-NL2 & - & - & 5.84 & 47.33 & - & - \\
+A2 & Open-NL & - & 5.59 & 2.71 & 6.41 & - & - \\
+A3 & NAL-NL2 & 1.00 & - & 8.37 & 3.75 & 3.03 & 2.42 \\
+A3 & Open-NL & 1.00 & 1.00 & 2.31 & 2.94 & 2.94 & - \\
+A4 & NAL-NL2 & 1.00 & 1.00 & - & 6.40 & 2.46 & 2.11 \\
+A4 & Open-NL & 1.00 & 1.00 & 1.00 & - & 2.96 & 1.64 \\
+A5 & NAL-NL2 & 1.00 & 1.00 & 56.50 & 2.44 & 1.87 & 1.75 \\
+A5 & Open-NL & 1.00 & 1.00 & 1.00 & - & 2.17 & 2.10 \\
+A6 & NAL-NL2 & 1.35 & 1.35 & 1.43 & 1.43 & 1.55 & 1.53 \\
+A6 & Open-NL & 1.54 & 1.38 & 1.30 & 1.29 & 1.26 & 1.34 \\
+A7 & NAL-NL2 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+A7 & Open-NL & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{N. Stage 11: Acoustic Venting, Coupling Loss, and Receiver
+Saturation
+Limits}\label{n.-stage-11-acoustic-venting-coupling-loss-and-receiver-saturation-limits}
+
+Real-Ear Aided Responses (REAR) are heavily influenced by acoustic
+coupling. Low-frequency leakage is modeled by log-frequency
+interpolation over anchor frequencies
+\(\mathbf{f}_{vent} = [250, 500, 1000, 2000, 4000, 8000]\text{ Hz}\):
+
+\begin{equation}
+V_{loss}(f) = \text{interp}_{\log_{10}}\left(f, \mathbf{f}_{vent}, \mathbf{v}_c\right)
+\end{equation}
+
+where \(\mathbf{v}_c\) is the coupling-specific attenuation vector
+defined in Table S1.
+
+\textbf{TABLE S1. Acoustic Coupling Real-Ear Insertion Loss Vectors
+(\(\mathbf{v}_c\), in dB).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1176}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}
+  >{\centering\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1471}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Coupling Configuration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+250 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+500 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+1000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+2000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+4000 Hz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+8000 Hz
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{custom\_occluded} & 0 & 0 & 0 & 0 & 0 & 0 \\
+\texttt{open\_dome} & -35 & -28 & -15 & -2 & 0 & 0 \\
+\texttt{tulip\_dome} & -25 & -18 & -5 & 0 & 0 & 0 \\
+\texttt{double\_dome} & -20 & -10 & 0 & 0 & 0 & 0 \\
+\texttt{vent\_1mm\_solid} & -3 & -1 & 0 & 0 & 0 & 0 \\
+\texttt{vent\_2mm\_solid} & -8 & -2 & 0 & 0 & 0 & 0 \\
+\texttt{vent\_3mm\_solid} & -12 & -4 & 0 & 0 & 0 & 0 \\
+\texttt{vent\_1mm\_hollow} & -12 & -3 & 0 & 0 & 0 & 0 \\
+\texttt{vent\_2mm\_hollow} & -22 & -12 & -5 & -2 & 0 & 0 \\
+\texttt{vent\_3mm\_hollow} & -25 & -15 & -8 & -4 & 0 & 0 \\
+\end{longtable}
+
+Conductive air-bone gaps are restored linearly with a 75\% fraction:
+\(G_{cond}(f) = 0.75 \cdot \text{Loss}_{cond}(f)\). To prevent active
+anti-phase cancellation demands and comb filtering, insertion gain is
+floored at \(V_{loss}(f) - 10\) dB:
+
+\begin{equation}
+G_{heuristic}(f, L_{in}) = \max\left(G_{target}(f, L_{in}) + 0.75 \cdot \text{Loss}_{cond}(f) + V_{loss}(f),\, V_{loss}(f) - 10\right)
+\end{equation}
+
+Hardware receiver limits (MPO/SSPL90) are established to avoid severe
+saturation distortion: \begin{equation}
+\text{MPO}(f) = \min\left(120,\, 105 + 0.5 \cdot \max(0, \text{HTL}_{sn}(f) - 20) + \text{Loss}_{cond}(f)\right)
+\end{equation}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{O. Stage 12: Embedded Nelder-Mead Simplex Optimization \&
+Physiological Loudness
+Ceilings}\label{o.-stage-12-embedded-nelder-mead-simplex-optimization-physiological-loudness-ceilings}
+
+When \texttt{optimize\ =\ TRUE}, Open-NL adjusts the heuristic targets
+by minimizing an unconstrained multi-objective loss function via
+Nelder-Mead simplex search (\texttt{stats::optim}).
+
+\subsubsection{Parameter Vector and Gain
+Formation}\label{parameter-vector-and-gain-formation}
+
+The optimization parameter vector is
+\(\boldsymbol{\delta} = [\delta_{250}, \delta_{500}, \delta_{1000}, \delta_{2000}, \delta_{4000}, \delta_{8000}]^T \in \mathbb{R}^6\).
+During evaluation, shifts are clamped:
+
+\begin{equation}
+\delta_{clamped, j} = \max(-60, \min(10, \delta_j))
+\end{equation}
+
+Candidate insertion gains \(\mathbf{G} \in [0, 80]\) dB are interpolated
+to calculation frequencies: \begin{equation}
+G(f) = \max\left(0, \min\left(80, G_{heuristic}(f) + \delta_{clamped}(f)\right)\right)
+\end{equation}
+
+\subsubsection{Loss Function
+Formulation}\label{loss-function-formulation}
+
+The Nelder-Mead solver minimizes:
+
+\begin{equation}
+\mathcal{L}(\boldsymbol{\delta}) = -100 \cdot \text{SII}_{desens}(\mathbf{G}) + P_{anchor} + P_{bounds} + P_{loud} + P_{spl} + P_{rough} + P_{order} + P_{cr} + P_{abg}
+\end{equation}
+
+where \(\text{SII}_{desens}\) is the effective Speech Intelligibility
+Index calculated using the \texttt{johnson2011\_smoothed} transfer
+function.
+
+\subsubsection{\texorpdfstring{Explicit Penalty Terms and Exact Weights
+(\(\lambda\))}{Explicit Penalty Terms and Exact Weights (\textbackslash lambda)}}\label{explicit-penalty-terms-and-exact-weights-lambda}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Anchor Penalty} (\(\lambda_{anchor} = 0.1\)): \begin{equation}
+  P_{anchor} = 0.1 \sum_{j=1}^6 |\delta_j|
+  \end{equation}
+\item
+  \textbf{Out-of-Bounds Penalty} (\(\lambda_{bounds} = 1000.0\)):
+  \begin{equation}
+  P_{bounds} = 1000.0 \left[\sum_{j=1}^6 \max(0, \delta_j - 30)^2 + \sum_{j=1}^6 \max(0, -\delta_j - 60)^2\right]
+  \end{equation}
+\item
+  \textbf{Physiological Loudness Ceiling Penalty}
+  (\(\lambda_{loud} = 2000.0\)): \begin{equation}
+  P_{loud} = 2000.0 \cdot \max(0, \text{Sones}_{MG04}(\mathbf{G}) - \text{Cap})
+  \end{equation} where \(\text{Sones}_{MG04}\) is the Moore \& Glasberg
+  (2004) specific-loudness integration computed via native C++. The
+  dynamic U-shaped cap is interpolated across Pure Tone Average knots
+  \(\mathbf{PTA}_{knots} = [10, 32.5, 52.5, 72.5, 90]\) dB HL from
+  level-specific sone vectors:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(L_{in} = 50\) dB SPL:
+    \(\mathbf{K}_{50} = [1.5, 1.0, 0.8, 1.2, 1.2]\) sones
+  \item
+    \(L_{in} = 65\) dB SPL:
+    \(\mathbf{K}_{65} = [7.0, 4.5, 4.0, 6.5, 6.0]\) sones
+  \item
+    \(L_{in} = 80\) dB SPL:
+    \(\mathbf{K}_{80} = [20.0, 12.0, 10.0, 15.0, 14.0]\) sones
+    \begin{equation}
+    \text{Cap}_{base} = \text{interp}\left(\text{PTA}_{sn}, \mathbf{PTA}_{knots}, \mathbf{K}_{L_{in}}\right)
+    \end{equation} \emph{Profile Adjustments:}
+  \item
+    Reverse-slope restriction (\(L_{in} \ge 75\) dB SPL and low-to-high
+    threshold difference \(> 10\) dB):
+    \(\text{Cap} = \text{Cap}_{base} - 0.10 \cdot (\overline{\text{HTL}}_{\le 500} - \overline{\text{HTL}}_{\ge 4000})\).
+  \item
+    Conductive air-bone gap adjustment:
+    \(\text{Cap} \leftarrow \text{Cap} - 0.25 \cdot \text{PTA}_{ABG}\)
+    (if \(L_{in} \ge 75\) dB SPL) or \(+0.10 \cdot \text{PTA}_{ABG}\)
+    (if \(L_{in} < 75\) dB SPL).
+  \end{itemize}
+\item
+  \textbf{Broadband SPL Saturation Ceiling Penalty}
+  (\(\lambda_{spl} = 2000.0\)): \begin{equation}
+  P_{spl} = 2000.0 \cdot \max\left(0, \text{SPL}_{aided} - 110.0\right)
+  \end{equation}
+\item
+  \textbf{Spectral Roughness Penalty} (\(\lambda_{rough} = 0.5\)):
+  \begin{equation}
+  P_{rough} = 0.5 \sum_{j=1}^5 (\delta_{j+1} - \delta_j)^2
+  \end{equation}
+\item
+  \textbf{Inter-Level Order Monotonicity Penalty}
+  (\(\lambda_{order} = 2000.0\)): Enforces \(G_{50} \ge G_{65}\) and
+  \(G_{80} \le G_{65}\): \begin{equation}
+  P_{order} = \begin{cases} 
+  2000.0 \sum_{j=1}^6 \max(0, G_{65, j} - G_{50, j})^2, & \text{for } L_{in} = 50 \\ 
+  2000.0 \sum_{j=1}^6 \max(0, G_{80, j} - G_{65, j})^2, & \text{for } L_{in} = 80 
+  \end{cases}
+  \end{equation}
+\item
+  \textbf{Compression Ratio Ceiling Penalty} (\(\lambda_{cr} = 200.0\)):
+  \begin{equation}
+  P_{cr} = \begin{cases} 
+  200.0 \sum_{j=1}^6 \max\left(0, (G_{50, j} - G_{65, j}) - \Delta_{max, j}\right)^2, & \text{for } L_{in} = 50 \\ 
+  200.0 \sum_{j=1}^6 \max\left(0, (G_{65, j} - G_{80, j}) - \Delta_{max, j}\right)^2, & \text{for } L_{in} = 80 
+  \end{cases}
+  \end{equation} where
+  \(\Delta_{max, j} = 15.0 \cdot (1 - \text{ABG}_j / \max(0.001, \text{HTL}_j))\)
+  for soft speech, bounding emergent compression ratios safely below
+  3.0:1 for sensorineural loss while enforcing linear amplification for
+  conductive components.
+\item
+  \textbf{Air-Bone Gap Excursion Penalty} (\(\lambda_{abg} = 1.0\)):
+  \begin{equation}
+  P_{abg} = \begin{cases} 
+  1.0 \sum_{j=1}^6 \max(0, \delta_j)^2, & \text{if } \exists j, \text{Loss}_j > 0 \\ 
+  0, & \text{otherwise} 
+  \end{cases}
+  \end{equation}
+\end{enumerate}
+
+\subsubsection{Solver Controls and Convergence
+Tolerances}\label{solver-controls-and-convergence-tolerances}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Algorithm}: Nelder-Mead Simplex via R's
+  \texttt{stats::optim()}.
+\item
+  \textbf{Iteration Ceiling}: \texttt{control\ =\ list(maxit\ =\ 800)}.
+\item
+  \textbf{Convergence Tolerance}: Relative convergence tolerance
+  \texttt{reltol\ =\ sqrt(.Machine\$double.eps)\ \textbackslash{}approx\ 1.49\ \textbackslash{}times\ 10\^{}\{-8\}}.
+\item
+  \textbf{Initial Simplex Seeding}: Seeding incorporates an audibility
+  projection
+  \(\boldsymbol{\delta}_{start} = \min(20, \max(0, \text{target\_aided} - G_{heuristic}))\),
+  where
+  \(\text{target\_aided} = \min(\text{UCL} - 5, \max(L_{in}, \text{HTL} + 10))\).
+  Soft inputs receive \(+3\) dB shift; loud inputs receive
+  \(\max(-10, \boldsymbol{\delta}_{start} - 5)\) dB shift.
+\item
+  \textbf{Multi-Start Strategy}: 3 restarts executed per input level
+  with uniform random jitter
+  \(\boldsymbol{\delta}_{start} \leftarrow \boldsymbol{\delta}_{start} + \mathcal{U}(-5, +5)\)
+  to escape shallow local extrema and guarantee global convergence.
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{References}\label{references}
+
+Denk, F., Oetting, D., Latzel, M., Bonsel, H., \& Husstedt, H. (2025).
+Prevalence of excess binaural broadband loudness summation in the
+hearing-impaired population and implications for hearing aid gain
+targets. \emph{PLOS ONE}, 20(3), e0319236.
+https://doi.org/10.1371/journal.pone.0319236
+
+Engler, M., Digeser, F., \& Hoppe, U. (2026). Speech recognition and
+real-ear-measured amplification in hearing-aid users with various grades
+of hearing loss. \emph{International Journal of Audiology}, 65(7),
+834--845. https://doi.org/10.1080/14992027.2024.2426009
+
+Kitterick, P. T., Zakis, J. A., \& Edwards, B. (2026). Evolving the
+philosophy: From the NAL rule to NAL-NL3. \emph{International Journal of
+Audiology}, 65(6), 513--524.
+https://doi.org/10.1080/14992027.2026.42342663
+
+Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., \& Wilson, R. H.
+(2025). Predicted and measured word-recognition scores unmask distortion
+in the impaired auditory system. \emph{The Journal of the Acoustical
+Society of America}, 157(2), 555--568.
+https://doi.org/10.1121/10.0036461
+
+Moore, B. C., \& Glasberg, B. R. (2004). A revised model of loudness
+perception applied to cochlear hearing loss. \emph{Hearing Research},
+188(1-2), 70-88.
+
+Scollie, S., Seewald, R., Cornelisse, L., Moodie, S., Bagatto, M.,
+Laurnagaray, D., Beaulac, S., \& Pumford, J. (2005). The Desired
+Sensation Level multistage input/output algorithm. \emph{Trends in
+Amplification}, 9(4), 159-197.
+
+\end{document}

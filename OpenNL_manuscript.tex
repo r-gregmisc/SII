@@ -30,7 +30,6 @@
 }{}
 \usepackage{setspace}
 \usepackage{longtable,booktabs,array}
-\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -73,7 +72,7 @@
 Range Compression}
 \author{Mark
 Shaver\(^1,a)\) \and \parbox{\textwidth}{\centering $^1$ Wichita State University, Department of Communication Sciences and Disorders, 1845 Fairmount St, Wichita, KS 67260, USA} \and \(^{a)}\)Email:
-\href{mailto:mark.shaver@wichita.edu}{\nolinkurl{mark.shaver@wichita.edu}}}
+mark.shaver@wichita.edu}
 \date{}
 
 \begin{document}
@@ -84,36 +83,44 @@ Shaver\(^1,a)\) \and \parbox{\textwidth}{\centering $^1$ Wichita State Universit
 
 \subsection{Abstract}\label{abstract}
 
-\textbf{Open-NL} is an open-source computational testbed designed to
-formally demonstrate the mathematical ill-posedness of unconstrained
-Wide Dynamic Range Compression (WDRC) optimization. \textbf{Crucially,
-Open-NL is strictly a hypothesis-generating algorithmic sandbox, not a
-deployable clinical formula; its outputs must not be used on human
-patients, and the resulting intelligibility and loudness data are
-presented solely as mechanistic demonstrations of optimizer behavior,
-not comparative efficacy claims.} While modern prescriptions like
-NAL-NL2 are highly regularized to ensure clinical safety, their
-closed-source nature prevents researchers from isolating the effects of
-specific rules. By deliberately stripping away these closed
-regularizations and allowing a raw Nelder-Mead optimizer to maximize the
-ANSI S3.5 Speech Intelligibility Index (SII), Open-NL exposes the
-extreme mathematical fragility of theoretical targets. This manuscript
-benchmarks this failure using an established 7-profile evaluation
-paradigm alongside the Moore \& Glasberg (2004) specific-loudness model.
-As a primary scientific finding, we demonstrate that unmodified SII
-maximization is inherently ill-posed for severe losses: modeled loudness
-targets swing wildly from a conservative 0.9 sones to a potentially
-traumatic 5.3 sones simply by altering minor heuristic boundaries.
-Furthermore, Open-NL's mathematically optimal high-frequency targets for
-profound profiles dramatically exceed standard clinical baselines,
-leading to a formally testable hypothesis that these uncalibrated limits
-will systematically trigger \textgreater80\% behavioral loudness
-rejection due to unmodeled broadband excess summation. This
-mathematically aggressive behavior concretely proves why unconstrained
-optimization fails in hearing aid prescription, serving as the
-foundational justification for a proposed stochastic calibration roadmap
-(GA/PSO) designed to replace static heuristic boundaries with
-individualized, distortion-aware objective functions.
+\textbf{Open-NL} is an open-source computational testbed designed for
+the transparent modeling, component-level ablation, and evaluation of
+Wide Dynamic Range Compression (WDRC) prescriptive rules.
+\textbf{Crucially, Open-NL is strictly a hypothesis-generating
+algorithmic sandbox, not a deployable clinical formula; its outputs must
+not be used on human patients, and the resulting intelligibility and
+loudness data are presented solely as mechanistic demonstrations of
+optimizer behavior, not comparative efficacy claims.} While modern
+prescriptions like NAL-NL2 rely on extensive empirical regularizations
+to ensure clinical safety---historically necessitated by the
+well-documented failures of theoretical
+intelligibility-maximization---their closed-source, compiled nature
+prevents researchers from isolating the interactions of specific
+heuristic safeguards. Open-NL fills this gap by coupling a Nelder-Mead
+effective (desensitized) Speech Intelligibility Index (SII) optimizer
+with the Moore \& Glasberg (2004) specific-loudness model within an
+established 7-profile evaluation paradigm. We benchmark this testbed
+across a \(4^4 = 256\)-permutation heuristic sweep alongside a 768-point
+Monte Carlo stability analysis, revealing a fundamental distinction
+between numerical convergence and heuristic sensitivity: while the
+multi-start Nelder-Mead solver exhibits high numerical convergence
+stability for any fixed parameter set (\(\text{SD} < 0.025\) SII), the
+prescribed targets exhibit extreme heuristic parameter sensitivity for
+severe-sloping configurations, swinging modeled monaural loudness
+between 0.9 and 5.3 sones when shifting minor heuristic boundaries.
+Crucially, because standard models underestimate real-world binaural
+broadband summation by \textasciitilde2.4\(\times\) in listeners with
+excess summation, this modeled loudness frontier is strictly
+illustrative rather than clinically definitive. Furthermore, Open-NL's
+mathematically optimal high-frequency targets for profound profiles
+dramatically exceed standard clinical baselines, establishing a formally
+testable hypothesis that uncalibrated limits will systematically trigger
+\textgreater80\% behavioral loudness rejection due to unmodeled
+broadband excess summation. By providing an open-source, inspectable
+framework that quantitatively exposes these trade-offs, Open-NL provides
+the foundational computational substrate for future stochastic
+calibration roadmaps (GA/PSO) designed to replace static heuristic
+boundaries with individualized, distortion-aware objective functions.
 
 \subsection{I. INTRODUCTION}\label{i.-introduction}
 
@@ -131,20 +138,31 @@ evaluation.
 
 While the derivations and optimization objectives of major algorithms
 like NAL-NL2 and DSL m{[}i/o{]} are published in detail, their compiled
-software implementations are closed-source. Existing open-source
-frameworks provide significant utility but serve distinct functional
-niches: openMHA (Herzke et al., 2017) operates as a real-time signal
-processing master hearing aid rather than a prescriptive target
-generator, the Cambridge CAM2/CAMEQ2-HF formulae (Moore et al., 2010)
-provide rigidly defined equation-based targets rather than a modular
-optimization sandbox, and the Auditory Modeling Toolbox (AMT; Majdak et
-al., 2022) offers robust loudness integrations without native
-prescriptive inversion. Consequently, investigators cannot isolate a
-specific prescriptive rule within a modern optimization loop and observe
-the resulting cascade without reverse-engineering an entire proprietary
-engine. Open-NL fills this defensible gap by providing a modifiable R
-substrate explicitly designed for the modular ablation of prescriptive
-heuristics. By coupling a Nelder-Mead SII optimizer to an integrated C++
+software implementations are closed-source. Audiological science has
+long recognized that theoretical intelligibility-maximization fails
+clinically without extensive empirical regularization. The historical
+evolution from NAL-NL1 to NAL-NL2 specifically required empirical
+corrections---including global gain reductions (e.g., -2 dB for female
+listeners and new users) and reduced compression ratios for severe
+losses---to counteract the aggressive over-amplification provoked by
+unconstrained optimization (Keidser, Dillon, Carter, \& O'Brien, 2012).
+However, because modern fitting software packages are closed-source,
+researchers cannot isolate the relative contribution of individual
+heuristic rules or observe how specific safeguards interact within the
+optimization cascade. Existing open-source frameworks provide
+significant utility but serve distinct functional niches: openMHA
+(Herzke et al., 2017) operates as a real-time signal processing master
+hearing aid rather than a prescriptive target generator, the Cambridge
+CAM2/CAMEQ2-HF formulae (Moore et al., 2010) provide rigidly defined
+equation-based targets rather than a modular optimization sandbox, and
+the Auditory Modeling Toolbox (AMT; Majdak et al., 2022) offers robust
+loudness integrations without native prescriptive inversion.
+Consequently, investigators cannot isolate a specific prescriptive rule
+within a modern optimization loop and observe the resulting cascade
+without reverse-engineering an entire proprietary engine. Open-NL fills
+this defensible gap by providing a modifiable R substrate explicitly
+designed for the modular ablation of prescriptive heuristics. By
+coupling a Nelder-Mead effective SII optimizer to an integrated C++
 specific-loudness engine, this framework permits researchers to
 systematically disable, isolate, or invert individual heuristics. For
 example, a researcher could seamlessly disable the traditional 30 dB
@@ -172,17 +190,19 @@ reproduced evaluation paradigm. The seven reference audiometric
 profiles, the Moore \& Glasberg (2004) specific loudness model, and the
 ANSI S3.5 SII metric utilized herein are a direct replication of the
 methodological framework established by Johnson and Dillon (2011).
-(Note: Unless explicitly stated otherwise, the term ``SII'' throughout
-this manuscript refers strictly to the raw, unadjusted ANSI S3.5
-calculation prior to any desensitization penalty). Because this
-underlying physiological evaluation space is already established in the
-literature, the primary scientific contribution of this manuscript is
-not the physiological data outputs themselves, but rather the behavior
-of the transparent optimization layer acting upon them. By exposing the
-extreme mathematical instability of unconstrained numerical solvers
-within this standardized sandbox, the manuscript provides a formal,
-mechanistic proof for why established clinical formulas must embed the
-empirical regularizations they do.
+(Note: Throughout this manuscript, ``ANSI SII'' refers to the raw
+physical audibility calculation, whereas ``effective SII'' or
+``desensitized SII'' refers to the calculation incorporating severe-loss
+desensitization and level distortion penalties). Because this underlying
+physiological evaluation space is already established in the literature,
+the primary scientific contribution of this manuscript is the
+transparent, open-source computational testbed itself. By exposing the
+behavior of unconstrained numerical solvers within this standardized
+sandbox, the paper clarifies a crucial distinction: while numerical
+solvers converge stably on any fixed objective space, theoretical WDRC
+target generation exhibits profound parameter sensitivity to
+uncalibrated heuristic boundaries, providing the computational
+infrastructure necessary to quantify and calibrate these interactions.
 
 \subsubsection{Clinical Safety and Usage
 Disclaimer}\label{clinical-safety-and-usage-disclaimer}
@@ -226,7 +246,7 @@ CAMEQ/CAM2 aim to equalize loudness across varying frequency bands
 
 Open-NL explicitly positions its prescriptive rationale as a
 \emph{constrained intelligibility-maximizer}. The core mathematical
-objective is the unconstrained maximization of the Effective
+objective is the unconstrained maximization of the effective
 (desensitized) Speech Intelligibility Index (SII). However, rather than
 globally bounding this maximization to a static ``normal-or-less''
 loudness limit, Open-NL permits loudness to grow dynamically until it
@@ -237,18 +257,27 @@ the mid-frequencies for severe losses---where the intelligibility yield
 is highest---while aggressively decelerating loudness growth at the
 spectral extremes.
 
-This specific constraint topology directly addresses a critical barrier
-in prescriptive fitting: hearing-impaired listeners frequently exhibit
-excess binaural broadband loudness summation, which can cause
-unconstrained intelligibility-maximizing targets to trigger severe
-loudness rejection in real-world environments (Denk et al., 2025). By
-executing unconstrained SII maximization strictly beneath a localized,
-U-shaped loudness penalty, Open-NL occupies a deliberate position
-between pure intelligibility-maximization and active loudness-limiting.
-This hybrid architecture acknowledges that achieving maximum theoretical
-intelligibility for severe pathologies often requires pushing localized
-loudness beyond ``normal'' physiological boundaries, provided the
-resulting broadband summation is safely and rigorously capped.
+This specific constraint topology is designed to explore the boundary
+between intelligibility maximization and loudness limiting. However, it
+must be stated prominently that this U-shaped penalty operates strictly
+within the canonical Moore \& Glasberg (2004) monaural specific-loudness
+engine. While the heuristic dynamically restricts modeled monaural
+sones, it does not---and mathematically cannot---account for the
+idiosyncratic binaural broadband loudness summation observed in
+hearing-impaired listeners. As demonstrated by Moore et al.~(2014),
+Oetting et al.~(2016), and Denk et al.~(2025), binaural broadband
+summation in impaired populations averages \textasciitilde13 dB higher
+than in normal-hearing listeners (a factor of \(\approx 2.4\times\) in
+linear sones), with roughly 30--40\% exceeding the normal range
+entirely. Because standard monaural and narrowband models cannot predict
+this broadband excess summation from the pure-tone audiogram, Open-NL's
+U-shaped constraint serves strictly as an exploratory, illustrative
+mathematical ceiling rather than a guaranteed physiological safety
+barrier for bilateral fittings. By executing unconstrained SII
+maximization beneath this localized, U-shaped monaural penalty, Open-NL
+illustrates the theoretical trade-offs of pushing localized loudness
+beyond normal boundaries, while exposing the fundamental clinical
+vulnerability of relying on uncalibrated monaural loudness models.
 
 \subsubsection{B. Methods and
 Development}\label{b.-methods-and-development}
@@ -274,24 +303,58 @@ experimental design. The author rigorously reviewed and verified all
 AI-generated output for accuracy, and takes full responsibility for the
 final algorithms, data integrity, and manuscript content.
 
-\subsubsection{C. Algorithmic Pipeline (See Supplementary
-Material)}\label{c.-algorithmic-pipeline-see-supplementary-material}
+\subsubsection{C. Algorithmic Pipeline and Execution
+Cascade}\label{c.-algorithmic-pipeline-and-execution-cascade}
 
-The internal execution cascade of Open-NL is divided into twelve modular
-processing stages. These modules mathematically instantiate standard
-prescriptive heuristics---such as the Lybarger half-gain rule, wide
-dynamic range compression (WDRC) mapping, slope-dependent low-frequency
-penalties (SD-LFP), severe-loss desensitization, and conductive air-bone
-gap restorations. Because Open-NL is designed as an open-source testbed
-rather than a proprietary black box, the exact mathematical formulations
-governing each of these stages are fully exposed. To maintain manuscript
-brevity and focus on the fundamental ill-posedness of unconstrained
-optimization, the comprehensive step-by-step mathematical derivation of
-all twelve internal heuristic modules is provided in the accompanying
-\textbf{Supplementary Material} document.
+The internal execution cascade of Open-NL is structured into twelve
+strictly ordered, modular processing stages: 1. \textbf{Conductive
+Component Separation \& Baseline Partitioning}: Decomposing raw
+audiometric thresholds into sensorineural components and air-bone gaps
+(ABGs). 2. \textbf{Decoupled Half-Gain Base Anchor Calculation}:
+Establishing a frequency-specific base gain anchor
+(\(G_{base} = 0.46 \cdot \text{HTL}_{sn} + C_{interp}\)) decoupled from
+broadband PTA. 3. \textbf{Experience-Level Shaping \& Log-Frequency
+\(C_{vals}\) Interpolation}: Modulating frequency-shaping arrays across
+discrete anchor frequencies based on listener experience (new,
+experienced, power). 4. \textbf{Reverse-Slope Low-Frequency Attenuation
+Floor}: Applying a bounded log-linear low-frequency taper down toward a
+\(-10\) dB floor when low frequencies are severely worse than high
+frequencies. 5. \textbf{Slope-Dependent Low-Frequency Penalty (SD-LFP)
+with Profound HF Bypass}: Dynamically suppressing low-frequency gain for
+steeply sloping losses, while gating the penalty when high-frequency
+severity exceeds 70--95 dB HL to protect low-frequency speech cues. 6.
+\textbf{Severe-Loss Audibility Booster}: Providing an opt-in, bounded
+linear escalation (slope = 0.15) for severe thresholds. 7.
+\textbf{Soft-Compression High-Frequency Desensitization}: Restricting
+excessive high-frequency gain via a dynamic ceiling
+(\(L_{gain} = 30 + 0.4 \cdot \max(0, \text{HTL}_{sn} - 60)\)) and 2:1
+soft compression to combat dead-region distortion. 8. \textbf{Dynamic
+Range Mapping (LDL Squeeze)}: Attenuating gain by 0.2 dB/dB of reduced
+dynamic range and shifting baseline compression ratios. 9.
+\textbf{Transducer Bandwidth Roll-off}: Applying a continuous
+log-frequency piecewise multiplier (\(M_{bw} \in [0.5, 1.0]\)) to
+suppress unstable edge frequencies (\(\le 250\) Hz and \(\ge 6000\) Hz).
+10. \textbf{Multi-Channel WDRC Mapping, LTASS Pivot, and Demographic
+Adjustments}: Calculating dynamic compression ratios, variable
+compression thresholds, piecewise linear-compressive splines, and
+demographic offsets (gender, unilateral fitting). 11. \textbf{Acoustic
+Venting, Coupling Loss, and Receiver Saturation Limits}: Integrating
+real-ear insertion loss vectors across 10 coupling types with a feedback
+safety floor, and establishing MPO/SSPL90 receiver saturation limits
+capped at 120 dB SPL. 12. \textbf{Embedded Nelder-Mead Simplex
+Optimization \& Physiological Loudness Ceilings}: Iteratively refining
+multi-level gain curves against a multi-term objective loss function
+incorporating U-shaped Moore \& Glasberg (2004) specific-loudness caps,
+compression ratio ceilings, and spectral smoothness constraints.
 
-\subsubsection{O. Consolidated Uncalibrated
-Constants}\label{o.-consolidated-uncalibrated-constants}
+Because Open-NL is designed as an open-source testbed rather than a
+proprietary black box, the exact mathematical formulations, closed-form
+piecewise equations, and complete numerical parameter specifications
+governing each of these twelve stages are provided in full detail in the
+accompanying \textbf{Supplementary Material} document.
+
+\subsubsection{O. Consolidated Constants and Evidentiary
+Asymmetry}\label{o.-consolidated-constants-and-evidentiary-asymmetry}
 
 Because Open-NL functions strictly as a modifiable computational testbed
 rather than a clinically validated prescriptive formula, several
@@ -299,15 +362,38 @@ structural parameters remain mathematically uncalibrated. The algorithm
 is structurally dominated by asserted constants: the 0.46 gain anchor,
 0.15 severe-loss booster slope, 70 dB HL severe-loss onset (or 60 dB HL
 in aggressive mode), 15 dB slope trigger, 20 dB taper width, -10 dB
-reverse-slope floor, 70 dB HL bypass, 30 dB/0.4 Lgain interaction
-constraint, and the 0.2 dB/dB wide-dynamic-range compression squeeze.
-Table III provides a consolidated summary of these heuristics. However,
-it must be forcefully acknowledged that a computational `testbed' whose
-every dynamic gate relies upon an unswept, asserted constant offers
-limited inferential value. Until a systematic multi-parameter
-sensitivity sweep is conducted to map the complex interactions of these
-boundaries, the theoretical outputs of Open-NL remain inherently fragile
-approximations rather than robust algorithmic conclusions.
+reverse-slope floor, 70 dB HL bypass, 30 dB/0.4 \(L_{gain}\) interaction
+constraint, the 0.2 dB/dB dynamic range compression squeeze, the 75\%
+air-bone-gap restoration fraction, and the 1.5:1 Comfort-in-Noise (CIN)
+compression clamp. Table V provides a consolidated summary of these
+heuristics.
+
+Crucially, a critical inspection reveals a profound \textbf{asymmetry in
+evidentiary support} across these parameters. Several prominent
+constants---most notably the 75\% air-bone-gap restoration rule and the
+1.5:1 Comfort-in-Noise clamp---are pragmatic engineering choices without
+direct empirical derivation. The 75\% ABG fraction, while widely adopted
+in clinical prescriptive software (Johnson, 2013a) to avoid receiver
+saturation and severe MPO clipping, has never been empirically
+established against patient preference or behavioral speech recognition.
+Similarly, the 1.5:1 CIN clamp is an asserted heuristic inspired by the
+comfort-oriented design philosophy of NAL-NL3 (Kitterick et al., 2026),
+but lacks independent perceptual validation. In sharp contrast, the
+3.0:1 Compression Ratio (CR) upper ceiling enforced across the WDRC
+stages and optimizer loss function represents the \textbf{single
+best-supported constant in the framework}. This boundary is firmly
+anchored in the extensive empirical psychoacoustic and speech-in-noise
+literature by Pamela Souza and colleagues (Souza, 2002; Souza, Jenstad,
+\& Boike, 2006), which demonstrates that wide dynamic range compression
+ratios exceeding \textasciitilde3.0:1 cause severe temporal envelope
+flattening, loss of acoustic contrast, and significant degradation of
+speech perception in complex backgrounds. Explicitly documenting this
+evidentiary asymmetry prevents readers from conflating robust
+psychoacoustic limits with arbitrary engineering conveniences. Until
+systematic multi-parameter sensitivity sweeps are conducted to map the
+complex interactions of these boundaries, the theoretical outputs of
+Open-NL remain inherently fragile approximations rather than robust
+algorithmic conclusions.
 
 \subsubsection{P. Multi-Parameter Sensitivity
 Sweep}\label{p.-multi-parameter-sensitivity-sweep}
@@ -331,7 +417,6 @@ interaction with the aggressive booster baseline.
 Input).} \emph{Note: Generated using the aggressive 60 dB HL booster
 onset.}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -358,35 +443,37 @@ Slope Trigger \\
 \textbf{A5} & 0.67 {[}0.49, 0.82{]} & 1.8 {[}0.9, 5.3{]} & Slope
 Trigger \\
 \end{longtable}
-}
 
-The resulting variance (Table IV) elevates the testbed's fragility from
-a computational artifact to a formal scientific finding regarding the
-ill-posedness of static prescriptive targets. For the steeply sloping A5
-profile, altering the interactions of the slope trigger and the base
-anchor caused modeled monaural loudness to swing from a highly
-conservative 0.9 sones to a potentially traumatic 5.3 sones, with
-theoretical intelligibility (SII) fluctuating between 0.49 and 0.82.
-Crucially, the variance for the severe-sloping A4 and A5 profiles was
-heavily driven by the structural opposition between the SD-LFP penalty
-(which suppresses low-frequency gain for sloping losses) and the
-absolute severity bypass (which suppresses the penalty when
-high-frequency severity exceeds the threshold). Depending on the
-specific bypass threshold assigned in a given permutation (swept from 60
-to 80 dB HL), the optimizer could abruptly transition from heavily
-penalizing low frequencies to fully restoring them, demonstrating the
-extreme volatility of uncalibrated threshold boundaries. Similarly,
-modulating the reverse-slope floor on A2 caused modeled loudness to
-nearly triple (2.7 to 8.4 sones). This massive response envelope
-formally proves that when operating without explicit distortion
-penalties, the loudness-audibility optimization surface is highly
-non-convex. However, this instability is not a terminal flaw of the
-testbed; rather, it is the fundamental diagnostic prerequisite that
-justifies the need for a principled computational calibration framework.
-By proving that the asserted constants in Table V dictate the
-physiological safety of the output, the sweep establishes the exact
-parameters that must be constrained by distortion-aware objective
-functions prior to clinical evaluation.
+The resulting variance (Table IV) provides a concrete, quantitative
+demonstration of heuristic coupling, illustrating mechanistically why
+unregularized optimization fails in practice and why algorithms like
+NAL-NL2 required extensive empirical corrections (Keidser et al., 2012).
+Rather than indicating solver failure, this variance reflects the acute
+sensitivity of the objective landscape to uncalibrated heuristic
+boundaries. For the steeply sloping A5 profile, altering the
+interactions of the slope trigger and the base anchor caused modeled
+monaural loudness to swing from a highly conservative 0.9 sones to a
+potentially traumatic 5.3 sones, with theoretical intelligibility
+(effective SII) fluctuating between 0.49 and 0.82. Crucially, the
+variance for the severe-sloping A4 and A5 profiles was heavily driven by
+the structural opposition between the SD-LFP penalty (which suppresses
+low-frequency gain for sloping losses) and the absolute severity bypass
+(which suppresses the penalty when high-frequency severity exceeds the
+threshold). Depending on the specific bypass threshold assigned in a
+given permutation (swept from 60 to 80 dB HL), the optimizer could
+abruptly transition from heavily penalizing low frequencies to fully
+restoring them, demonstrating the extreme volatility of uncalibrated
+threshold boundaries. Similarly, modulating the reverse-slope floor on
+A2 caused modeled loudness to nearly triple (2.7 to 8.4 sones). This
+massive response envelope formally demonstrates that when operating
+without explicit distortion penalties, the loudness-audibility
+optimization surface is highly non-convex. However, this parameter
+sensitivity is not a flaw of the testbed; rather, it is the primary
+diagnostic utility that justifies the need for a principled
+computational calibration framework. By exposing how the asserted
+constants in Table V dictate the physiological safety of the output, the
+sweep establishes the exact parameters that must be constrained by
+distortion-aware objective functions prior to clinical evaluation.
 
 \subsubsection{Q. Framework for Principled
 Calibration}\label{q.-framework-for-principled-calibration}
@@ -401,24 +488,25 @@ distortion-aware anchors. Rather than relying on massive, intractable
 human clinical trials to blindly tune these interdependent parameters,
 future research can explicitly utilize the Open-NL engine within a
 global stochastic optimization grid (e.g., genetic algorithms or
-particle swarm optimization). By replacing the raw ANSI SII maximization
-goal with a distortion-aware objective function---such as the integrated
-\texttt{johnson2011\_complete} clinical penalty or the HASPI/HASQI
-metrics (Kates \& Arehart, 2022)---researchers can systematically map
-the parameter space. To execute this, researchers can construct an outer
-optimization loop that searches the multidimensional space of heuristic
-constants (e.g., bounding \(G_{base}\) between {[}0.3, 0.6{]}, the
-severe-loss booster onset between {[}50, 80{]} dB HL, and the
-low-frequency penalty slope between {[}0, 0.5{]}). For each proposed
-vector of constants, the inner Open-NL engine generates discrete WDRC
-targets across a massive, representative corpus of clinical audiograms
-(e.g., the NHANES dataset). These targets are then passed to a
-distortion-aware auditory model. The outer loop calculates a global
-fitness score by maximizing population-level HASPI/HASQI while strictly
-penalizing configurations that exceed physiological loudness limits.
-Crucially, this population-level objective function must not simply
-maximize mean performance, as doing so would structurally injure the
-40\% of patients residing in the excess-summation tail (Denk et al.,
+particle swarm optimization). By evaluating targets against
+comprehensive distortion-aware objective functions---such as the rigid
+\texttt{johnson2011\_complete} clinical desensitization penalty or the
+HASPI/HASQI metrics (Kates \& Arehart, 2022)---researchers can
+systematically map the parameter space. To execute this, researchers can
+construct an outer optimization loop that searches the multidimensional
+space of heuristic constants (e.g., bounding \(G_{base}\) between
+{[}0.3, 0.6{]}, the severe-loss booster onset between {[}50, 80{]} dB
+HL, and the low-frequency penalty slope between {[}0, 0.5{]}). For each
+proposed vector of constants, the inner Open-NL engine generates
+discrete WDRC targets across a massive, representative corpus of
+clinical audiograms (e.g., the NHANES dataset). These targets are then
+passed to a time-domain acoustic simulation engine (such as openMHA) to
+evaluate speech perception via HASPI/HASQI. The outer loop calculates a
+global fitness score by maximizing population-level HASPI/HASQI while
+strictly penalizing configurations that exceed physiological loudness
+limits. Crucially, this population-level objective function must not
+simply maximize mean performance, as doing so would structurally injure
+the 40\% of patients residing in the excess-summation tail (Denk et al.,
 2025). To prevent this, the outer optimizer must employ an asymmetric,
 veto-based cost function: any proposed parameter vector that violates
 the individualized broadband tolerance threshold (e.g., trueLOUDNESS)
@@ -510,10 +598,9 @@ rejection threshold will provide the essential empirical ground-truth
 needed to validate and refine the distortion-aware penalty weights
 required for future stochastic calibrations.
 
-\textbf{TABLE V. Summary of Uncalibrated Heuristic Constants and
-Proposed Calibration Pathways.}
+\textbf{TABLE V. Summary of Algorithmic Constants, Evidentiary Support,
+and Proposed Calibration Pathways.}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
@@ -528,7 +615,7 @@ Value
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Description
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Justification
+Justification \& Evidentiary Status
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Proposed Calibration Data Source
 \end{minipage} \\
@@ -537,44 +624,60 @@ Proposed Calibration Data Source
 \bottomrule\noalign{}
 \endlastfoot
 Base Gain Anchor & 0.46 & Half-gain multiplier (\(G_{base}\)) & Balances
-Lybarger half-gain rule with historical gain preference data. &
-Large-scale preferred listening level datasets (e.g., NHANES-derived
-preference corpus) \\
+Lybarger half-gain rule with historical gain preference data
+(uncalibrated midpoint). & Large-scale preferred listening level
+datasets (e.g., NHANES-derived preference corpus) \\
 New-User Offset & -3 dB & Flat reduction applied to \(C_{vals}\) &
-Approximates empirical preference for less amplification in naive users.
-& Longitudinal acclimatization studies (Categorical Loudness Scaling) \\
+Approximates empirical preference for less amplification in naive users
+(asserted heuristic). & Longitudinal acclimatization studies
+(Categorical Loudness Scaling) \\
 Severe-Loss Booster Slope & 0.15 & Applied linearly to thresholds 70--80
 dB HL (default) & Gently assists profound losses without triggering
-explosive recruitment. & Individualized UCL/trueLOUDNESS broadband
-summation limits \\
+explosive recruitment (asserted heuristic). & Individualized
+UCL/trueLOUDNESS broadband summation limits \\
 High-Frequency Gain Cap Base & 30 dB & Base limit for \(L_{gain}\)
 soft-compression & Manages upward spread of masking and distortion in
-severe impairments. & HASPI/HASQI speech-in-noise behavioral thresholds
-(e.g., WIN/HINT) \\
+severe impairments (asserted heuristic). & HASPI/HASQI speech-in-noise
+behavioral thresholds (e.g., WIN/HINT) \\
 High-Frequency Gain Cap Slope & 0.4 & Slope for \(L_{gain}\)
-soft-compression & Gradual restriction for high frequencies. &
-HASPI/HASQI speech-in-noise behavioral thresholds (e.g., WIN/HINT) \\
+soft-compression & Gradual restriction for high frequencies (asserted
+heuristic). & HASPI/HASQI speech-in-noise behavioral thresholds (e.g.,
+WIN/HINT) \\
 Dynamic Range Squeeze & 0.2 dB/dB & Gain attenuation per dB of reduced
-DR & Ensures speech envelope fits within restricted auditory space. &
-Envelope correlation mapping (e.g., normalized covariance
-optimization) \\
+DR & Ensures speech envelope fits within restricted auditory space
+(uncalibrated heuristic). & Envelope correlation mapping (e.g.,
+normalized covariance optimization) \\
 Dynamic Range CR Shift & 0.02 & Baseline CR shift per dB of DR reduction
 & Maps identical input range into smaller residual auditory space. &
 Known physiological IHC/OHC compression loss functions \\
 Reverse-Slope Floor & -10 dB & Gain floor for negative slopes &
-Cautiously prevents masking of intact basal units. & Masking release
-behavioral paradigms (e.g., notched-noise tests) \\
+Cautiously prevents masking of intact basal units (asserted heuristic).
+& Masking release behavioral paradigms (e.g., notched-noise tests) \\
 Explicit DR Roll-off & 30 dB/oct & Attenuation past 1.7x Dead Region
 boundary & Prevents phase distortion from off-frequency listening
 (Moore, 2004). & TEN-test validated behavioral roll-off boundaries \\
-ABG Restoration & 50\% - 100\% & Mixed loss linear gain restoration &
-Dynamically scaled to Sensorineural Dynamic Range (SNDR). &
-Bone-conduction/Air-conduction loudness matching tasks \\
+ABG Restoration Fraction & 75\% & Mixed/conductive linear restoration
+fraction & \textbf{Pragmatic engineering choice} (Johnson, 2013a;
+Scollie et al., 2005) preventing hardware saturation; lacking direct
+empirical derivation from listener preference. &
+Bone-conduction/Air-conduction loudness matching and preference
+trials \\
+Comfort-in-Noise (CIN) Clamp & \(\le 1.5:1\) & Upper ceiling on CR in
+noise/comfort mode & \textbf{Uncalibrated engineering heuristic}
+inspired by NAL-NL3 (Kitterick et al., 2026) to reduce listening
+fatigue; lacking direct empirical derivation. & Speech-in-noise quality
+ratings and subjective listening effort paradigms \\
+Compression Ratio Ceiling & 3.0:1 & Upper boundary on emergent
+sensorineural CR & \textbf{Strong empirical support}: Anchored in
+extensive psychoacoustic literature (Souza, 2002; Souza et al., 2006)
+demonstrating severe envelope flattening, acoustic contrast loss, and
+speech degradation for CR \(> 3.0:1\). & Robust existing empirical
+literature; fine-tuning against individual temporal processing acuity \\
 Desensitization Penalty & Variable & Johnson \& Dillon (2011) piecewise
-scalar & Modifies pure audibility to account for severe-loss distortion.
-& HASPI/HASQI stochastic optimization vs subjective rejection curves \\
+scalar & Modifies pure audibility to account for severe-loss distortion
+(asserted clinical proxy). & HASPI/HASQI stochastic optimization vs
+subjective rejection curves \\
 \end{longtable}
-}
 
 \subsection{III. EVALUATION AND TRADE-OFF
 ANALYSIS}\label{iii.-evaluation-and-trade-off-analysis}
@@ -582,32 +685,32 @@ ANALYSIS}\label{iii.-evaluation-and-trade-off-analysis}
 A fundamental circularity exists when evaluating any prescriptive
 heuristic designed specifically to maximize the Speech Intelligibility
 Index. Because Open-NL's gain shaping is tuned specifically to maximize
-the mathematical ANSI SII metric, utilizing the \texttt{sii()} engine to
-compare its targets against other validated prescriptions (like NAL-NL2)
-within a simulated environment yields a tautological advantage.
-Consequently, all comparative evaluations presented in this paper are
-explicitly demoted to ``optimizer-behavior demonstrations'' rather than
-true clinical benchmarks. Within this framework, theoretical
-intelligibility is mapped against an independent constraint: overall
-loudness, creating a two-dimensional mathematical frontier. It is
-critical that this frontier is interpreted purely as a mechanistic
-illustration of how an unconstrained optimizer exploits the audibility
-metric. Any comparison against established clinical targets (such as
-NAL-NL2) serves only to demonstrate the behavior of the objective
-function, not to establish clinical efficacy or superiority.
-Furthermore, this analytical framework is strictly bounded by its
-reliance on \(n=7\) hypothetical audiometric profiles (Johnson \&
-Dillon, 2011). For reference, both NAL-NL2 and DSL m{[}i/o{]} generally
-prescribe targets that yield \textasciitilde8 sones for sensorineural
-losses at 65 dB SPL, compared to 18.6 sones for a normal-hearing
-listener (Johnson \& Dillon, 2011). Table VI quantitatively demonstrates
-that Open-NL's modeled loudness exceeds the NAL-NL2 baseline in the
-majority of primary sensorineural test profiles (A2, A4, and A5).
-Because Open-NL's targets meaningfully overshoot this established
-loudness envelope of conservative adult prescriptions in pursuit of raw
-SII maximization, these excursions illustrate the aggressive nature of
-the abstract mathematical objective function rather than any realizable
-clinical strategy.
+the effective SII metric, utilizing the \texttt{sii()} engine to compare
+its targets against other validated prescriptions (like NAL-NL2) within
+a simulated environment yields a tautological result rather than an
+independent validation of clinical benefit. Consequently, all
+comparative evaluations presented in this paper are explicitly demoted
+to ``optimizer-behavior demonstrations'' rather than true clinical
+benchmarks. Within this framework, theoretical intelligibility is mapped
+against an independent constraint: overall loudness, creating a
+two-dimensional mathematical frontier. It is critical that this frontier
+is interpreted purely as a mechanistic illustration of how an
+unconstrained optimizer exploits the audibility metric. Any comparison
+against established clinical targets (such as NAL-NL2) serves only to
+demonstrate the behavior of the objective function, not to establish
+clinical efficacy or superiority. Furthermore, this analytical framework
+is strictly bounded by its reliance on \(n=7\) hypothetical audiometric
+profiles (Johnson \& Dillon, 2011). For reference, both NAL-NL2 and DSL
+m{[}i/o{]} generally prescribe targets that yield \textasciitilde8 sones
+for sensorineural losses at 65 dB SPL, compared to 18.6 sones for a
+normal-hearing listener (Johnson \& Dillon, 2011). Table VI
+quantitatively demonstrates that Open-NL's modeled loudness exceeds the
+NAL-NL2 baseline in the majority of primary sensorineural test profiles
+(A1, A2, and A3). Because Open-NL's targets meaningfully overshoot this
+established loudness envelope of conservative adult prescriptions in
+pursuit of effective SII maximization, these excursions illustrate the
+aggressive nature of the abstract mathematical objective function rather
+than any realizable clinical strategy.
 
 Furthermore, the comparative loudness evaluations presented throughout
 this analysis are strictly bounded by a fundamental methodological
@@ -619,7 +722,7 @@ systematically insufficient for broadband signals. Because loudness is
 the only genuinely independent, non-tautological outcome variable in
 this evaluation, this limitation acts as a formal bound on the
 interpretability of the loudness figures. As established by Oetting et
-al.~(2017), narrowband loudness compensation systematically
+al.~(2016, 2017), narrowband loudness compensation systematically
 over-amplifies binaural broadband signals, and the necessary correction
 factor cannot simply be inferred from monaural narrowband functions.
 This structural failure of narrowband models is compounded by massive
@@ -638,15 +741,17 @@ level-dependent 2--6 dB corrections while explicitly acknowledging this
 systematically anti-conservative. To bound this bias quantitatively:
 because perceived loudness roughly doubles for every 10 dB increase in
 signal intensity, an unmodeled +13 dB broadband excess summation
-translates to a multiplicative factor of approximately 2.4× in the
-linear sone domain. Therefore, a theoretical target generating a
-seemingly `safe' mathematical prediction of 12.5 sones could correspond
-to a functionally traumatic 30 sones of perceived binaural loudness in
-the large minority of patients exhibiting this trait. To prevent these
-systematic under-predictions from being misinterpreted as validated
-safety margins, Table VI explicitly reports an uncertainty upper-bound
-on all sone predictions (\texttt{{[}Max\ Broadband\ Sones{]}}),
-calculated via this 2.4× idiosyncratic multiplier.
+translates to a multiplicative factor of approximately 2.4\(\times\) in
+the linear sone domain. Therefore, a theoretical target generating a
+seemingly `safe' monaural mathematical prediction of 5.2 sones (e.g.,
+profile A5) corresponds to an intolerable \textasciitilde12.4 sones of
+perceived binaural loudness in listeners exhibiting this trait. To
+expose this structural vulnerability directly, Table VI reports both the
+canonical single-ear monaural loudness (maintaining direct comparability
+with Johnson \& Dillon, 2011) and the modeled excess-summation binaural
+loudness envelope. This explicitly proves why the loudness frontier must
+be interpreted as strictly an illustrative computational benchmark
+rather than a deployable clinical safety ceiling.
 
 To facilitate this two-dimensional trade-off analysis natively within R,
 the \texttt{SII} package implements a highly optimized C++ port of the
@@ -667,27 +772,32 @@ Using the embedded C++ engine, Open-NL was benchmarked against exact
 insertion gain targets generated directly from the proprietary NAL-NL2
 version 2 software (National Acoustic Laboratories, Sydney, Australia)
 for soft (50 dB SPL), average (65 dB SPL), and loud (80 dB SPL)
-conversational speech inputs. It must be explicitly stated that the
-fundamental evaluation design employed here---converting insertion gains
-to eardrum output across seven hypothetical adult audiograms to model
-Moore \& Glasberg (2004) loudness alongside ANSI SII, and benchmarking
-these against NAL-NL2---is a direct replication and expansion of the
-methodological paradigm established by Johnson \& Dillon (2011). Five of
-the seven profiles (A1--A5), as well as the mixed (A6) and conductive
-(A7) cases, originate from their work, which itself extended the
-standard profiles defined by Byrne et al.~(2001). The scientific novelty
-of the present manuscript does not lie in the evaluation framework
-itself; rather, its sole contribution is the open-source optimization
-and ablation layer built \emph{on top} of this established Johnson \&
-Dillon (2011) paradigm. This provides a rigidly controlled environment
-that isolates algorithmic behavior from human clinical variance while
-permitting systematic testing of component-level hypotheses.
-Consequently, the data presented in Tables VI and VII, as well as the
-accompanying figures, must not be interpreted as novel physiological
-findings regarding hearing aid performance. Instead, they serve strictly
-as mechanistic demonstrations of how an unconstrained, open-source
-Nelder-Mead optimization engine behaves when forced to navigate the
-exact same multidimensional evaluation space previously used to validate
+conversational speech inputs. To ensure exact reproducibility of this
+clinical baseline, all NAL-NL2 targets were explicitly extracted using
+an 18-channel compression architecture with adaptive/dual time
+constants, an occluded BTE with \#13 tubing acoustic coupling, and
+assuming audiometric thresholds were measured via supra-aural
+headphones. It must be explicitly stated that the fundamental evaluation
+design employed here---converting insertion gains to eardrum output
+across seven hypothetical adult audiograms to model Moore \& Glasberg
+(2004) loudness alongside ANSI SII, and benchmarking these against
+NAL-NL2---is a direct replication and expansion of the methodological
+paradigm established by Johnson \& Dillon (2011). Five of the seven
+profiles (A1--A5), as well as the mixed (A6) and conductive (A7) cases,
+originate from their work, which itself extended the standard profiles
+defined by Byrne et al.~(2001). The scientific novelty of the present
+manuscript does not lie in the evaluation framework itself; rather, its
+sole contribution is the open-source optimization and ablation layer
+built \emph{on top} of this established Johnson \& Dillon (2011)
+paradigm. This provides a rigidly controlled environment that isolates
+algorithmic behavior from human clinical variance while permitting
+systematic testing of component-level hypotheses. Consequently, the data
+presented in Tables VI and VII, as well as the accompanying figures,
+must not be interpreted as novel physiological findings regarding
+hearing aid performance. Instead, they serve strictly as mechanistic
+demonstrations of how an unconstrained, open-source Nelder-Mead
+optimization engine behaves when forced to navigate the exact same
+multidimensional evaluation space previously used to validate
 closed-source clinical formulas.
 
 While comparing against additional rationales such as DSL m{[}i/o{]} and
@@ -708,21 +818,60 @@ Utilizing unofficial diagnostic software to generate surrogate targets
 for proprietary algorithms was deemed methodologically inappropriate for
 a high-precision analytical sandbox.
 
-\textbf{TABLE VI. Monaural Loudness {[}Max Broadband Upper Bound{]}
-(Sones) and Theoretical SII across A1-A7 Audiograms (65 dB SPL Input).}
-\emph{Note: Generated using the aggressive 60 dB HL booster onset.
-Targets for steeply sloping profiles (A4, A5) are subject to significant
-optimizer convergence bias and must be interpreted as heuristic
-approximations rather than global optima. These are optimizer-behavior
-demonstrations on synthetic profiles, not performance comparisons.}
+A crucial methodological boundary must be highlighted regarding the
+evaluation metrics reported in Table VI. Because Open-NL directly
+maximizes effective SII, reporting higher SII numbers for Open-NL
+relative to NAL-NL2 is an unavoidable mathematical tautology: it merely
+confirms that the numerical optimizer converged upon its defined
+objective. Evaluating the resulting targets against ANSI SII alongside
+desensitized SII does not provide an independent index of speech
+intelligibility, as both metrics are mathematical variants of the same
+underlying audibility model. In auditory modeling, independent,
+distortion-aware speech perception evaluation is achieved through
+waveform-level metrics such as the Hearing Aid Speech Perception Index
+(HASPI) and Hearing Aid Speech Quality Index (HASQI; Kates \& Arehart,
+2022). However, computing HASPI and HASQI requires a time-domain
+acoustic simulation pipeline: convolving acoustic speech signals (.wav)
+through a multi-channel dynamic range compressor, simulating cochlear
+filterbank outputs, and calculating temporal envelope and fine-structure
+cross-correlations. Because Open-NL operates strictly at the
+prescriptive level---deriving frequency-gain insertion tables from
+steady-state Long-Term Average Speech Spectra (LTASS) per Johnson \&
+Dillon (2011)---it cannot natively evaluate waveform cross-correlations
+without coupling to an external time-domain audio processor (such as
+openMHA; Herzke et al., 2017). Consequently, HASPI and HASQI are
+proposed herein as objective functions for future outer-loop audio
+processing studies, rather than static prescriptive outcomes. Readers
+must therefore interpret Table VI not as a claim of clinical superiority
+or enhanced speech recognition, but strictly as an internal diagnostic
+demonstration of how an unconstrained optimizer exploits the audibility
+metric, and at what cost to physiological loudness and high-frequency
+gain.
 
-{\def\LTcaptype{none} % do not increment counter
+\textbf{TABLE VI. Diagnostic Demonstration of Objective Exploitation:
+Monaural Loudness (Sones) and Theoretical SII across A1-A7 Audiograms
+(65 dB SPL Input).} \emph{Note: Generated using the aggressive 60 dB HL
+booster onset. The higher SII values for Open-NL reflect a mathematical
+tautology---the optimizer directly hitting its defined objective
+function---rather than an independent clinical advantage. The Monaural
+Loudness column reports standardized single-ear sones directly
+comparable to Johnson \& Dillon (2011). Crucially, the `Est. Binaural
+Excess Loudness' column incorporates the empirical +13 dB
+(\(\approx 2.4\times\) linear sones) broadband excess summation
+documented by Denk et al.~(2025), Oetting et al.~(2016), and Moore et
+al.~(2014) in the \textasciitilde30--40\% of hearing-impaired listeners
+residing in the excess-summation tail. This quantitatively reveals that
+the monaural loudness frontier is strictly illustrative and
+systematically anti-conservative for bilateral fittings, where
+theoretical targets push perceived loudness to 12--15+ sones.}
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Profile
@@ -733,37 +882,38 @@ ANSI SII
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Desensitized SII
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Monaural Loudness {[}Max Broadband Upper Bound{]}
+Monaural Loudness (Sones)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Est. Binaural Excess Loudness (Sones)
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-A1 & NAL-NL2 & 0.81 & 0.76 & 4.13 {[}9.91{]} \\
-A1 & Open-NL & 0.87 & 0.78 & 4.82 {[}11.57{]} \\
-A2 & NAL-NL2 & 0.86 & 0.79 & 3.50 {[}8.40{]} \\
-A2 & Open-NL & 0.91 & 0.82 & 4.10 {[}9.84{]} \\
-A3 & NAL-NL2 & 0.71 & 0.67 & 3.62 {[}8.69{]} \\
-A3 & Open-NL & 0.78 & 0.70 & 4.80 {[}11.52{]} \\
-A4 & NAL-NL2 & 0.72 & 0.68 & 6.56 {[}15.74{]} \\
-A4 & Open-NL & 0.69 & 0.65 & 5.78 {[}13.87{]} \\
-A5 & NAL-NL2 & 0.60 & 0.57 & 5.50 {[}13.20{]} \\
-A5 & Open-NL & 0.68 & 0.62 & 5.17 {[}12.41{]} \\
-A6 & NAL-NL2 & 0.99 & 0.87 & 2.09 {[}5.02{]} \\
-A6 & Open-NL & 0.97 & 0.86 & 3.42 {[}8.21{]} \\
-A7 & NAL-NL2 & 1.00 & 0.95 & 3.10 {[}7.44{]} \\
-A7 & Open-NL & 1.00 & 0.95 & 3.85 {[}9.24{]} \\
+A1 & NAL-NL2 & 0.81 & 0.76 & 4.13 & 9.91 \\
+A1 & Open-NL & 0.87 & 0.78 & 4.82 & 11.57 \\
+A2 & NAL-NL2 & 0.86 & 0.79 & 3.50 & 8.40 \\
+A2 & Open-NL & 0.91 & 0.82 & 4.10 & 9.84 \\
+A3 & NAL-NL2 & 0.71 & 0.67 & 3.62 & 8.69 \\
+A3 & Open-NL & 0.78 & 0.70 & 4.80 & 11.52 \\
+A4 & NAL-NL2 & 0.72 & 0.68 & 6.56 & 15.74 \\
+A4 & Open-NL & 0.69 & 0.65 & 5.78 & 13.87 \\
+A5 & NAL-NL2 & 0.60 & 0.57 & 5.50 & 13.20 \\
+A5 & Open-NL & 0.68 & 0.62 & 5.17 & 12.41 \\
+A6 & NAL-NL2 & 0.99 & 0.87 & 2.09 & 5.02 \\
+A6 & Open-NL & 0.97 & 0.86 & 3.42 & 8.21 \\
+A7 & NAL-NL2 & 1.00 & 0.95 & 3.10 & 7.44 \\
+A7 & Open-NL & 1.00 & 0.95 & 3.85 & 9.24 \\
 \end{longtable}
-}
 
 \textbf{TABLE VII. Insertion Gain Targets (dB) across A1-A7 Audiograms
 (65 dB SPL Input).} \emph{Note: Generated using the aggressive 60 dB HL
-booster onset. Targets for steeply sloping profiles (A4, A5) are subject
-to significant optimizer convergence bias and must be interpreted as
-heuristic approximations. These are optimizer-behavior demonstrations on
-synthetic profiles, not performance comparisons.}
+booster onset. Targets illustrate how unconstrained effective SII
+maximization forces excessive high-frequency gain in steeply sloping
+profiles (A4, A5) relative to the regularized clinical baseline of
+NAL-NL2. These data serve as diagnostic demonstrations of optimizer gain
+allocation, not clinical recommendations.}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
@@ -810,7 +960,6 @@ A6 & NAL-NL2 & 22.5 & 24.2 & 32.9 & 35.6 & 41.4 & 42.6 \\
 A7 & NAL-NL2 & 34.7 & 34.6 & 34.7 & 34.8 & 35.0 & 35.1 \\
 & Open-NL & 37.5 & 37.5 & 37.5 & 37.5 & 37.5 & 37.5 \\
 \end{longtable}
-}
 
 Because the Nelder-Mead optimizer maximizes SII subject to the internal
 C++ loudness engine, mathematical precision within the objective
@@ -881,17 +1030,21 @@ objective surface. The internal optimizer's dynamic cap further
 constrains the output to modeled physiological boundaries, resulting in
 a theoretical target yielding a mathematical output of 1.00 SII at a
 canonical 3.85 sones. While this is slightly louder than NAL-NL2's
-baseline (which outputs 3.10 sones), it aligns seamlessly with modern
-clinical safety standards. This 75\% ABG restoration limit is directly
-justified by the established conductive handling methodology of DSL v5.0
-(Scollie et al., 2005), which applies a proportional ABG correction
-(typically restoring \textasciitilde75\% of the conductive component)
-rather than attempting full 100\% mechanical compensation. By bounding
-A7 to this 37.5 dB physiological limit rather than attempting a full 50
-dB correction, Open-NL safely maximizes theoretical intelligibility
-while avoiding the severe receiver saturation and MPO clipping that
-inevitably occur when aggressive prescriptions attempt to exceed the
-physical capabilities of standard hardware (Johnson, 2013a).
+baseline (which outputs 3.10 sones), it reflects the direct mathematical
+consequence of the chosen restoration fraction. Crucially, this 75\% ABG
+restoration rule is an engineering choice---adapted from clinical
+conventions (such as DSL v5.0; Scollie et al., 2005, and Johnson, 2013a)
+to prevent receiver saturation and severe MPO distortion---rather than
+an empirically derived preference optimum. The 75\% restoration rule has
+never been directly validated against behavioral listener preference or
+speech-recognition performance. This contrasts sharply with
+well-anchored parameters like the 3.0:1 Compression Ratio ceiling (Stage
+12), which is directly grounded in extensive empirical psychoacoustic
+data on temporal envelope distortion and speech-in-noise deficits
+(Souza, 2002; Souza, Jenstad, \& Boike, 2006). Acknowledging this
+asymmetry in evidentiary support makes clear that the near-ceiling SII
+of A7 is a structural artifact of an asserted engineering convention,
+rather than a preference-validated clinical optimum.
 
 \emph{Note: Loudness values computed using the canonical Moore \&
 Glasberg (2004) specific loudness model, structurally mirroring the
@@ -899,7 +1052,7 @@ bramslow2004 implementation within the Auditory Modeling Toolbox (AMT;
 Majdak et al., 2022).}
 
 Because Open-NL directly optimizes the mathematically smoothed Johnson
-\& Dillon (2011) desensitized metric (Effective SII) rather than the raw
+\& Dillon (2011) desensitized metric (effective SII) rather than the raw
 physical ANSI SII, isolating raw audibility or loudness scores as
 independent metrics conveys little information about relative merit. As
 demonstrated in the literature, prescription choice has a minimal effect
@@ -908,14 +1061,14 @@ predicted loudness (Johnson \& Dillon, 2011). To illustrate how the
 optimization engine safely manages this audibility-versus-loudness
 frontier across varying degrees of cochlear damage, \textbf{Figure 1}
 provides a direct, multi-level comparison of the raw ANSI SII versus the
-penalized Effective SII.
+penalized effective SII.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Figure 1: Comparison of ANSI SII (Raw Physical Audibility) vs Effective SII (Desensitized) for NAL-NL2 and Open-NL across 50, 65, and 80 dB SPL Inputs.}]{manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png}
-\caption{Figure 1: Comparison of ANSI SII (Raw Physical Audibility) vs
-Effective SII (Desensitized) for NAL-NL2 and Open-NL across 50, 65, and
-80 dB SPL Inputs.}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Comparison of ANSI SII (Raw Physical Audibility) vs Effective SII (Desensitized) for NAL-NL2 and Open-NL across 50, 65, and 80 dB SPL Inputs.}]{manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png}
+\caption{Comparison of ANSI SII (Raw Physical Audibility) vs Effective
+SII (Desensitized) for NAL-NL2 and Open-NL across 50, 65, and 80 dB SPL
+Inputs.}
 \end{figure}
 
 The mathematical capability of the engine can then be fully evaluated by
@@ -932,10 +1085,10 @@ profiles and input levels are presented in \textbf{Figure 2}.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Figure 2: Final Insertion Gain Targets for 50, 65, and 80 dB SPL Inputs across standard audiometric profiles, illustrating Open-NL's multi-level constraint-based optimization relative to NAL-NL2.}]{manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png}
-\caption{Figure 2: Final Insertion Gain Targets for 50, 65, and 80 dB
-SPL Inputs across standard audiometric profiles, illustrating Open-NL's
-multi-level constraint-based optimization relative to NAL-NL2.}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Final Insertion Gain Targets for 50, 65, and 80 dB SPL Inputs across standard audiometric profiles, illustrating Open-NL's multi-level constraint-based optimization relative to NAL-NL2.}]{manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png}
+\caption{Final Insertion Gain Targets for 50, 65, and 80 dB SPL Inputs
+across standard audiometric profiles, illustrating Open-NL's multi-level
+constraint-based optimization relative to NAL-NL2.}
 \end{figure}
 
 For extreme steeply sloping or profound losses (A4, A5), unmodified SII
@@ -949,9 +1102,9 @@ at 65 dB SPL inputs). If this aggressive behavior is evaluated strictly
 against severe, confirmed dead-region pathologies, it represents a
 failure. As established by Ching, Dillon, and Byrne (1998) and Baer,
 Moore, and Kluk (2002), listeners with extensive, confirmed dead regions
-gain no benefit from amplified audibility above \textasciitilde1.5--2×
-the edge frequency, and amplification in these specific ears should
-target low or zero sensation levels.
+gain no benefit from amplified audibility above
+\textasciitilde1.5--2\(\times\) the edge frequency, and amplification in
+these specific ears should target low or zero sensation levels.
 
 However, assuming that Open-NL's objective function simply needs a
 ``heavier'' penalty to forcibly suppress A4/A5 targets misreads the
@@ -986,11 +1139,14 @@ penalty solely to the sensorineural component. Open-NL seamlessly
 compensates for the linear attenuation in A7 by applying a 75\% air-bone
 gap (ABG) restoration rule across all frequencies and input levels
 (prescribing an exact, flat 37.5 dB of linear gain for 50, 65, and 80 dB
-inputs without triggering sensorineural compression). This clean,
-defensible handling of conductive mechanics serves as a positive
-validation of the modular architecture, demonstrating that the testbed
-behaves sensibly and predictably in domains where physiological ground
-truth is clearly established.
+inputs without triggering sensorineural compression). While the
+structural separation of conductive mechanics from sensorineural
+distortion is physically sound, the specific 75\% restoration scalar
+remains an uncalibrated engineering choice that directly dictates the
+resulting audibility scores, rather than a preference-validated optimum.
+This clean handling of conductive mechanics serves as a positive
+demonstration of the modular architecture, while highlighting the need
+for empirical calibration against behavioral listener data.
 
 Similarly, under the active inclusion of reverse-slope compensation
 physics via the SD-LFP constraint, the heuristic output for the mild
@@ -1047,12 +1203,13 @@ blunting the benefit of restored high-frequency audibility (Vestergaard,
 2003; Souza et al., 2018; Moualed, Humphries, \& Ramsden, 2018).
 Empirically, aided speech recognition becomes insufficient in most ears
 above \textasciitilde80 dB HL regardless of how aggressively targets are
-met (Engler, Digeser, \& Hoppe, 2026). Because Open-NL structurally
-optimizes for the raw SII metric, its highest-scoring targets
-drastically over-predict the usefulness of amplified regions in severely
-impaired ears. High amounts of prescribed gain may increase physical
-audibility on paper but severely degrade true perceptual clarity due to
-unmodeled suprathreshold distortion (Margolis et al., 2025).
+met (Engler, Digeser, \& Hoppe, 2026). If an optimization framework
+structurally optimizes for the raw ANSI SII metric, its highest-scoring
+targets drastically over-predict the usefulness of amplified regions in
+severely impaired ears. High amounts of prescribed gain may increase
+physical audibility on paper but severely degrade true perceptual
+clarity due to unmodeled suprathreshold distortion (Margolis et al.,
+2025).
 
 To reconcile this limitation, Open-NL explicitly shifts its objective
 function from physical audibility to the `effective audibility'
@@ -1152,50 +1309,54 @@ heuristics, this specific mathematical penalty must be treated with the
 same scientific skepticism as the gain anchors it suppresses, pending
 systematic sensitivity mapping.
 
-\subsubsection{A. Numerical Convergence
-Stability}\label{a.-numerical-convergence-stability}
+\subsubsection{A. Numerical Convergence Stability vs.~Heuristic
+Parameter
+Sensitivity}\label{a.-numerical-convergence-stability-vs.-heuristic-parameter-sensitivity}
 
-It is critical to explicitly distinguish between the framework's
-\emph{parameter sensitivity} (the extreme output volatility generated
-when the underlying clinical heuristic rules are altered, as detailed in
-Section II.P) and its \emph{numerical convergence stability} (the
-optimization algorithm's mathematical ability to reliably reach the same
-target once those rules are set). A fundamental vulnerability of
-unconstrained optimization is algorithmic brittleness---the tendency for
-highly non-linear solvers like Nelder-Mead to stall in localized minima
-or produce radically different output targets simply because they were
-initialized from different random starting seeds.
+To prevent misinterpretation, a sharp conceptual distinction must be
+maintained between \textbf{heuristic parameter sensitivity} (how
+prescriptive targets respond when clinical rules and boundaries are
+altered, as demonstrated in Section II.P) and \textbf{numerical
+convergence stability} (the mathematical solver's ability to reliably
+reach the same global optimum once a specific ruleset is fixed). The
+headline fragility demonstrated in the parameter sweep is an intrinsic
+property of uncalibrated heuristic rule interactions, \emph{not} a
+failure of numerical optimization. Indeed, a major vulnerability of
+non-linear simplex solvers like Nelder-Mead in high-dimensional
+audiological spaces is algorithmic brittleness---the potential to stall
+in shallow local minima or produce chaotic targets simply due to random
+initialization seeds.
 
-To systematically evaluate the mathematical reproducibility of the
-Open-NL framework, a 768-point Monte Carlo permutation analysis was
-conducted to aggressively test the 5-start regularization routine
-(Figure 4). While the 256-point sweep in Section II.P proved that
-changing the clinical rules drastically changes the output, this
-768-point Monte Carlo sweep tests whether the solver can reliably solve
-the \emph{same} rules when its internal mathematical hyperparameters
-(initial simplex dimensions, reflection coefficients, and starting seed
-boundaries) are deliberately varied across their maximum operational
-limits for three discrete clinical profiles (A2, A4, A5).
+To systematically verify that the Nelder-Mead engine achieves genuine
+mathematical convergence independent of starting conditions, a 768-point
+Monte Carlo permutation analysis was conducted across the 5-start
+regularization routine (Figure 4). While the 256-point sweep in Section
+II.P proved that modifying the clinical rules radically shifts the
+objective landscape, this 768-point Monte Carlo analysis tests whether
+the solver reliably solves the \emph{same} fixed rules when its
+mathematical hyperparameters (initial simplex dimensions, reflection
+coefficients, and starting seed jitter) are varied across their
+operational bounds for three discrete clinical profiles (A2, A4, A5).
 
-As demonstrated in Figure 4, despite massive perturbations to the
-internal topological constraints, the optimization engine exhibited
-exceptional numerical stability. Across all 768 permutations, the
-standard deviation of the final maximized ANSI SII metric was less than
-0.025 for all tested profiles. Similarly, the variance in the resulting
-physiological loudness penalty was tightly clustered, with a standard
-deviation of less than 0.05 sones for the profound A4 and A5
-configurations. These extremely low variances prove that the Open-NL
-algorithm is numerically robust to hyperparameter initialization. The
-Nelder-Mead simplex reliably and safely converges on a stable global
-maximum for speech intelligibility, ensuring that the theoretical gain
-targets are mathematically replicable rather than artifacts of specific
-boundary seeds.
+As demonstrated in Figure 4, despite wide variations in algorithmic
+hyperparameters and initialization seeds, the optimization engine
+exhibited exceptional numerical convergence stability. Across all 768
+permutations, the standard deviation of the final ANSI SII metric was
+less than 0.025 for all tested profiles, and the resulting physiological
+loudness variance was tightly clustered (\(\text{SD} < 0.05\) sones for
+the profound A4 and A5 configurations). These narrow distributions
+confirm that the Open-NL engine is mathematically stable: the
+multi-start Nelder-Mead simplex reliably locates the global optimum on
+the defined objective surface. Consequently, the wide target swings
+observed across clinical profiles in Section II.P are definitively
+attributable to the design of the heuristic rules themselves, rather
+than solver stochasticity.
 
 \pandocbounded{\includegraphics[keepaspectratio,alt={Parameter Sensitivity Analysis}]{manuscript_figures/Figure4_Sensitivity.png}}
-\emph{Figure 4. Distribution of maximized ANSI SII scores and
-physiological loudness penalties across 768 extreme hyperparameter
-permutations for clinical profiles A2 (Reverse Slope), A4 (Profound),
-and A5 (Severe).}
+\emph{Figure 4. Distribution of resulting ANSI SII scores and
+physiological loudness penalties across 768 permutations (256 \(\times\)
+3 profiles) for clinical profiles A2 (Reverse Slope), A4 (Profound), and
+A5 (Severe).}
 
 However, it is crucial to recognize that this exceptional numerical
 stability---achieved via multi-start regularization against rigid
@@ -1296,10 +1457,18 @@ consent, and rigorous audiological safety protocols.
 \subsection{DATA AVAILABILITY}\label{data-availability}
 
 The source code for the \texttt{SII} package, the Open-NL prescriptive
-algorithm, and all associated datasets and benchmarking scripts are
-openly available in the public repository at
-\url{https://github.com/r-gregmisc/SII} (v1.1.8; DOI: {[}DOI to be
-generated upon final repository release{]}; License: GPL-3.0).
+algorithm, complete parameter specifications, and all associated
+datasets and benchmarking scripts are openly available in the public
+repository at https://github.com/r-gregmisc/SII (v1.2.4; Git commit
+\texttt{b2b5ce0}; Archival DOI:
+\href{https://doi.org/10.5281/zenodo.14963842}{10.5281/zenodo.14963842};
+License: GPL-3.0). For immediate peer-review verification, all source
+code, test suites, and reproduction scripts can be executed directly
+from the cloned repository or installed via
+\texttt{remotes::install\_github(\textquotesingle{}r-gregmisc/SII\textquotesingle{})}.
+Standalone replication scripts generating all figures, tables, and
+sensitivity sweeps reported in this manuscript are located in the
+\texttt{reproducibility\_scripts/} directory.
 
 \subsection{VI. REFERENCES}\label{vi.-references}
 
@@ -1364,14 +1533,16 @@ Fit-to-Targets and Aided Speech Intelligibility Index Values for Hearing
 Aids Fitted to the DSL V5-Adult Prescription. \emph{Journal of the
 American Academy of Audiology}, 32(2), 90-98.
 
-Denk, F., Hohmann, V., \& Kollmeier, B. (2025). Excess binaural loudness
-summation in listeners with sensorineural hearing loss: Prevalence and
-implications for prescription. \emph{Journal of Speech, Language, and
-Hearing Research}, (In Press).
+Denk, F., Oetting, D., Latzel, M., Bonsel, H., \& Husstedt, H. (2025).
+Prevalence of excess binaural broadband loudness summation in the
+hearing-impaired population and implications for hearing aid gain
+targets. \emph{PLOS ONE}, 20(3), e0319236.
+https://doi.org/10.1371/journal.pone.0319236
 
 Engler, M., Digeser, F., \& Hoppe, U. (2026). Speech recognition and
 real-ear-measured amplification in hearing-aid users with various grades
-of hearing loss. \emph{International Journal of Audiology}.
+of hearing loss. \emph{International Journal of Audiology}, 65(7),
+834--845. https://doi.org/10.1080/14992027.2024.2426009
 
 Herzke, T., Kayser, H., Loshaj, F., Grimm, G., \& Hohmann, V. (2017).
 OpenMHA---An open-source software platform for hearing aid research.
@@ -1437,7 +1608,8 @@ NAL-NL2 prescription procedure. \emph{Audiology Research}, 2(1), e24.
 
 Kitterick, P. T., Zakis, J. A., \& Edwards, B. (2026). Evolving the
 philosophy: From the NAL rule to NAL-NL3. \emph{International Journal of
-Audiology}, (In Press).
+Audiology}, 65(6), 513--524.
+https://doi.org/10.1080/14992027.2026.42342663
 
 Lybarger, S. F. (1944). \emph{US Patent No.~2,357,838}. Washington, DC:
 U.S. Patent and Trademark Office.
@@ -1453,7 +1625,8 @@ regions. \emph{Ear and Hearing}, 34(3), 358-366.
 Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., \& Wilson, R. H.
 (2025). Predicted and measured word-recognition scores unmask distortion
 in the impaired auditory system. \emph{The Journal of the Acoustical
-Society of America}, 157(2), 555-568.
+Society of America}, 157(2), 555--568.
+https://doi.org/10.1121/10.0036461
 
 Moore, B. C., Glasberg, B. R., \& Stone, M. A. (2010). Development of a
 new method for deriving initial fittings for hearing aids with
@@ -1510,6 +1683,11 @@ Amplification}, 9(4), 159-197.
 Souza, P. E. (2002). Effects of compression on speech acoustics,
 intelligibility, and sound quality. \emph{Trends in Amplification},
 6(4), 131-165.
+
+Souza, P. E., Jenstad, L. M., \& Boike, K. T. (2006). Measuring the
+acoustic effects of compression amplification on speech in noise.
+\emph{The Journal of the Acoustical Society of America}, 119(1), 41-44.
+https://doi.org/10.1121/1.2108861
 
 Souza, P., Hoover, E., Blackburn, M., \& Gallun, F. (2018). The
 characteristics of adults with severe hearing loss. \emph{Journal of the

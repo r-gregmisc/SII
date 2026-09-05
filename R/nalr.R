@@ -88,10 +88,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Standard experienced user baseline (from manuscript)
   c_vals <- c(-8, -1, 3, 1, 0, 0, 0, 0)
   
-  if (experience == "new") {
-    # New Users receive a purely nominal, uncalibrated flat -3 dB reduction
-    c_vals <- c_vals - 3
-  } else if (experience == "power") {
+  if (experience == "power") {
     # Power Users (not defined in manuscript, but present in UI) get +3 dB
     c_vals <- c_vals + 3
   }
@@ -139,7 +136,7 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   
   disable_sdlfp <- if (!is.null(dots$disable_sdlfp)) dots$disable_sdlfp else FALSE
   if (steep_slope_diff > slope_trigger && !disable_sdlfp) {
-    # Profound High-Frequency Bypass (PF_bypass) - Eq. 3
+    # Profound High-Frequency Bypass (PF_active) - Eq. 3
     # If high frequencies are extremely severe (>70 dB HL), we bypass the low frequency penalty 
     # so they can still hear low frequency cues.
     pf_bypass <- pmax(0, pmin(1, (95 - high_thresh_mean) / 25))

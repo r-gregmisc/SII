@@ -117,7 +117,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
       
       obj_fn <- function(shifts) {
         out_of_bounds_penalty <- (sum(pmax(0, shifts - 30)^2) + sum(pmax(0, -shifts - 60)^2)) * 1000.0
-        clamped_shifts <- pmax(-60, pmin(10, shifts))
+        clamped_shifts <- pmax(-60, pmin(30, shifts))
         shift_21 <- approx(x = log10(hl_freqs), y = clamped_shifts, xout = log10(freq), rule = 2)$y
         gain_array <- pmax(0, pmin(80, final_gain_base + shift_21))
         
@@ -142,11 +142,11 @@ open_nl <- function(speech = 65, threshold, freq, ...,
           # but we must allow up to 15 dB of shift for pure sensorineural losses so they can reach audibility 
           # if the 65 dB target sits very low.
           if (eval_level < 65) {
-             max_shift_oct <- sn_proportion * 15.0
+             max_shift_oct <- sn_proportion * 10.0
           } else if (eval_level > 65) {
-             max_shift_oct <- rep(15.0, length(hl_freqs))
+             max_shift_oct <- rep(10.0, length(hl_freqs))
           } else {
-             max_shift_oct <- sn_proportion * 15.0
+             max_shift_oct <- sn_proportion * 10.0
           }
           
           if (eval_level < 65) {
@@ -318,7 +318,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
         # Interpolate max_shift to 21 bands
         sn_loss_local <- pmax(0, threshold - local_loss)
         sn_proportion_local <- ifelse(threshold > 0, sn_loss_local / threshold, 1.0)
-        max_shift_oct <- sn_proportion_local * 15.0
+        max_shift_oct <- sn_proportion_local * 10.0
         max_shift_interp <- approx(x = log10(hl_freqs), y = max_shift_oct, xout = log10(freq), rule=2)$y
         
         if (eval_level < 65) {
