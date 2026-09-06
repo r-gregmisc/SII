@@ -1,5 +1,5 @@
 # validate_amt_loudness_random.R
-# This script generates 250 completely randomized audiogram profiles and input levels,
+# This script generates completely randomized audiogram profiles and input levels,
 # evaluates them using the Open-NL C++ engine, and generates an Octave/MATLAB script 
 # to run the identical set against AMT bramslow2004 for cross-validation.
 
@@ -10,7 +10,14 @@ suppressWarnings(rm(list = intersect(ls(envir = .GlobalEnv), c("open_nl", "sii",
 devtools::load_all(".", quiet=TRUE)
 
 set.seed(42) # For reproducible random samples
-n_samples <- 250
+
+# NOTE ON PERFORMANCE: 
+# bramslow2004 runs in ~1 second per point in MATLAB (JIT compiled), 
+# but takes ~1.5 - 2 minutes per point in Octave because Octave lacks 
+# compiled MEX files for the Gammatone filterbanks by default.
+# N=50 takes ~1.5 hours in Octave, or ~1 minute in MATLAB.
+n_samples <- 50 
+
 aud_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
 
 random_profiles <- list()
@@ -18,8 +25,8 @@ test_grid <- data.frame(id = 1:n_samples, level = sample(seq(50, 90, by=1), n_sa
 
 cpp_loudness <- numeric(n_samples)
 
-cat("Generating 250 random profiles and evaluate_random_amt.m...\n")
-cat("R C++ evaluation is extremely fast (expected time: < 2 seconds).\n\n")
+cat(sprintf("Generating %d random profiles and evaluate_random_amt.m...\n", n_samples))
+cat("R C++ evaluation is extremely fast (expected time: < 1 second).\n\n")
 
 m_code <- c(
   "% AMT bramslow2004 Random Benchmark for Open-NL Validation",
@@ -27,14 +34,14 @@ m_code <- c(
   "addpath('/home/mark/Desktop/amtoolbox-full-1.6.0/amtoolbox-1.6.0');",
   "amt_start;",
   sprintf("fprintf('Evaluating %d random test points using bramslow2004...\\n');", n_samples),
-  "fprintf('Expected total time: ~6-8 minutes (depending on CPU).\\n');",
+  "fprintf('Expected total time: ~1.5 hours in Octave, or ~1 minute in MATLAB.\\n');",
   "fileID = fopen('amt_random_results.csv', 'w');",
   "fprintf(fileID, 'id,level,amt_loudness\\n');",
   "t_start = tic;"
 )
 
 for (i in 1:n_samples) {
-  if (i %% 25 == 0 || i == 1) {
+  if (i %% 10 == 0 || i == 1) {
     cat(sprintf("R Progress: Processed %d / %d random profiles...\n", i, n_samples))
   }
   
@@ -93,5 +100,5 @@ write.csv(test_grid, "cpp_random_results.csv", row.names = FALSE)
 
 cat("\nDone! Generated evaluate_random_amt.m and cpp_random_results.csv.\n")
 cat("Next steps:\n")
-cat("  1. Run 'octave --no-gui evaluate_random_amt.m' (~6-8 minutes)\n")
-cat("  2. Run 'Rscript reproducibility_scripts/plot_random_bland_altman.R' (instant)\n")
+cat("  1. Run 'octave --no-gui evaluate_random_amt.m'\n")
+cat("  2. Run 'Rscript reproducibility_scripts/plot_random_bland_altman.R'\n")
