@@ -715,7 +715,7 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
   loss <- if (!is.null(x$loss)) approx(x = log10(x$freq), y = x$loss, xout = log10(hl_freqs), rule=2)$y else rep(0, 6)
   
   # Determine the target speech level
-  target_level <- as.numeric(gsub(" dB SPL", "", x$vocal_effort))
+  target_level <- if (!is.null(x$overall_level)) as.numeric(x$overall_level) else as.numeric(gsub(" dB SPL", "", x$vocal_effort))
   if (is.na(target_level) || length(target_level) == 0) {
     target_level <- 65
   }
