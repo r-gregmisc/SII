@@ -19,17 +19,25 @@ test_grid <- data.frame(id = 1:n_samples, level = sample(seq(50, 90, by=1), n_sa
 cpp_loudness <- numeric(n_samples)
 
 cat("Generating 250 random profiles and evaluate_random_amt.m...\n")
+cat("R C++ evaluation is extremely fast (expected time: < 2 seconds).\n\n")
+
 m_code <- c(
   "% AMT bramslow2004 Random Benchmark for Open-NL Validation",
   "% Run with: octave --no-gui evaluate_random_amt.m",
   "addpath('/home/mark/Desktop/amtoolbox-full-1.6.0/amtoolbox-1.6.0');",
   "amt_start;",
-  "fprintf('Evaluating 250 random test points using bramslow2004...\\n');",
+  sprintf("fprintf('Evaluating %d random test points using bramslow2004...\\n');", n_samples),
+  "fprintf('Expected total time: ~6-8 minutes (depending on CPU).\\n');",
   "fileID = fopen('amt_random_results.csv', 'w');",
-  "fprintf(fileID, 'id,level,amt_loudness\\n');"
+  "fprintf(fileID, 'id,level,amt_loudness\\n');",
+  "t_start = tic;"
 )
 
 for (i in 1:n_samples) {
+  if (i %% 25 == 0 || i == 1) {
+    cat(sprintf("R Progress: Processed %d / %d random profiles...\n", i, n_samples))
+  }
+  
   # Generate somewhat realistic random audiogram (preventing 100dB jumps)
   t_raw <- cumsum(rnorm(6, mean=5, sd=15)) 
   t_raw <- t_raw - min(t_raw) # shift to 0
@@ -53,7 +61,14 @@ for (i in 1:n_samples) {
   hl_str <- paste(bramslow_hl, collapse = " ")
   
   m_code <- c(m_code, 
-    sprintf("fprintf('Running Random Profile %%d at %%d dB SPL (%%d/%d)...\\n', %d, %d, %d);", i, lvl, i, n_samples, i, lvl, i),
+    sprintf("if %d > 1", i),
+    sprintf("  elapsed = toc(t_start);"),
+    sprintf("  avg_time = elapsed / (%d - 1);", i),
+    sprintf("  eta = avg_time * (%d - %d + 1);", n_samples, i),
+    sprintf("  fprintf('Running Random Profile %%d at %%d dB SPL (%%d/%d)... [ETA: %%.1f sec]\\n', %d, %d, %d, eta);", i, n_samples, i, lvl, i),
+    "else",
+    sprintf("  fprintf('Running Random Profile %%d at %%d dB SPL (%%d/%d)... [ETA: Calculating...]\\n', %d, %d, %d);", i, n_samples, i, lvl, i),
+    "end",
     "fs = 32000;",
     "t = (0:(fs*0.25-1))' / fs;", 
     "insig = zeros(length(t), 1);",
@@ -70,10 +85,13 @@ for (i in 1:n_samples) {
   )
 }
 m_code <- c(m_code, "fclose(fileID);")
+m_code <- c(m_code, "fprintf('AMT evaluation complete! Total time: %.1f sec\\n', toc(t_start));")
 writeLines(m_code, "evaluate_random_amt.m")
 
 test_grid$cpp_loudness <- cpp_loudness
 write.csv(test_grid, "cpp_random_results.csv", row.names = FALSE)
 
-cat("Generated evaluate_random_amt.m and cpp_random_results.csv.\n")
-cat("Run 'octave --no-gui evaluate_random_amt.m' to generate AMT benchmark results.\n")
+cat("\nDone! Generated evaluate_random_amt.m and cpp_random_results.csv.\n")
+cat("Next steps:\n")
+cat("  1. Run 'octave --no-gui evaluate_random_amt.m' (~6-8 minutes)\n")
+cat("  2. Run 'Rscript reproducibility_scripts/plot_random_bland_altman.R' (instant)\n")
