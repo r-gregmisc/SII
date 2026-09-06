@@ -641,7 +641,7 @@ G_{65}^{(1)}(f) = G_{65}^{(0)}(f) + G_{slb}(f)
 To prevent unconstrained audibility maximization from prescribing intolerable high-frequency gain in steeply sloping losses, Open-NL applies a dynamic soft-compression envelope ($L_{gain}$):
 
 \begin{equation}
-L_{gain}(f) = 30 + 0.4 \cdot \max\left(0, \text{HTL}_{sn}(f) - 60\right)
+L_{gain}(f) = 30 + 0.4 \cdot \max\left(0, \text{HTL}_{sn}(f) - 60\right) \\ \text{(Power Users: } L_{gain}(f) = 40 + 0.5 \cdot \max(0, \text{HTL}_{sn}(f) - 60)\text{)}
 \end{equation}
 
 *(Note: For patients in "Moderate" or "High" distortion categories, $L_{gain}$ is reduced by 10 dB).*
