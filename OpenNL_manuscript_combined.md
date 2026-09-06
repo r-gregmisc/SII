@@ -805,16 +805,16 @@ where $\mathbf{v}_c$ is the coupling-specific attenuation vector defined in Tabl
 
 | Coupling Configuration | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| `custom_occluded` | 0 | 0 | 0 | 0 | 0 | 0 |
-| `open_dome` | -35 | -28 | -15 | -2 | 0 | 0 |
-| `tulip_dome` | -25 | -18 | -5 | 0 | 0 | 0 |
-| `double_dome` | -20 | -10 | 0 | 0 | 0 | 0 |
-| `vent_1mm_solid` | -3 | -1 | 0 | 0 | 0 | 0 |
-| `vent_2mm_solid` | -8 | -2 | 0 | 0 | 0 | 0 |
-| `vent_3mm_solid` | -12 | -4 | 0 | 0 | 0 | 0 |
-| `vent_1mm_hollow` | -12 | -3 | 0 | 0 | 0 | 0 |
-| `vent_2mm_hollow` | -22 | -12 | -5 | -2 | 0 | 0 |
-| `vent_3mm_hollow` | -25 | -15 | -8 | -4 | 0 | 0 |
+| Custom Occluded | 0 | 0 | 0 | 0 | 0 | 0 |
+| Open Dome | -35 | -28 | -15 | -2 | 0 | 0 |
+| Tulip Dome | -25 | -18 | -5 | 0 | 0 | 0 |
+| Double Dome | -20 | -10 | 0 | 0 | 0 | 0 |
+| Vent (1mm Solid) | -3 | -1 | 0 | 0 | 0 | 0 |
+| Vent (2mm Solid) | -8 | -2 | 0 | 0 | 0 | 0 |
+| Vent (3mm Solid) | -12 | -4 | 0 | 0 | 0 | 0 |
+| Vent (1mm Hollow) | -12 | -3 | 0 | 0 | 0 | 0 |
+| Vent (2mm Hollow) | -22 | -12 | -5 | -2 | 0 | 0 |
+| Vent (3mm Hollow) | -25 | -15 | -8 | -4 | 0 | 0 |
 
 Conductive air-bone gaps are restored linearly with a 75% fraction: $G_{cond}(f) = 0.75 \cdot \text{Loss}_{cond}(f)$ *(Note: This 75% restoration fraction is a pragmatic engineering convention—adapted from clinical practice to prevent excessive output demands and MPO clipping; Johnson, 2013a—without direct empirical derivation from listener preference)*. To prevent active anti-phase cancellation demands and comb filtering, insertion gain is floored at $V_{loss}(f) - 10$ dB:
 
