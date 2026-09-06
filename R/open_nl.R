@@ -353,10 +353,24 @@ open_nl <- function(speech = 65, threshold, freq, ...,
     convergence_stats <- NULL
   }
   
+
+  # Calculate 1/3-octave Speechmap Output Target
+  # ANSI S3.5-1997 1/3-octave band LTASS at 65 dB SPL overall
+  ltass_1_3_oct <- c(55.0, 57.5, 51.3, 46.6, 41.6, 36.5)
+  ltass_1_3_oct <- ltass_1_3_oct + (overall_level - 65)
+  if(length(freq) == 6 && all(freq == c(250, 500, 1000, 2000, 4000, 8000))) {
+    speechmap_target <- final_gain + ltass_1_3_oct
+  } else {
+    ltass_interp <- approx(x = log10(c(250, 500, 1000, 2000, 4000, 8000)), y = ltass_1_3_oct, xout = log10(freq), rule=2)$y
+    speechmap_target <- final_gain + ltass_interp
+  }
+  
   res <- list(
     freq = freq,
     gain = final_gain,
     mpo = mpo,
+    speechmap_target = speechmap_target,
+
     speech = speech_spec,
     threshold = threshold,
     loss = loss,
@@ -375,7 +389,9 @@ print.prescription_target <- function(x, ...) {
   cat(sprintf("Module: %s\n", x$module))
   cat(sprintf("Input Level: %.1f dB SPL\n", x$overall_level))
   cat("\nGain Targets:\n")
-  df <- data.frame(Freq = x$freq, Gain = round(x$gain, 1), MPO = round(x$mpo, 1))
+  df <- data.frame(Freq = x$freq, Gain = round(x$gain, 1), 
+                   Speechmap_SPL = round(x$speechmap_target, 1),
+                   MPO = round(x$mpo, 1))
   print(df, row.names = FALSE)
 }
 
