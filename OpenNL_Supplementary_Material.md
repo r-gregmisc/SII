@@ -461,8 +461,10 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
    - $L_{in} = 65$ dB SPL: $\mathbf{K}_{65} = [7.0, 4.5, 4.0, 6.5, 6.0]$ sones
    - $L_{in} = 80$ dB SPL: $\mathbf{K}_{80} = [20.0, 12.0, 10.0, 15.0, 14.0]$ sones
    \begin{equation}
-   \text{Cap}_{base} = \text{interp}\left(\text{PTA}_{sn} (defined as the four-frequency pure-tone average of the sensorineural component at 500, 1000, 2000, and 4000 Hz), \mathbf{PTA}_{knots}, \mathbf{K}_{L_{in}}\right)
+   \text{Cap}_{base} = \text{interp}\left(\text{PTA}_{sn}, \mathbf{PTA}_{knots}, \mathbf{K}_{L_{in}}\right)
    \end{equation}
+   where $\text{PTA}_{sn}$ is defined as the four-frequency pure-tone average of the sensorineural component at 500, 1000, 2000, and 4000 Hz.
+   
    *Profile Adjustments:*
    - Reverse-slope restriction ($L_{in} \ge 75$ dB SPL and low-to-high threshold difference $> 10$ dB):
      $\text{Cap} = \text{Cap}_{base} - 0.10 \cdot (\overline{\text{HTL}}_{\le 500} - \overline{\text{HTL}}_{\ge 4000})$.
