@@ -31,7 +31,7 @@ calculate_nalr_gain <- function(freq, threshold) {
   return(ig)
 }
 
-calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, f_e_hf = NULL, f_e_lf = NULL, abg_fraction = 0.75, ...) {
+calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male", experience = "experienced", config = "bilateral", age = "adult", coupling = "custom_occluded", module = "standard", ldl = NULL, age_years = NULL, age_months = NULL, loss = NULL, distortion_category = NULL, f_e_hf = NULL, f_e_lf = NULL, abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, ...) {
 
   dots <- list(...)
   anchor <- if (!is.null(dots$anchor)) dots$anchor else 0.46
@@ -161,8 +161,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Bounded severe-loss booster (slope = 0.15) applied to thresholds.
   # The manuscript defaults to off, but Eq. 1 uses the 60 dB HL aggressive onset.
   # We apply the 0.15 slope and remove the undocumented tapers (dead region & mid-taper).
-  b_en <- 1.0 # Set to 1.0 to enable the aggressive ablation mode from Eq. 1
-  slb_final <- b_en * 0.15 * pmax(0, pmin(80, sn_threshold) - 60)
+  b_en <- if (enable_severe_booster) 1.0 else 0.0
+  actual_onset <- if (enable_severe_booster) 60 else 70 # As per manuscript text
+  slb_final <- b_en * 0.15 * pmax(0, pmin(80, sn_threshold) - actual_onset)
   
   g_65 <- g_65 + slb_final
   
