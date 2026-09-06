@@ -61,7 +61,9 @@ for (i in 1:n_samples) {
   
   bramslow_freqs <- c(125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 10000, 12500)
   bramslow_hl <- approx(log10(aud_freqs), t_scaled, log10(bramslow_freqs), rule=2)$y
-  bramslow_spl <- approx(log10(aud_freqs), aided_spl, log10(bramslow_freqs), rule=2)$y
+  bramslow_spl_spec <- approx(log10(aud_freqs), aided_spl, log10(bramslow_freqs), rule=2)$y
+  erb <- 24.7 * (4.37 * (bramslow_freqs / 1000) + 1)
+  bramslow_spl <- bramslow_spl_spec + 10 * log10(erb)
   
   freq_str <- paste(bramslow_freqs, collapse = " ")
   lvl_str <- paste(bramslow_spl, collapse = " ")
