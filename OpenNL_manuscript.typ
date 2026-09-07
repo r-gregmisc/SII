@@ -713,9 +713,9 @@ predictions were rigidly validated against external AMT simulations
 across 45 discrete test points (5 profiles $times$ 9 input levels from
 50 to 90 dB SPL). Because the C++ engine is a direct mathematical
 translation, agreement was near-exact on the canonical set: Bland-Altman
-analysis revealed a mean bias of $+ 0.01$ sones, with tight 95% limits
-of agreement $\[ - 0.07 \, + 0.09 upright(" sones") \]$ and a Mean
-Absolute Error (MAE) of just $0.04$ sones (#strong[Figure 2];).
+analysis revealed a mean bias of $+ 0.23$ sones, with 95% limits of
+agreement $\[ - 0.71 \, + 1.17 upright(" sones") \]$ and a Mean Absolute
+Error (MAE) of $0.39$ sones (#strong[Figure 2];).
 
 #box(image("figures/Figure2_BlandAltman.png")) #emph[Figure 2.
 Bland-Altman plot demonstrating near-exact computational agreement
