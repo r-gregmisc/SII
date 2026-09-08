@@ -859,14 +859,14 @@ sensorineural thresholds. In profile A7 (pure conductive loss with a 50
 dB air-bone gap), the output is fully deterministic: the 75% ABG
 restoration rule mandates an exact, flat 37.5 dB of linear gain across
 frequencies and levels. Because the optimizer contributes nothing to
-this solution and both formulas mechanically hit ANSI SII 1.00, A7 is
-included in the tables strictly as an arithmetic sanity check rather
-than a comparative optimization finding. Crucially, this 75% restoration
-rule is an engineering choice adapted from clinical conventions
-(Johnson, 2013a; Scollie et al., 2005) to prevent hardware saturation,
-rather than an empirical preference optimum. This contrasts with
-well-supported heuristic targets like the 3.0:1 Compression Ratio bound
-(Stage 12), which is directly grounded in extensive empirical
+this solution and both formulas mechanically converge on ANSI SII 0.97,
+A7 is included in the tables strictly as an arithmetic sanity check
+rather than a comparative optimization finding. Crucially, this 75%
+restoration rule is an engineering choice adapted from clinical
+conventions (Johnson, 2013a; Scollie et al., 2005) to prevent hardware
+saturation, rather than an empirical preference optimum. This contrasts
+with well-supported heuristic targets like the 3.0:1 Compression Ratio
+bound (Stage 12), which is directly grounded in extensive empirical
 psychoacoustic data (Souza, 2002; Souza et al., 2006). However, to
 enforce this bound safely during unconstrained optimization, Open-NL
 applies the 3.0:1 constraint both as a soft objective penalty
