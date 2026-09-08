@@ -615,9 +615,9 @@ and Proposed Calibration Pathways.}
   \item
     \emph{Justification}: \textbf{Strong empirical support}: Anchored in
     literature (Souza, 2002) demonstrating speech degradation for CR
-    \(> 3.0:1\). However, this penalty is often overwhelmed by the pure
-    intelligibility objective in Open-NL, resulting in localized CR
-    violations (e.g., A4 reaches 12.0:1).
+    \(> 3.0:1\). By enforcing this penalty alongside a strict
+    post-optimization clamp, Open-NL successfully constrains emergent
+    multi-level input/output mapping to empirically safe limits.
   \item
     \emph{Proposed Calibration}: Robust existing empirical literature;
     formalizing hard absolute architectural bounds

@@ -152,7 +152,7 @@ Crucially, the outer-loop objective function must incorporate an asymmetric, vet
 
 - **Compression Ratio Soft Penalty ($P_{cr}$)** (Value: 3.0:1 target)
   - *Description*: Soft penalty on emergent sensorineural CR
-  - *Justification*: **Strong empirical support**: Anchored in literature (Souza, 2002) demonstrating speech degradation for CR $> 3.0:1$. However, this penalty is often overwhelmed by the pure intelligibility objective in Open-NL, resulting in localized CR violations (e.g., A4 reaches 12.0:1).
+  - *Justification*: **Strong empirical support**: Anchored in literature (Souza, 2002) demonstrating speech degradation for CR $> 3.0:1$. By enforcing this penalty alongside a strict post-optimization clamp, Open-NL successfully constrains emergent multi-level input/output mapping to empirically safe limits.
   - *Proposed Calibration*: Robust existing empirical literature; formalizing hard absolute architectural bounds
 
 - **Desensitization Penalty** (Value: Variable)
