@@ -886,15 +886,16 @@ To model severe-loss distortion mathematically, Open-NL adapts the
 empirical desensitization formulation of Johnson & Dillon (2011) and
 Ching et al.~(1998). Crucially, the engine isolates the pure
 sensorineural component ($T_(h l) = max \( 0 \, T'_i - J_i \)$) by
-subtracting the air-bone gap ($J_i$), and corrects a historical flaw in
-ANSI S3.5 implementations by restricting the internal cochlear noise
-floor calculation strictly to sensorineural loss
-($X'_i = X_i + max \( 0 \, T'_i - J_i \)$), preventing conductive
-attenuation from falsely inflating internal noise. While the rigid
-clinical formula ($K'_(c o m p l e t e) = \( K_i^p + m^p \)^(1 \/ p)$)
-introduces non-differentiable step boundaries that stall simplex
-optimizers, Open-NL's optimizer evaluates intermediate solutions against
-a continuous mathematical relaxation: where $K_i$ is raw audibility and
+subtracting the air-bone gap ($J_i$), and departs from common ANSI S3.5
+implementations by restricting the internal cochlear noise floor
+calculation strictly to sensorineural loss
+($X'_i = X_i + max \( 0 \, T'_i - J_i \)$), on the rationale that
+conductive attenuation should not falsely inflate internal noise. While
+the rigid clinical formula
+($K'_(c o m p l e t e) = \( K_i^p + m^p \)^(1 \/ p)$) introduces
+non-differentiable step boundaries that stall simplex optimizers,
+Open-NL's optimizer evaluates intermediate solutions against a
+continuous mathematical relaxation: where $K_i$ is raw audibility and
 $m$ is the maximum asymptotic audibility limit directly extracted from
 Ching et al.~(1998). This continuous relaxation permits smooth gradient
 descent. While the maximum discrepancy between the relaxation and the
