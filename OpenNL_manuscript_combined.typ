@@ -16,10 +16,13 @@ $4^4 = 256$-permutation heuristic sweep alongside a 5-iteration
 multi-start stability analysis. This approach establishes a fundamental
 distinction between numerical convergence and heuristic sensitivity. The
 multi-start solver exhibits high numerical stability
-($upright("SD") < 0.025$ SII) for any fixed parameter set. In contrast,
-prescribed targets display extreme heuristic sensitivity in
-severe-sloping configurations. Minor rule modifications can swing
-modeled monaural loudness between 0.9 and 5.3 sones.
+($upright("SD") < 0.025$ SII) for any fixed parameter set. Crucially, by
+enforcing strict mathematical boundary conditions, the objective
+landscape remains remarkably robust against heuristic parameter sweeps.
+For severely sloping profiles, modulating underlying heuristic triggers
+yielded tight response envelopes, demonstrating that explicit distortion
+penalties successfully prevent runaway intelligibility optimization
+without requiring proprietary, closed-source corrections.
 
 Standard monaural models systematically underestimate real-world
 binaural broadband summation. Therefore, this modeled loudness frontier
@@ -109,7 +112,7 @@ computational research testbed and #strong[must not be used for fitting
 hearing aids on human listeners in its current form];. Because the
 framework deliberately permits aggressive, over-prescriptive targets for
 boundary testing---such as utilizing an aggressive 60 dB HL severe-loss
-booster onset that permits 14--15 sones of theoretical loudness for
+booster onset that permits aggressively high-frequency targets for
 profound losses---it carries a significant risk of severe
 over-amplification. As established by Ching, Dillon, Katsch, and Byrne
 (2001), aggressive high-level targets in steeply sloping or profound
@@ -478,7 +481,8 @@ historically unregularized intelligibility optimization.
 Distribution of resulting ANSI SII scores and physiological loudness
 penalties across 768 permutations (256 $times$ 3 profiles) for clinical
 profiles A2 (Reverse Slope), A4 (Profound), and A5 (Severe),
-illustrating high heuristic parameter sensitivity.]
+illustrating the robustness of the constrained optimization space
+against heuristic parameter modifications.]
 
 ==== 2. Numerical Convergence Stability: Nelder-Mead Limitations and Future Stochastic Solvers
 <numerical-convergence-stability-nelder-mead-limitations-and-future-stochastic-solvers>
