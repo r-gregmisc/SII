@@ -11,7 +11,7 @@ heuristic safeguards interact.
 
 Open-NL addresses this limitation. It couples a multi-start Nelder-Mead
 Speech Intelligibility Index (SII) optimizer with the Moore & Glasberg
-(2004) specific-loudness model. We benchmark this testbed across a
+(2004) specific-loudness model. This testbed is benchmarked across a
 $4^4 = 256$-permutation heuristic sweep. To mitigate the numerical
 entrapment inherent to local simplex search on non-convex audiological
 surfaces, the framework deploys a robust 5-iteration multi-start
@@ -99,9 +99,9 @@ desensitization and level distortion penalties). Because this
 physiological evaluation space is already established in the literature,
 the primary contribution of this manuscript is the transparent
 computational testbed itself. By exposing the behavior of numerical
-solvers within this standardized sandbox, we clarify a crucial
-distinction: while numerical solvers converge stably on any fixed
-objective space, theoretical WDRC target generation exhibits acute
+solvers within this standardized sandbox, this manuscript clarifies a
+crucial distinction: while numerical solvers converge stably on any
+fixed objective space, theoretical WDRC target generation exhibits acute
 parameter sensitivity to uncalibrated heuristic boundaries, providing
 the computational infrastructure necessary to quantify and calibrate
 these interactions.
@@ -723,9 +723,9 @@ simulation (`bramslow2004`) across 45 canonical evaluation points.]
 
 For mixed and conductive profiles (A6, A7), direct AMT benchmarking was
 omitted because canonical AMT lacks native air-bone gap parameters,
-whereas our C++ engine algorithmically extends the model to treat the
-conductive component as a linear pre-cochlear attenuator, in accordance
-with standard audiological principles (Dillon, 2012).
+whereas the Open-NL C++ engine algorithmically extends the model to
+treat the conductive component as a linear pre-cochlear attenuator, in
+accordance with standard audiological principles (Dillon, 2012).
 
 #strong[TABLE III. Diagnostic Demonstration of Objective Exploitation:
 Monaural Loudness (Sones) and Desensitized SII across A1-A7 Audiograms
@@ -936,16 +936,17 @@ Beyond safety protocols, this framework yields a concrete, falsifiable
 clinical prediction: because Open-NL's uncalibrated A4 and A5
 high-frequency targets exceed NAL-NL2 by roughly 11 dB at 4000 Hz, they
 push far beyond historical comfort boundaries (Keidser et al., 2012a;
-Denk et al., 2025). We offer the following operational hypothesis: If
-adult listeners with A4 or A5 audiometric profiles are fitted with
-real-ear verified Open-NL targets, \>80% will exhibit immediate
-categorical loudness rejection---operationally defined as a rating of 6
-("Loud") or 7 ("Uncomfortably Loud") on the 7-point Categorical Loudness
-Scaling (CLS) procedure (ISO 16832)---when presented with continuous
-broadband speech (e.g., ISTS) at 65 and 80 dB SPL, relative to a matched
-NAL-NL2 baseline. Empirically quantifying this rejection threshold will
-provide the ground-truth data required to constrain distortion-aware
-objective functions in future stochastic calibrations.
+Denk et al., 2025). The author offers the following operational
+hypothesis: If adult listeners with A4 or A5 audiometric profiles are
+fitted with real-ear verified Open-NL targets, \>80% will exhibit
+immediate categorical loudness rejection---operationally defined as a
+rating of 6 ("Loud") or 7 ("Uncomfortably Loud") on the 7-point
+Categorical Loudness Scaling (CLS) procedure (ISO 16832)---when
+presented with continuous broadband speech (e.g., ISTS) at 65 and 80 dB
+SPL, relative to a matched NAL-NL2 baseline. Empirically quantifying
+this rejection threshold will provide the ground-truth data required to
+constrain distortion-aware objective functions in future stochastic
+calibrations.
 
 == IV. CONCLUSION
 <iv.-conclusion>
