@@ -137,13 +137,16 @@ Speech Intelligibility Index (SII) optimizer with the Moore \& Glasberg
 multi-start stability analysis. This approach establishes a fundamental
 distinction between numerical convergence and heuristic sensitivity. The
 multi-start solver exhibits high numerical stability
-(\(\text{SD} < 0.025\) SII) for any fixed parameter set. Crucially, by
-enforcing strict mathematical boundary conditions, the objective
-landscape remains remarkably robust against heuristic parameter sweeps.
-For severely sloping profiles, modulating underlying heuristic triggers
-yielded tight response envelopes, demonstrating that explicit distortion
-penalties successfully prevent runaway intelligibility optimization
-without requiring proprietary, closed-source corrections.
+(\(\text{SD} < 0.025\) SII) for any fixed parameter set. Crucially, a
+sensitivity analysis reveals that the optimizer actively collides with
+these mathematical boundary conditions. Because the objective function
+is dominated by physiological loudness constraints, modulating the
+underlying heuristic triggers yielded exceptionally tight response
+envelopes. This indicates that once the optimizer reaches the active
+penalty boundary, the underlying heuristic parameters are rendered
+largely irrelevant, effectively preventing runaway amplification but
+emphasizing the need to include binding penalty parameters in future
+sensitivity sweeps.
 
 Standard monaural models systematically underestimate real-world
 binaural broadband summation. Therefore, this modeled loudness frontier
@@ -714,25 +717,29 @@ Residual Variance (\(\eta^2\))
 
 The resulting variance (\textbf{Table II}, \textbf{Figure 1})
 illustrates mechanistically how strict mathematical boundary conditions
-stabilize the objective landscape. Because Open-NL enforces strict
-distortion limits---such as capping maximum channel shifts at +10 dB to
-prevent unbounded compression ratios---the algorithm is remarkably
-robust against heuristic parameter sweeps. For the steeply sloping A5
-profile, ablating the slope trigger and base anchor interactions caused
-modeled monaural loudness to fluctuate narrowly between 4.26 and 4.37
-sones, with theoretical desensitized SII constrained between 0.45 and
-0.51. For the reverse-slope A2 profile, modulating the LF floor yielded
-sones between 3.38 and 4.44. This tight response envelope demonstrates
-that explicitly bounding the objective space with hard distortion
-penalties prevents the massive runaway amplification typical of
-historically unregularized intelligibility optimization.
+dominate the objective landscape. The tight response envelope is not
+evidence of a flat optimization space, but rather demonstrates that the
+optimizer actively collides with the binding physiological loudness
+constraint. For example, the interpolated loudness caps for profiles A1,
+A2, A3, and A5 effectively dictate the final modeled loudness to within
+0.1 sones. Because the objective function is entirely bound by these
+hard distortion penalties, modulating the underlying heuristic triggers
+(such as the base anchor or slope bypass) yielded minimal variance
+(e.g., A5 fluctuating narrowly between 4.26 and 4.37 sones). This
+indicates that once the active penalty wall is reached, the underlying
+heuristic parameters are rendered practically irrelevant. While this
+successfully prevents the massive runaway amplification typical of
+historically unregularized intelligibility optimization, any future
+claims of comprehensive parameter robustness must be tested against a
+sweep that formally includes these binding penalty variables.
 
 \pandocbounded{\includegraphics[keepaspectratio,alt={Parameter Sensitivity Analysis}]{figures/Figure1_Sensitivity.png}}
 \emph{Figure 1. Distribution of resulting ANSI SII scores and
 physiological loudness penalties across 768 permutations (256 \(\times\)
 3 profiles) for clinical profiles A2 (Reverse Slope), A4 (Profound), and
-A5 (Severe), illustrating the robustness of the constrained optimization
-space against heuristic parameter modifications.}
+A5 (Severe), illustrating how the active physiological loudness
+constraint dominates the optimization space, severely restricting the
+variance caused by heuristic parameter modifications.}
 
 \paragraph{2. Numerical Convergence Stability: Nelder-Mead Limitations
 and Future Stochastic
