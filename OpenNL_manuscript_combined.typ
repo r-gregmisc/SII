@@ -44,12 +44,12 @@ hearing aid practice. While earlier investigations suggested that
 generic targets might outperform proprietary first-fit algorithms on
 patient preference and specific metrics (Valente et al., 2018),
 contemporary evidence indicates that aided speech recognition in noise
-often shows no significant difference across formulas. However, while
-formula choice has relatively modest intelligibility consequences in
-background noise, it drives substantial variations in overall loudness,
-making modeled loudness (quantified in sones per the Moore & Glasberg
-2004 impaired loudness model) the primary dependent variable in
-prescriptive evaluation.
+often shows no significant difference across formulas (e.g., Cox et al.,
+2012). However, while formula choice has relatively modest
+intelligibility consequences in background noise, it drives substantial
+variations in overall loudness, making modeled loudness (quantified in
+sones per the Moore & Glasberg 2004 impaired loudness model) the primary
+dependent variable in prescriptive evaluation.
 
 While the derivations of major algorithms like NAL-NL2 and DSL m\[i/o\]
 are published in detail, their software implementations remain
@@ -84,7 +84,7 @@ isolate, or invert individual heuristics. For instance, investigators
 can evaluate the upward spread of masking when disabling the 30 dB
 conductive safety cap. This modular architecture aligns directly with
 evolving audiological frameworks, such as the multi-profile philosophy
-introduced in NAL-NL3 (Kitterick et al., 2026).
+introduced in NAL-NL3 (Kitterick et al., 2026a).
 
 Crucially, to benchmark this testbed without introducing confounding
 variables, the optimization layer is embedded within a strictly
@@ -167,9 +167,9 @@ impaired ears. Binaural broadband summation in hearing-impaired
 populations averages \~13 dB higher than in normal-hearing listeners.
 This represents an unmodeled factor of $approx 2.4 times$ in linear
 sones (Denk et al., 2025; Moore et al., 2014; Oetting et al., 2016,
-2017). Approximately 30--40% of hearing-impaired listeners exhibit
-excess summation far exceeding the normal range. Individual summation
-values span a massive -10 to +40 dB envelope.
+2017). About 40% of hearing-impaired listeners (in a sample of 180)
+exhibit excess summation far exceeding the normal range. Individual
+summation values span a massive -10 to +40 dB envelope.
 
 Standard monaural and narrowband loudness models cannot predict this
 broadband suprathreshold phenomenon from the pure-tone audiogram alone.
@@ -273,7 +273,7 @@ clinical prescriptive software (Johnson, 2013a) to avoid receiver
 saturation and MPO clipping, has never been empirically established
 against patient preference or speech recognition. Similarly, the 1.5:1
 CIN clamp is an asserted heuristic inspired by NAL-NL3 (Kitterick et
-al., 2026) to mitigate listening fatigue, but lacks independent
+al., 2026b) to mitigate listening fatigue, but lacks independent
 perceptual validation. In sharp contrast, the 3.0:1 Compression Ratio
 (CR) upper ceiling enforced across the WDRC stages and optimizer loss
 function represents the best-supported constant in the framework. This
@@ -956,7 +956,7 @@ researchers to systematically inspect the trade-offs between audibility
 and physiological loudness without relying on closed-source clinical
 software. As the framework evolves, it provides the computational
 substrate needed to evaluate emerging multi-profile rationales such as
-NAL-NL3 (Kitterick, Zakis, & Edwards, 2026) and to integrate
+NAL-NL3 (Kitterick, Zakis, & Edwards, 2026a) and to integrate
 individualized broadband loudness summation metrics (Denk et al., 2025).
 
 == ACKNOWLEDGMENTS
@@ -1000,10 +1000,6 @@ Baer, T., Moore, B. C., & Kluk, K. (2002). Effects of low pass filtering
 on the intelligibility of speech in quiet for people with and without
 dead regions at high frequencies. #emph[The Journal of the Acoustical
 Society of America];, 112(3), 1133-1144.
-
-Byrne, D., & Dillon, H. (1986). The National Acoustic Laboratories'
-(NAL) new procedure for selecting the gain and frequency response of a
-hearing aid. #emph[Ear and Hearing];, 7(4), 257-265.
 
 Byrne, D., Parkinson, A., & Newall, P. (1990). Hearing aid gain and
 frequency response requirements for the severely/profoundly hearing
@@ -1061,37 +1057,33 @@ from generic hearing aid prescriptive methods: Impacts on predicted
 loudness, frequency bandwidth, and speech intelligibility. #emph[Journal
 of the American Academy of Audiology];, 22(7), 441-459.
 
-Kates, J. M., Arehart, K. H., Anderson, M. C., Kumar Muralimanohar, R.,
-& Harvey, L. O. (2018). Using objective metrics to measure hearing aid
-performance. #emph[Ear and Hearing];, 39(6), 1165-1175.
-
 Kates, J. M., & Arehart, K. H. (2022). An overview of the HASPI and
 HASQI metrics for predicting speech intelligibility and speech quality
 for normal hearing, hearing loss, and hearing aids. #emph[Hearing
 Research];, 424, 108593.
 
-Kaur, M., Ramekers, D., & Knipper, M. (2023). Temporal bone pathology in
-reverse-slope audiograms: Reevaluating the structural basis of
-low-frequency hearing loss. #emph[Hearing Research];, 427, 108654.
-
 Keidser, G., Dillon, H., Dyrlund, O., Carter, L., & Hartley, D. (2007).
-Preferred low- and high-frequency compression ratios among hearing aid
-users with moderately severe to profound hearing loss. #emph[Journal of
-the American Academy of Audiology];, 18(1), 17-33.
+Preferred Compression Ratios in the Low and High Frequencies by the
+Moderately Severe to Severe-Profound Population. #emph[Journal of the
+American Academy of Audiology];, 18(1), 17-33.
 
 Keidser, G., Dillon, H., Carter, L., & O'Brien, A. (2012a). NAL-NL2
 empirical adjustments. #emph[Trends in Amplification];, 16(4), 211-223.
 
-Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026). Evolving the
-philosophy: From the NAL rule to NAL-NL3. #emph[International Journal of
-Audiology];, 65(6), 513--524.
-https:\/\/doi.org/10.1080/14992027.2026.4234266
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026a). Evolving the
+philosophy: From the NAL rule to NAL-NL3. Advance online publication.
+1-10. https:\/\/doi.org/10.1080/14992027.2026.2690236
+
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026b). The NAL-NL3
+comfort-in-noise module. #emph[International Journal of Audiology];. In
+press.
 
 Lybarger, S. F. (1944). #emph[US Patent No.~2,357,838];. Washington, DC:
 U.S. Patent and Trademark Office.
 
-Majdak, P., Hollmach, V., & Baumgartner, R. (2022). AMT: Auditory
-Modeling Toolbox. #emph[Acta Acustica];, 6, 19.
+Majdak, P., Hollomey, C., & Baumgartner, R. (2022). AMT 1.x: A toolbox
+for reproducible research in auditory modeling. #emph[Acta Acustica];,
+6, 19. https:\/\/doi.org/10.1051/aacus/2022011
 
 Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., & Wilson, R. H. (2025).
 Predicted and measured word-recognition scores unmask distortion in the
@@ -1133,10 +1125,6 @@ Oetting, D., Hohmann, V., Appell, J. E., Kollmeier, B., & Ewert, S. D.
 (2017). Restoring perceived loudness for listeners with hearing loss.
 #emph[Ear and Hearing];, 38(1), 74-83.
 
-National Acoustic Laboratories. (2021). #emph[NAL-NL2 software]
-\[Computer software\]. Sydney, Australia: National Acoustic
-Laboratories.
-
 Pepler, A., Lewis, K., & Munro, K. J. (2015). Adult hearing-aid users
 with cochlear dead regions restricted to high frequencies: implications
 for amplification. #emph[International Journal of Audiology];, 54(5),
@@ -1163,11 +1151,6 @@ https:\/\/doi.org/10.1121/1.2108861
 Souza, P., Hoover, E., Blackburn, M., & Gallun, F. (2018). The
 characteristics of adults with severe hearing loss. #emph[Journal of the
 American Academy of Audiology];, 29(8), 764-779.
-
-Storey, L., Dillon, H., Yeend, I., & Wigney, D. (1998). The National
-Acoustic Laboratories' procedure for selecting the saturation sound
-pressure level of hearing aids: Experimental validation. #emph[Ear and
-Hearing];, 19(4), 267-279.
 
 Valente, M., Oeding, K., Brockmeyer, A., Smith, S., & Kallogjeri, D.
 (2018). Differences in word and phoneme recognition in quiet, sentence
@@ -1723,10 +1706,13 @@ real-ear-measured amplification in hearing-aid users with various grades
 of hearing loss. #emph[International Journal of Audiology];, 65(7),
 834--845. https:\/\/doi.org/10.1080/14992027.2024.2426009
 
-Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026). Evolving the
-philosophy: From the NAL rule to NAL-NL3. #emph[International Journal of
-Audiology];, 65(6), 513--524.
-https:\/\/doi.org/10.1080/14992027.2026.4234266
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026a). Evolving the
+philosophy: From the NAL rule to NAL-NL3. Advance online publication.
+1-10. https:\/\/doi.org/10.1080/14992027.2026.2690236
+
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026b). The NAL-NL3
+comfort-in-noise module. #emph[International Journal of Audiology];. In
+press.
 
 Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., & Wilson, R. H. (2025).
 Predicted and measured word-recognition scores unmask distortion in the
