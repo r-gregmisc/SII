@@ -144,7 +144,7 @@ frequency bands (Moore, Glasberg, & Stone, 2010).
 
 Open-NL positions its prescriptive rationale as a #emph[constrained
 intelligibility-maximizer];. Its primary mathematical objective is the
-unconstrained maximization of desensitized SII. Rather than globally
+soft-constrained maximization of desensitized SII. Rather than globally
 restricting this maximization to a static "normal-or-less" loudness
 boundary, Open-NL permits dynamic loudness growth. This growth continues
 until it strikes a U-shaped physiological ceiling (controlled via
@@ -466,9 +466,9 @@ downhill solvers like the Nelder-Mead simplex algorithm are notoriously
 prone to premature stagnation, simplex collapse, and entrapment in
 shallow local extrema.
 
-Indeed, unconstrained Nelder-Mead search from disparate flat
-initializations (e.g., -10 dB vs.~+10 dB) can deviate by up to 0.5 sones
-or 0.05 SII. To mitigate this, Open-NL deploys a 5-iteration multi-start
+Indeed, local Nelder-Mead search from disparate flat initializations
+(e.g., -10 dB vs.~+10 dB) can deviate by up to 0.5 sones or 0.05 SII. To
+mitigate this, Open-NL deploys a 5-iteration multi-start
 routine---seeding the initial simplex with the NAL-R target and
 executing four additional randomized restarts.
 
@@ -767,7 +767,7 @@ clinical anchors.]
 #strong[TABLE IV. Insertion Gain Targets (dB) across A1-A7 Audiograms
 (65 dB SPL Input).] #emph[Note: Open-NL targets are presented for both
 Conservative and Aggressive modes for A4 and A5. Targets illustrate how
-unconstrained desensitized SII maximization allocates high-frequency
+soft-constrained desensitized SII maximization allocates high-frequency
 gain relative to regularized formulae. Profile A7 is fully deterministic
 (0.75 x 50 dB = 37.5 dB) and is included strictly as an arithmetic
 sanity check.]
@@ -869,7 +869,7 @@ saturation, rather than an empirical preference optimum. This contrasts
 with well-supported heuristic targets like the 3.0:1 Compression Ratio
 bound (Stage 12), which is directly grounded in extensive empirical
 psychoacoustic data (Souza, 2002; Souza et al., 2006). However, to
-enforce this bound safely during unconstrained optimization, Open-NL
+enforce this bound safely during soft-constrained optimization, Open-NL
 applies the 3.0:1 constraint both as a soft objective penalty
 ($P_(c r)$) to guide the optimizer, and as a strict post-optimization
 hard clamp. This dual constraint structure ensures that the raw drive to
@@ -1376,8 +1376,8 @@ dB SPL Input).]
   align(center)[#table(
     columns: (20%, 20%, 20%, 20%, 20%),
     align: (auto,auto,auto,auto,auto,),
-    table.header([Profile], [Unconstrained Seed SII], [Unconstrained
-      Seed Sones], [SD-LFP Seed SII], [SD-LFP Seed Sones],),
+    table.header([Profile], [Unmodified Seed SII], [Unmodified Seed
+      Sones], [SD-LFP Seed SII], [SD-LFP Seed Sones],),
     table.hline(),
     [A1 (Flat mod)], [0.86], [7.2], [0.86], [7.2],
     [A2 (Reverse)], [0.88], [6.3], [0.88], [6.0],
@@ -1405,9 +1405,9 @@ $T_(o n s e t) = 70$ dB HL (conservative default) or $60$ dB HL
 
 == S.I.7. Stage 7: Soft-Compression High-Frequency Desensitization
 <s.i.7.-stage-7-soft-compression-high-frequency-desensitization>
-To prevent unconstrained audibility maximization from prescribing
-intolerable high-frequency gain in steeply sloping losses, Open-NL
-applies a dynamic soft-compression envelope ($L_(g a i n)$):
+To prevent pure audibility maximization from prescribing intolerable
+high-frequency gain in steeply sloping losses, Open-NL applies a dynamic
+soft-compression envelope ($L_(g a i n)$):
 
 #emph[(Note: For patients in "Moderate" or "High" distortion categories,
 $L_(g a i n)$ is reduced by 10 dB).]
@@ -1590,7 +1590,7 @@ saturation distortion:
 == S.I.12. Stage 12: Embedded Nelder-Mead Simplex Optimization & Physiological Loudness Ceilings
 <s.i.12.-stage-12-embedded-nelder-mead-simplex-optimization-physiological-loudness-ceilings>
 When `optimize = TRUE`, Open-NL adjusts the heuristic targets by
-minimizing an unconstrained multi-objective loss function via
+minimizing an soft-constrained multi-objective loss function via
 Nelder-Mead simplex search (`stats::optim`).
 
 === Parameter Vector and Gain Formation
