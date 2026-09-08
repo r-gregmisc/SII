@@ -781,19 +781,19 @@ Target gain at arbitrary overall input level $L_{in}$ (e.g., 50, 65, 80 dB SPL) 
 **TABLE S3. Effective Compression Ratios (50 to 80 dB SPL Inputs) across A1-A7 Audiograms.** *Note: Dashes (-) indicate frequency regions where prescribed gain is exactly 0 dB for both 50 and 80 dB SPL inputs (linear amplification, CR = 1.0). Note that these values represent the emergent multi-level input/output ratios measured dynamically between 50 and 80 dB SPL inputs, rather than the prescribed static channel CRs calculated internally in Stage 10. To strictly enforce the 3.0:1 maximum bound, Open-NL applies dual constraints: a soft objective penalty ($P_{cr}$) during optimization, followed by a strict hard clamp, ensuring that pure intelligibility maximization never violates empirical psychoacoustic limits.*
 
 | Profile | Formula | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
-|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+|---------|---------|--------|--------|---------|---------|---------|---------|
 | A1 | NAL-NL2 | 1.01 | 1.07 | 1.69 | 2.27 | 2.63 | 2.17 |
-| A1 | Open-NL | 1.25 | - | 1.19 | 1.54 | 2.27 | 4.35 |
+| A1 | Open-NL | 1.04 | - | 1.42 | 1.36 | 1.66 | 1.66 |
 | A2 | NAL-NL2 | 2.11 | 2.36 | 2.07 | 1.86 | 1.40 | 1.28 |
-| A2 | Open-NL | 2.56 | 1.70 | 1.59 | 1.66 | 1.52 | 1.21 |
+| A2 | Open-NL | 1.50 | 1.78 | 2.10 | 1.73 | 1.18 | - |
 | A3 | NAL-NL2 | - | 1.10 | 1.88 | 2.48 | 2.70 | 2.19 |
-| A3 | Open-NL | - | - | 1.55 | 2.19 | 2.68 | 3.75 |
+| A3 | Open-NL | - | 1.03 | 1.71 | 1.59 | 3.00 | 3.00 |
 | A4 | NAL-NL2 | - | - | 1.12 | 2.17 | 2.22 | 1.88 |
-| A4 | Open-NL | - | - | - | 1.29 | 12.00 | 2.00 |
+| A4 | Open-NL | - | - | - | 1.45 | 2.51 | 1.50 |
 | A5 | NAL-NL2 | - | - | 1.59 | 2.11 | 1.99 | 1.79 |
-| A5 | Open-NL | - | - | - | 1.33 | 3.30 | 2.38 |
+| A5 | Open-NL | - | - | - | 1.83 | 1.34 | 1.10 |
 | A6 | NAL-NL2 | 1.32 | 1.42 | 1.61 | 2.00 | 2.24 | 1.91 |
-| A6 | Open-NL | 1.50 | 1.50 | 1.50 | 1.50 | 1.50 | 1.50 |
+| A6 | Open-NL | 1.16 | 1.27 | 1.38 | 1.47 | 1.64 | 1.71 |
 | A7 | NAL-NL2 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 | A7 | Open-NL | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 

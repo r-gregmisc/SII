@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  5 SEP 2026 18:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  8 SEP 2026 08:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -667,212 +667,176 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/t
 exmf/fonts/enc/dvips/lm/lm-mathit.enc}] [2] [3] [4]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
-67.
+74.
  (/usr/share/texmf/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [5] [6{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}] [7] [8] [9]
+) [5] [6{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}] [7] [8] [9] [10]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 4
-29.
+47.
 
 (/usr/share/texmf/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [10{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}] [11] [12] [13]
-Underfull \hbox (badness 10000) in paragraph at lines 625--625
+) [11{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}] [12] [13] [14]
+Underfull \hbox (badness 10000) in paragraph at lines 643--643
 [][]\T1/lmr/bx/n/14.4 (+20) III. AN-A-LYT-I-CAL CEN-TER-PIECE: DIS-TIN-GUISH-IN
 G
  []
 
-[14] [15]
-<manuscript_figures/Figure4_Sensitivity.png, id=94, 578.16pt x 361.35pt>
-File: manuscript_figures/Figure4_Sensitivity.png Graphic file (type png)
-<use manuscript_figures/Figure4_Sensitivity.png>
-Package pdftex.def Info: manuscript_figures/Figure4_Sensitivity.png  used on in
-put line 706.
+[15] [16]
+<figures/Figure1_Sensitivity.png, id=98, 578.16pt x 361.35pt>
+File: figures/Figure1_Sensitivity.png Graphic file (type png)
+<use figures/Figure1_Sensitivity.png>
+Package pdftex.def Info: figures/Figure1_Sensitivity.png  used on input line 73
+0.
 (pdftex.def)             Requested size: 578.15858pt x 361.34912pt.
 
-Overfull \hbox (17.62364pt too wide) in paragraph at lines 706--711
+Overfull \hbox (17.62364pt too wide) in paragraph at lines 730--736
 [][]
  []
 
-[16 <./manuscript_figures/Figure4_Sensitivity.png>] [17] [18] [19] [20]
-[21] [22] [23]
-ignored error: Infinite glue shrinkage found in box being split [24] [25]
-[26]
-<manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png, id=148, 867.24pt x 433.62
-pt>
-File: manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png Graphic file (type pn
-g)
-<use manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png>
-Package pdftex.def Info: manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png  u
-sed on input line 1082.
+[17 <./figures/Figure1_Sensitivity.png>] [18] [19] [20] [21] [22] [23] [24]
+<figures/Figure2_BlandAltman.png, id=136, 505.89pt x 361.35pt>
+File: figures/Figure2_BlandAltman.png Graphic file (type png)
+<use figures/Figure2_BlandAltman.png>
+Package pdftex.def Info: figures/Figure2_BlandAltman.png  used on input line 98
+1.
+(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
+
+Overfull \hbox (17.63245pt too wide) in paragraph at lines 981--986
+[][]
+ []
+
+[25 <./figures/Figure2_BlandAltman.png>]
+ignored error: Infinite glue shrinkage found in box being split [26] [27]
+[28]
+<figures/Figure3_SII_Comparison.png, id=157, 867.24pt x 433.62pt>
+File: figures/Figure3_SII_Comparison.png Graphic file (type png)
+<use figures/Figure3_SII_Comparison.png>
+Package pdftex.def Info: figures/Figure3_SII_Comparison.png  used on input line
+ 1121.
 (pdftex.def)             Requested size: 469.75827pt x 234.87912pt.
-<manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png, id=149, 867.24pt x 722.7pt
->
-File: manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png Graphic file (type png
-)
-<use manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png>
-Package pdftex.def Info: manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png  us
-ed on input line 1090.
+
+Overfull \hbox (17.62807pt too wide) in paragraph at lines 1121--1125
+[][]
+ []
+
+[29]
+<figures/Figure4_Insertion_Gain.png, id=162, 867.24pt x 722.7pt>
+File: figures/Figure4_Insertion_Gain.png Graphic file (type png)
+<use figures/Figure4_Insertion_Gain.png>
+Package pdftex.def Info: figures/Figure4_Insertion_Gain.png  used on input line
+ 1126.
 (pdftex.def)             Requested size: 469.75827pt x 391.46521pt.
- [27] [28 <./manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png>] [29 <./manus
-cript_figures/OpenNL_vs_NALNL2_Gain_Final.png>] [30] [31] [32] [33]
-[34] [35]
-Underfull \hbox (badness 1077) in paragraph at lines 1312--1317
+
+Overfull \hbox (17.62807pt too wide) in paragraph at lines 1126--1130
+[][]
+ []
+
+[30 <./figures/Figure3_SII_Comparison.png>] [31 <./figures/Figure4_Insertion_Ga
+in.png>] [32] [33] [34] [35] [36] [37]
+Underfull \hbox (badness 1077) in paragraph at lines 1338--1343
 \T1/lmr/m/n/12 (+20) of ex-cess bin-au-ral broad-band loud-ness sum-ma-tion in 
 the hearing-impaired pop-u-la-
  []
 
-[36] [37] [38] [39] [40] [41] [42] [43{/usr/share/texmf/fonts/enc/dvips/lm/lm-m
-athex.enc}] [44] [45] [46] [47]
-Overfull \hbox (3.83762pt too wide) in paragraph at lines 1772--1772
+[38] [39] [40] [41] [42] [43] [44] [45{/usr/share/texmf/fonts/enc/dvips/lm/lm-m
+athex.enc}] [46] [47] [48] [49]
+Overfull \hbox (3.83762pt too wide) in paragraph at lines 1798--1798
 []|\T1/lmr/m/n/12 (-20) Reverse 
  []
 
 
-Overfull \hbox (22.06282pt too wide) in paragraph at lines 1773--1773
+Overfull \hbox (22.06282pt too wide) in paragraph at lines 1799--1799
 []|\T1/lmr/m/n/12 (-20) Moderately 
  []
 
 
-Overfull \hbox (1.58928pt too wide) in paragraph at lines 1774--1774
+Overfull \hbox (1.58928pt too wide) in paragraph at lines 1800--1800
 []|\T1/lmr/m/n/12 (-20) Steeply 
  []
 
 
-Overfull \hbox (1.58928pt too wide) in paragraph at lines 1775--1775
+Overfull \hbox (1.58928pt too wide) in paragraph at lines 1801--1801
 []|\T1/lmr/m/n/12 (-20) Steeply 
  []
 
 
-Overfull \hbox (22.1688pt too wide) in paragraph at lines 1777--1777
+Overfull \hbox (22.1688pt too wide) in paragraph at lines 1803--1803
 []|\T1/lmr/m/n/12 (-20) Conductive|  
  []
 
-[48] [49] [50] [51] [52] [53]
-Overfull \hbox (39.86566pt too wide) detected at line 1996
+[50] [51]
+Overfull \hbox (41.18445pt too wide) detected at line 1871
+[][][]\OML/lmm/m/it/12 L[]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 f\OT1/lmr/m/n/12 ) 
+= 30 + 0\OML/lmm/m/it/12 :\OT1/lmr/m/n/12 4 \OMS/lmsy/m/n/12 ^^A [] [] [] []\OM
+L/lmm/m/it/12 L[]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 f\OT1/lmr/m/n/12 ) = 40 + 0\
+OML/lmm/m/it/12 :\OT1/lmr/m/n/12 5 \OMS/lmsy/m/n/12 ^^A []\OT1/lmr/m/n/12 (0\OM
+L/lmm/m/it/12 ; [][]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 f\OT1/lmr/m/n/12 ) \OMS/l
+msy/m/n/12 ^^@ \OT1/lmr/m/n/12 60)[]
+ []
+
+[52] [53] [54] [55]
+Overfull \hbox (39.86566pt too wide) detected at line 2022
 [][][]\OML/lmm/m/it/12 G[]\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 f; L[]\OT1/lmr/m/n/
 12 ) = []
  []
 
-[54]
-Overfull \hbox (0.77397pt too wide) in paragraph at lines 2031--2032
-[]\T1/lmr/m/n/12 (-20) Formula  
- []
-
-ignored error: Infinite glue shrinkage found in box being split [55]
-ignored error: Infinite glue shrinkage found in box being split [56]
-Overfull \hbox (45.84927pt too wide) in paragraph at lines 2114--2114
-[]|\T1/lmtt/m/n/12 custom_occluded|  
- []
-
-
-Overfull \hbox (8.79926pt too wide) in paragraph at lines 2115--2115
-[]|\T1/lmtt/m/n/12 open_dome|  
- []
-
-
-Overfull \hbox (14.97426pt too wide) in paragraph at lines 2116--2116
-[]|\T1/lmtt/m/n/12 tulip_dome|  
- []
-
-
-Overfull \hbox (21.14926pt too wide) in paragraph at lines 2117--2117
-[]|\T1/lmtt/m/n/12 double_dome|  
- []
-
-
-Overfull \hbox (39.67427pt too wide) in paragraph at lines 2118--2118
-[]|\T1/lmtt/m/n/12 vent_1mm_solid|  
- []
-
-
-Overfull \hbox (39.67427pt too wide) in paragraph at lines 2119--2119
-[]|\T1/lmtt/m/n/12 vent_2mm_solid|  
- []
-
-
-Overfull \hbox (39.67427pt too wide) in paragraph at lines 2120--2120
-[]|\T1/lmtt/m/n/12 vent_3mm_solid|  
- []
-
-
-Overfull \hbox (45.84927pt too wide) in paragraph at lines 2121--2121
-[]|\T1/lmtt/m/n/12 vent_1mm_hollow|  
- []
-
-
-Overfull \hbox (45.84927pt too wide) in paragraph at lines 2122--2122
-[]|\T1/lmtt/m/n/12 vent_2mm_hollow|  
- []
-
-
-Overfull \hbox (45.84927pt too wide) in paragraph at lines 2123--2123
-[]|\T1/lmtt/m/n/12 vent_3mm_hollow|  
- []
-
+[56]
 ignored error: Infinite glue shrinkage found in box being split [57] [58]
-[59]
-Underfull \hbox (badness 1221) in paragraph at lines 2179--2182
+ignored error: Infinite glue shrinkage found in box being split [59] [60]
+[61]
+Underfull \hbox (badness 1221) in paragraph at lines 2205--2208
 []\T1/lmr/m/n/12 (+20) where $[][]$ is the ef-fec-tive Speech In-tel-li-gi-bil-
 ity In-dex cal-cu-lated us-ing the
  []
 
-[60]
-Overfull \hbox (381.54854pt too wide) detected at line 2228
-[][][][][] \OT1/lmr/m/n/12 = [] []
- []
-
-[61] [62]
-Overfull \hbox (63.10039pt too wide) in paragraph at lines 2295--2298
+[62] [63] [64]
+Overfull \hbox (63.10039pt too wide) in paragraph at lines 2323--2326
 []\T1/lmr/bx/n/12 (-20) Convergence Tol-er-ance\T1/lmr/m/n/12 (-20) : Rel-a-tiv
 e con-ver-gence tol-er-ance \T1/lmtt/m/n/12 reltol = sqrt(.Machine$double.eps)
  []
 
 
-Underfull \hbox (badness 4328) in paragraph at lines 2298--2306
+Underfull \hbox (badness 4328) in paragraph at lines 2326--2334
 []\T1/lmr/bx/n/12 (+20) Initial Sim-plex Seed-ing\T1/lmr/m/n/12 (+20) : Seed-in
 g in-cor-po-rates an au-di-bil-ity pro-jec-tion
  []
 
 
-Underfull \hbox (badness 4927) in paragraph at lines 2298--2306
+Underfull \hbox (badness 4927) in paragraph at lines 2326--2334
 [][] \OT1/lmr/m/n/12 (+20) = [](20\OML/lmm/m/it/12 ; []\OT1/lmr/m/n/12 (+20) (0
 \OML/lmm/m/it/12 ; [] \OMS/lmsy/m/n/12 ^^@ \OML/lmm/m/it/12 G[]\OT1/lmr/m/n/12 
 (+20) ))$\T1/lmr/m/n/12 (+20) , where $[] \OT1/lmr/m/n/12 (+20) =
  []
 
 
-Underfull \hbox (badness 1270) in paragraph at lines 2298--2306
+Underfull \hbox (badness 1270) in paragraph at lines 2326--2334
 []\OT1/lmr/m/n/12 (+20) ([] \OMS/lmsy/m/n/12 ^^@ \OT1/lmr/m/n/12 (+20) 5\OML/lm
 m/m/it/12 ; []\OT1/lmr/m/n/12 (+20) (\OML/lmm/m/it/12 L[]; [] \OT1/lmr/m/n/12 (
 +20) + 10))$\T1/lmr/m/n/12 (+20) . Soft in-puts re-ceive $\OT1/lmr/m/n/12 (+20)
  +3$ \T1/lmr/m/n/12 (+20) dB shift; loud
  []
 
-
-Underfull \hbox (badness 1077) in paragraph at lines 2318--2323
+[65]
+Underfull \hbox (badness 1077) in paragraph at lines 2346--2351
 \T1/lmr/m/n/12 (+20) of ex-cess bin-au-ral broad-band loud-ness sum-ma-tion in 
 the hearing-impaired pop-u-la-
  []
 
-[63] [64] [65] (./OpenNL_manuscript_combined.aux)
+[66] [67] (./OpenNL_manuscript_combined.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 15192 strings out of 469514
- 237353 string characters out of 5470072
- 707245 words of memory out of 5000000
- 43123 multiletter control sequences out of 15000+600000
- 713053 words of font info for 239 fonts, out of 8000000 for 9000
+ 15176 strings out of 469514
+ 236986 string characters out of 5470072
+ 706252 words of memory out of 5000000
+ 43124 multiletter control sequences out of 15000+600000
+ 711768 words of font info for 230 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 83i,11n,93p,1142b,683s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 83i,11n,93p,1142b,686s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/ty
 pe1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></u
 sr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/p
@@ -886,10 +850,10 @@ r/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/pu
 blic/lm/lmsy6.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share
 /texmf/fonts/type1/public/lm/lmtt12.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/symbols/msbm10.pfb>
-Output written on OpenNL_manuscript_combined.pdf (65 pages, 1149538 bytes).
+Output written on OpenNL_manuscript_combined.pdf (67 pages, 1182915 bytes).
 PDF statistics:
- 704 PDF objects out of 1000 (max. 8388607)
- 585 compressed objects within 6 object streams
+ 709 PDF objects out of 1000 (max. 8388607)
+ 588 compressed objects within 6 object streams
  199 named destinations out of 1000 (max. 500000)
- 45400 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 43357 words of extra memory for PDF output out of 51595 (max. 10000000)
 
