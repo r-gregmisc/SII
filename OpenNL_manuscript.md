@@ -174,11 +174,11 @@ To isolate heuristic sensitivity from numerical solver stochasticity, an ANOVA v
 
 **TABLE II. ANOVA Variance Decomposition of Heuristic Parameters (65 dB SPL Input).** *Note: Generated using the aggressive 60 dB HL booster onset. The ANOVA decomposition explicitly separates variance explained by clinical heuristics from residual solver stochasticity.*
 
-| Profile | Median SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) | Residual Variance ($\eta^2$) |
-|---|---|---|---|---|
-| **A2** | 0.87 [0.82, 0.88] | 4.43 [3.38, 4.44] | Anchor (61.1%) | 38.9% |
-| **A4** | 0.64 [0.62, 0.66] | 5.27 [5.23, 5.28] | None | 99.7% |
-| **A5** | 0.45 [0.45, 0.51] | 4.28 [4.26, 4.37] | None | 84.3% |
+| Profile | Median SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) |
+|---|---|---|---|
+| **A2** | 0.87 [0.82, 0.88] | 4.43 [3.38, 4.44] | Anchor (61.1%) |
+| **A4** | 0.64 [0.62, 0.66] | 5.27 [5.23, 5.28] | None (Total Variance < 0.1 sones) |
+| **A5** | 0.45 [0.45, 0.51] | 4.28 [4.26, 4.37] | None (Total Variance < 0.2 sones) |
 
 The resulting variance (**Table II**, **Figure 1**) illustrates mechanistically how strict mathematical boundary conditions dominate the objective landscape. The tight response envelope is not evidence of a flat optimization space, but rather demonstrates that the optimizer actively collides with the binding physiological loudness constraint. For example, the interpolated loudness caps for profiles A1, A2, A3, and A5 effectively dictate the final modeled loudness to within 0.1 sones. Because the objective function is entirely bound by these hard distortion penalties, modulating the underlying heuristic triggers (such as the base anchor or slope bypass) yielded minimal variance (e.g., A5 fluctuating narrowly between 4.26 and 4.37 sones). This indicates that once the active penalty wall is reached, the underlying heuristic parameters are rendered practically irrelevant. While this successfully prevents the massive runaway amplification typical of historically unregularized intelligibility optimization, any future claims of comprehensive parameter robustness must be tested against a sweep that formally includes these binding penalty variables.
 

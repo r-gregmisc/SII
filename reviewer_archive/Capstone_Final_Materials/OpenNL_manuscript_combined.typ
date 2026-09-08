@@ -449,18 +449,17 @@ explained by clinical heuristics from residual solver stochasticity.]
 
 #figure(
   align(center)[#table(
-    columns: (20%, 20%, 20%, 20%, 20%),
-    align: (auto,auto,auto,auto,auto,),
+    columns: (25%, 25%, 25%, 25%),
+    align: (auto,auto,auto,auto,),
     table.header([Profile], [Median SII \[Min, Max\]], [Median Loudness
-      \[Min, Max\]], [ANOVA Dominant Factor ($eta^2$)], [Residual
-      Variance ($eta^2$)],),
+      \[Min, Max\]], [ANOVA Dominant Factor ($eta^2$)],),
     table.hline(),
     [#strong[A2];], [0.87 \[0.82, 0.88\]], [4.43 \[3.38,
-    4.44\]], [Anchor (61.1%)], [38.9%],
-    [#strong[A4];], [0.64 \[0.62, 0.66\]], [5.27 \[5.23,
-    5.28\]], [None], [99.7%],
-    [#strong[A5];], [0.45 \[0.45, 0.51\]], [4.28 \[4.26,
-    4.37\]], [None], [84.3%],
+    4.44\]], [Anchor (61.1%)],
+    [#strong[A4];], [0.64 \[0.62, 0.66\]], [5.27 \[5.23, 5.28\]], [None
+    (Total Variance \< 0.1 sones)],
+    [#strong[A5];], [0.45 \[0.45, 0.51\]], [4.28 \[4.26, 4.37\]], [None
+    (Total Variance \< 0.2 sones)],
   )]
   , kind: table
   )

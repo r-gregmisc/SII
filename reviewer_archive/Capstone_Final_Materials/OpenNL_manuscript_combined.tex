@@ -686,11 +686,10 @@ booster onset. The ANOVA decomposition explicitly separates variance
 explained by clinical heuristics from residual solver stochasticity.}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Profile
@@ -700,19 +699,17 @@ Median SII {[}Min, Max{]}
 Median Loudness {[}Min, Max{]}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 ANOVA Dominant Factor (\(\eta^2\))
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Residual Variance (\(\eta^2\))
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{A2} & 0.87 {[}0.82, 0.88{]} & 4.43 {[}3.38, 4.44{]} & Anchor
-(61.1\%) & 38.9\% \\
-\textbf{A4} & 0.64 {[}0.62, 0.66{]} & 5.27 {[}5.23, 5.28{]} & None &
-99.7\% \\
-\textbf{A5} & 0.45 {[}0.45, 0.51{]} & 4.28 {[}4.26, 4.37{]} & None &
-84.3\% \\
+(61.1\%) \\
+\textbf{A4} & 0.64 {[}0.62, 0.66{]} & 5.27 {[}5.23, 5.28{]} & None
+(Total Variance \textless{} 0.1 sones) \\
+\textbf{A5} & 0.45 {[}0.45, 0.51{]} & 4.28 {[}4.26, 4.37{]} & None
+(Total Variance \textless{} 0.2 sones) \\
 \end{longtable}
 
 The resulting variance (\textbf{Table II}, \textbf{Figure 1})
