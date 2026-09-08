@@ -990,8 +990,8 @@ License: GPL-3.0). Standalone replication scripts generating all
 figures, tables, and sensitivity sweeps reported in this manuscript are
 located in the `reproducibility_scripts/` directory.
 
-== VI. REFERENCES
-<vi.-references>
+== REFERENCES
+<references>
 Almufarrij, I., Dillon, H., & Munro, K. J. (2021). Does probe-tube
 verification of real-ear hearing aid amplification characteristics
 improve outcomes in adult hearing aid users? A systematic review and
@@ -1693,7 +1693,7 @@ transfer function.
 #horizontalrule
 
 == References
-<references>
+<references-1>
 Denk, F., Oetting, D., Latzel, M., Bonsel, H., & Husstedt, H. (2025).
 Prevalence of excess binaural broadband loudness summation in the
 hearing-impaired population and implications for hearing aid gain
