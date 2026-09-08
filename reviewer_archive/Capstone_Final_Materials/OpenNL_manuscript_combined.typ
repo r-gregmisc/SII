@@ -595,10 +595,16 @@ software (National Acoustic Laboratories, Sydney, Australia) for soft
 (50 dB SPL), conversational (65 dB SPL), and loud (80 dB SPL) speech
 inputs. All NAL-NL2 targets were extracted using an 18-channel
 compression architecture with adaptive time constants, occluded BTE \#13
-tubing, and supra-aural headphone thresholds. Restricting comparisons to
-NAL-NL2 provides a standardized, universally recognized clinical
-baseline, avoiding the artifacts of surrogate target estimators for
-alternative proprietary formulae.
+tubing, and supra-aural headphone thresholds. Crucially, to isolate the
+pure mathematical objective function without demographic artifacts, both
+Open-NL and NAL-NL2 targets were generated using identical baseline
+configurations: #strong[Bilateral, Adult, Male, Experienced user, and
+Non-tonal language];. Both sets are reported strictly as Real-Ear
+Insertion Gain (REIG) in the identical acoustic reference plane with
+matched occluded coupling. Restricting comparisons to NAL-NL2 provides a
+standardized, universally recognized clinical baseline, avoiding the
+artifacts of surrogate target estimators for alternative proprietary
+formulae.
 
 === Shared Monaural Vulnerability: The Rationale for Aggressive Boundary Testing
 <shared-monaural-vulnerability-the-rationale-for-aggressive-boundary-testing>
