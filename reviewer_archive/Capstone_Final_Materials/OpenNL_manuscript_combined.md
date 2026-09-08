@@ -126,7 +126,7 @@ To isolate heuristic sensitivity from numerical solver stochasticity, an ANOVA v
 
 **TABLE II. ANOVA Variance Decomposition of Heuristic Parameters (65 dB SPL Input).** *Note: Generated using the aggressive 60 dB HL booster onset. The ANOVA decomposition explicitly separates variance explained by clinical heuristics from residual solver stochasticity.*
 
-| Profile | Median SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) |
+| Profile | Median Desensitized SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) |
 |---|---|---|---|
 | **A2** | 0.87 [0.82, 0.88] | 4.43 [3.38, 4.44] | Anchor (61.1%) |
 | **A4** | 0.64 [0.62, 0.66] | 5.27 [5.23, 5.28] | None (Total Variance < 0.1 sones) |
@@ -813,7 +813,7 @@ The Nelder-Mead solver minimizes:
 \mathcal{L}(\boldsymbol{\delta}) = -100 \cdot \text{SII}_{desens}(\mathbf{G}) + P_{anchor} + P_{bounds} + P_{loud} + P_{spl} + P_{rough} + P_{order} + P_{cr} + P_{abg}
 \end{equation}
 
-where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calculated using the `johnson2011_smoothed` transfer function.
+where $\text{SII}_{desens}$ is the desensitized Speech Intelligibility Index calculated using the `johnson2011_smoothed` transfer function.
 
 ### Explicit Penalty Terms and Exact Weights ($\lambda$)
 

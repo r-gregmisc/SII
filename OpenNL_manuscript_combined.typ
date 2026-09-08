@@ -410,8 +410,9 @@ explained by clinical heuristics from residual solver stochasticity.]
   align(center)[#table(
     columns: (25%, 25%, 25%, 25%),
     align: (auto,auto,auto,auto,),
-    table.header([Profile], [Median SII \[Min, Max\]], [Median Loudness
-      \[Min, Max\]], [ANOVA Dominant Factor ($eta^2$)],),
+    table.header([Profile], [Median Desensitized SII \[Min,
+      Max\]], [Median Loudness \[Min, Max\]], [ANOVA Dominant Factor
+      ($eta^2$)],),
     table.hline(),
     [#strong[A2];], [0.87 \[0.82, 0.88\]], [4.43 \[3.38,
     4.44\]], [Anchor (61.1%)],
@@ -1605,7 +1606,7 @@ interpolated to calculation frequencies:
 <loss-function-formulation>
 The Nelder-Mead solver minimizes:
 
-where $upright("SII")_(d e s e n s)$ is the effective Speech
+where $upright("SII")_(d e s e n s)$ is the desensitized Speech
 Intelligibility Index calculated using the `johnson2011_smoothed`
 transfer function.
 

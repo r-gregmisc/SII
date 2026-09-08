@@ -63,7 +63,7 @@ df <- do.call(rbind, df_list)
 
 # Prettify profile names
 profile_names <- c("A1" = "A1 (Mild)", "A2" = "A2 (Rev Slope)", "A3" = "A3 (Mod Sloping)", 
-                   "A4" = "A4 (Mod-Severe)", "A5" = "A5 (Profound)", "A6" = "A6 (Mixed)", "A7" = "A7 (Conductive)")
+                   "A4" = "A4 (Severe)", "A5" = "A5 (Profound)", "A6" = "A6 (Mixed)", "A7" = "A7 (Conductive)")
 df$Profile <- factor(profile_names[as.character(df$Profile)], levels = profile_names)
 
 # Custom colors and line types for clarity

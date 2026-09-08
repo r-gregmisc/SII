@@ -550,7 +550,7 @@ explained by clinical heuristics from residual solver stochasticity.}
 \begin{minipage}[b]{\linewidth}\raggedright
 Profile
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Median SII {[}Min, Max{]}
+Median Desensitized SII {[}Min, Max{]}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Median Loudness {[}Min, Max{]}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2073,7 +2073,7 @@ The Nelder-Mead solver minimizes:
 \mathcal{L}(\boldsymbol{\delta}) = -100 \cdot \text{SII}_{desens}(\mathbf{G}) + P_{anchor} + P_{bounds} + P_{loud} + P_{spl} + P_{rough} + P_{order} + P_{cr} + P_{abg}
 \end{equation}
 
-where \(\text{SII}_{desens}\) is the effective Speech Intelligibility
+where \(\text{SII}_{desens}\) is the desensitized Speech Intelligibility
 Index calculated using the \texttt{johnson2011\_smoothed} transfer
 function.
 

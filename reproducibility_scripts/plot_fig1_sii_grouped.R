@@ -21,12 +21,12 @@ raw_text <- "
 | A3 (Mod Sloping) | 65 | Open-NL | 0.718 | 0.671 | 4.20 |
 | A3 (Mod Sloping) | 80 | NAL-NL2 | 0.777 | 0.695 | 9.82 |
 | A3 (Mod Sloping) | 80 | Open-NL | 0.782 | 0.690 | 11.12 |
-| A4 (Mod-Severe) | 50 | NAL-NL2 | 0.614 | 0.590 | 1.61 |
-| A4 (Mod-Severe) | 50 | Open-NL | 0.562 | 0.537 | 1.16 |
-| A4 (Mod-Severe) | 65 | NAL-NL2 | 0.711 | 0.676 | 6.10 |
-| A4 (Mod-Severe) | 65 | Open-NL | 0.650 | 0.620 | 5.27 |
-| A4 (Mod-Severe) | 80 | NAL-NL2 | 0.749 | 0.689 | 15.76 |
-| A4 (Mod-Severe) | 80 | Open-NL | 0.749 | 0.699 | 15.47 |
+| A4 (Severe) | 50 | NAL-NL2 | 0.614 | 0.590 | 1.61 |
+| A4 (Severe) | 50 | Open-NL | 0.562 | 0.537 | 1.16 |
+| A4 (Severe) | 65 | NAL-NL2 | 0.711 | 0.676 | 6.10 |
+| A4 (Severe) | 65 | Open-NL | 0.650 | 0.620 | 5.27 |
+| A4 (Severe) | 80 | NAL-NL2 | 0.749 | 0.689 | 15.76 |
+| A4 (Severe) | 80 | Open-NL | 0.749 | 0.699 | 15.47 |
 | A5 (Profound) | 50 | NAL-NL2 | 0.504 | 0.474 | 1.65 |
 | A5 (Profound) | 50 | Open-NL | 0.388 | 0.375 | 0.92 |
 | A5 (Profound) | 65 | NAL-NL2 | 0.574 | 0.543 | 5.54 |
@@ -64,25 +64,25 @@ for (line in lines) {
   eff_sii <- as.numeric(parts[6])
   
   df <- rbind(df, data.frame(Profile=profile, Level=level, Method=method, Metric="ANSI", Value=ansi_sii))
-  df <- rbind(df, data.frame(Profile=profile, Level=level, Method=method, Metric="Effective", Value=eff_sii))
+  df <- rbind(df, data.frame(Profile=profile, Level=level, Method=method, Metric="Desensitized", Value=eff_sii))
 }
 
 # Create a combined grouping variable
 df$Group <- factor(paste(df$Method, df$Metric, sep=" - "),
-                   levels = c("NAL-NL2 - ANSI", "NAL-NL2 - Effective", "Open-NL - ANSI", "Open-NL - Effective"))
+                   levels = c("NAL-NL2 - ANSI", "NAL-NL2 - Desensitized", "Open-NL - ANSI", "Open-NL - Desensitized"))
 
 # Custom color palette:
 # NAL-NL2 ANSI: Light Blue, NAL-NL2 Eff: Dark Blue
 # Open-NL ANSI: Light Red, Open-NL Eff: Dark Red
-my_colors <- c("NAL-NL2 - ANSI" = "#89CFF0", "NAL-NL2 - Effective" = "#0047AB",
-               "Open-NL - ANSI" = "#FF7F7F", "Open-NL - Effective" = "#B22222")
+my_colors <- c("NAL-NL2 - ANSI" = "#89CFF0", "NAL-NL2 - Desensitized" = "#0047AB",
+               "Open-NL - ANSI" = "#FF7F7F", "Open-NL - Desensitized" = "#B22222")
 
 p <- ggplot(df, aes(x=as.factor(Level), y=Value, fill=Group)) +
   geom_bar(stat="identity", position=position_dodge(width=0.85), width=0.7) +
   facet_wrap(~Profile, ncol=4) +
   scale_fill_manual(values = my_colors) +
   theme_minimal() +
-  labs(title="ANSI vs Effective SII: NAL-NL2 vs Open-NL",
+  labs(title="ANSI vs Desensitized SII: NAL-NL2 vs Open-NL",
        subtitle="Direct comparison of raw physical audibility and desensitized audibility across input levels",
        x="Input Level (dB SPL)",
        y="Speech Intelligibility Index (SII)",

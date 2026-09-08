@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  8 SEP 2026 18:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.7.25)  8 SEP 2026 18:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -795,13 +795,7 @@ Overfull \hbox (39.86566pt too wide) detected at line 1893
 [55]
 ignored error: Infinite glue shrinkage found in box being split [56] [57]
 ignored error: Infinite glue shrinkage found in box being split [58] [59]
-[60]
-Underfull \hbox (badness 1221) in paragraph at lines 2076--2079
-[]\T1/lmr/m/n/12 (+20) where $[][]$ is the ef-fec-tive Speech In-tel-li-gi-bil-
-ity In-dex cal-cu-lated us-ing the
- []
-
-[61]
+[60] [61]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
 115.
  (/usr/share/texmf/tex/latex/lm/ts1lmr.fd
@@ -879,7 +873,7 @@ blic/lm/lmsy6.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share
 /texmf/fonts/type1/public/lm/lmtt12.pfb></usr/share/texmf/fonts/type1/public/lm
 /lmtti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols
 /msbm10.pfb>
-Output written on OpenNL_manuscript_combined.pdf (66 pages, 1196073 bytes).
+Output written on OpenNL_manuscript_combined.pdf (66 pages, 1196911 bytes).
 PDF statistics:
  710 PDF objects out of 1000 (max. 8388607)
  588 compressed objects within 6 object streams

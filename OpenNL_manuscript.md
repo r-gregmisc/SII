@@ -126,7 +126,7 @@ To isolate heuristic sensitivity from numerical solver stochasticity, an ANOVA v
 
 **TABLE II. ANOVA Variance Decomposition of Heuristic Parameters (65 dB SPL Input).** *Note: Generated using the aggressive 60 dB HL booster onset. The ANOVA decomposition explicitly separates variance explained by clinical heuristics from residual solver stochasticity.*
 
-| Profile | Median SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) |
+| Profile | Median Desensitized SII [Min, Max] | Median Loudness [Min, Max] | ANOVA Dominant Factor ($\eta^2$) |
 |---|---|---|---|
 | **A2** | 0.87 [0.82, 0.88] | 4.43 [3.38, 4.44] | Anchor (61.1%) |
 | **A4** | 0.64 [0.62, 0.66] | 5.27 [5.23, 5.28] | None (Total Variance < 0.1 sones) |
