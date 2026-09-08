@@ -716,17 +716,18 @@ dominate the objective landscape. The tight response envelope is not
 evidence of a flat optimization space, but rather demonstrates that the
 optimizer actively collides with the binding physiological loudness
 constraint. For example, the interpolated loudness caps for profiles A1,
-A2, A3, and A5 effectively dictate the final modeled loudness to within
-0.1 sones. Because the objective function is entirely bound by these
-hard distortion penalties, modulating the underlying heuristic triggers
-(such as the base anchor or slope bypass) yielded minimal variance
-(e.g., A5 fluctuating narrowly between 4.26 and 4.37 sones). This
-indicates that once the active penalty wall is reached, the underlying
-heuristic parameters are rendered practically irrelevant. While this
-successfully prevents the massive runaway amplification typical of
-historically unregularized intelligibility optimization, any future
-claims of comprehensive parameter robustness must be tested against a
-sweep that formally includes these binding penalty variables.
+A3, and A5 effectively dictate the final modeled loudness to within 0.1
+sones. Because the objective function is entirely bound by these hard
+distortion penalties, modulating the underlying heuristic triggers
+failed to produce any significant main effect (e.g., A5 fluctuating
+narrowly between 4.26 and 4.37 sones purely due to higher-order
+interactions). This indicates that once the active penalty wall is
+reached, the underlying heuristic parameters are rendered practically
+irrelevant. While this successfully prevents the massive runaway
+amplification typical of historically unregularized intelligibility
+optimization, any future claims of comprehensive parameter robustness
+must be tested against a sweep that formally includes these binding
+penalty variables.
 
 \pandocbounded{\includegraphics[keepaspectratio,alt={Parameter Sensitivity Analysis}]{figures/Figure1_Sensitivity.png}}
 \emph{Figure 1. Distribution of resulting ANSI SII scores and
@@ -759,31 +760,27 @@ or 0.05 SII. To mitigate this, Open-NL deploys a 5-iteration multi-start
 routine---seeding the initial simplex with the NAL-R target and
 executing four additional randomized restarts.
 
-To rigorously quantify the run-to-run reproducibility of this
-multi-start routine, we analyzed the residual variance from the
-256-iteration permutation sweep (Table II). Because the ANOVA
-decomposition demonstrated that the heuristic rules had zero main effect
-on the steeply sloping profiles (A4, A5), the resulting dataset serves
-as an effective \(N=256\) Monte Carlo evaluation of solver consistency.
-Across 256 independent executions of the multi-start routine with fixed
-inputs, the standard deviation (\(\sigma\)) of the final objective was
-exceptionally tight: just \(\sigma = 0.02\) sones for A4 and
-\(\sigma = 0.05\) sones for A5.
+Because the ANOVA decomposition demonstrated that the heuristic rules
+had minimal main effects on the steeply sloping profiles (A4, A5), the
+absolute variance observed across the sweep was exceptionally tight (a
+total range of just 0.05 sones for A4). However, this residual variance
+represents a convolution of highest-order heuristic interactions and
+solver stochasticity. Consequently, this sweep cannot strictly isolate
+pure numerical stability. Future investigations must formally evaluate
+Nelder-Mead solver consistency by executing dedicated Monte Carlo
+initializations with fixed parameter vectors across hundreds of varying
+RNG seeds.
 
-This tight clustering indicates that the procedure converges
-reproducibly to equivalent objective solutions rather than being highly
-sensitive to initialization. However, it must be explicitly disclosed
-that agreement on the final objective does not strictly prove
-identifiability of the underlying gain parameters. Because physiological
-optimization constraints (such as loudness ceilings) often create flat
-topological plateaus near the optimal basin, divergent parameter
-configurations can theoretically produce functionally equivalent
-objective scores. Thus, while the multi-start routine effectively
-neutralizes objective-level stochasticity---confirming that the wide
-target swings in profile A2 are driven systematically by heuristic rule
-interactions---future implementations analyzing parameter
-identifiability should transition to modern global stochastic
-optimization algorithms:
+Furthermore, while the algorithm tightly constrains profiles like A4 and
+A5 against the physiological loudness cap, other profiles exhibit
+significant heuristic sensitivity. For example, profile A2 experiences
+wide target swings (3.38 to 4.44 sones) systematically driven by the
+anchor heuristic (61.1\% variance). Because physiological optimization
+constraints often create flat topological plateaus near the optimal
+basin, divergent parameter configurations can theoretically produce
+functionally equivalent objective scores. Future implementations
+analyzing parameter identifiability should transition to modern global
+stochastic optimization algorithms:
 
 However, from an algorithmic optimization standpoint, Nelder-Mead
 remains a local simplex heuristic that lacks formal global convergence
