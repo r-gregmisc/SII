@@ -648,42 +648,51 @@ Two critical methodological boundaries govern this evaluation: 1.
 circularity exists when evaluating an optimization algorithm against the
 identical metric it was tuned to maximize. Because Open-NL's objective
 function seeks to maximize desensitized SII, reporting higher SII values
-relative to regularized formulae (like NAL-NL2) is generally expected as
-a mathematical tautology. However, because Open-NL is a
-#emph[constrained] optimizer, this tautology fails when its explicit
-safety heuristics bind. As seen in Table III, Open-NL yields
-#emph[lower] desensitized SII than NAL-NL2 for profiles A4 (0.62
-vs.~0.68) and A5 (0.44 vs.~0.54). For A4, the U-shaped physiological
-loudness cap acts as a soft physiological boundary (overcoming small
-boundary overshoots via massive SII gains, but preventing catastrophic
-loudness growth), forcing the solver to sacrifice theoretical audibility
-to prevent catastrophic loudness growth. For A5, the severe
-sensorineural loss restricts the available dynamic range, forcing heavy
-compression. Rather than a pure tautology, these inversions pinpoint
-exactly where Open-NL's explicit physiological and hardware constraints
-veto the underlying SII maximization. Stationary band-importance metrics
-like ANSI S3.5 and desensitized SII are blind to dynamic temporal
-envelope distortion, channel cross-talk, and phase distortion induced by
-aggressive compression ratios (\>3.0:1). In auditory science, genuine,
-independent, distortion-aware speech perception evaluation requires
-waveform-level biophysical models: - HASPI (Hearing Aid Speech
-Perception Index; Kates & Arehart, 2022): Accurately simulates
-peripheral auditory processing, basilar membrane compression loss,
-auditory nerve firing rates, and envelope modulation integrity. - HASQI
-(Hearing Aid Speech Quality Index; Kates & Arehart, 2022): Evaluates
-non-linear harmonic distortion, envelope fidelity, and spectral
-fine-structure cross-correlation between aided and reference speech
-signals. Computing HASPI and HASQI requires convolving continuous speech
-(.wav) through a time-domain dynamic range compression engine (such as
-openMHA; Herzke et al., 2017). Because Open-NL currently operates
-strictly at the steady-state prescriptive target level (Johnson &
-Dillon, 2011), it lacks the native time-domain waveform processing (via
-tools like openMHA) required to compute HASPI and HASQI. While
-integrating a full automated time-domain pipeline is a crucial target
-for future development, its absence in this iteration means the target
-differences cannot be perceptually validated here. Consequently, the
-objective metric differentials reported in Table III and Figure 3 are
-presented as theoretical bounds tests---quantifying the mathematical
+relative to regularized formulae (like NAL-NL2) is generally expected.
+However, examining the full distribution in Table III reveals that
+Open-NL's objective exploitation manifests through three distinct
+mechanical pathways: - #strong[Active Constraint Inversions (A4, A5)];:
+As previously noted, Open-NL yields #emph[lower] desensitized SII than
+NAL-NL2 for A4 (0.62 vs.~0.68) and A5 (0.44 vs.~0.54). Here, the
+U-shaped physiological loudness cap forces the solver to explicitly
+sacrifice theoretical audibility to prevent catastrophic loudness
+growth. - #strong[Solver Entrapment and Pareto Domination (A1, A2)];:
+For profile A2, Open-NL is strictly Pareto-dominated by NAL-NL2: it
+yields a lower desensitized SII (0.77 vs.~0.78) while being drastically
+louder (4.44 vs.~3.43 sones). This occurs because Nelder-Mead becomes
+trapped against the active 4.44-sone penalty wall. Lacking the ability
+to accept temporary uphill loss to traverse the non-convex landscape,
+the local simplex solver fails to locate NAL-NL2's objectively superior
+gain allocation. This starkly demonstrates the necessity of
+transitioning to global stochastic solvers (Section III.A.2). -
+#strong[Inefficient Objective Exploitation (A6, A7)];: For profile A6,
+Open-NL blindly trades a massive 1.36 sones of excess loudness to buy a
+marginal +0.04 increase in SII. For A7 (a purely deterministic
+conductive correction), Open-NL yields +0.62 sones for zero additional
+SII gain. This behavior highlights the inherent danger of pure
+unregularized optimization: algorithms will indiscriminately sacrifice
+patient comfort for statistically insignificant fractions of objective
+audibility unless heavily penalized.
+
+Ultimately, stationary band-importance metrics like ANSI S3.5 and
+desensitized SII are blind to dynamic temporal envelope distortion,
+channel cross-talk, and phase distortion induced by aggressive
+compression ratios. In auditory science, genuine, independent,
+distortion-aware speech perception evaluation requires waveform-level
+biophysical models: - HASPI (Hearing Aid Speech Perception Index; Kates
+& Arehart, 2022): Accurately simulates peripheral auditory processing,
+basilar membrane compression loss, auditory nerve firing rates, and
+envelope modulation integrity. - HASQI (Hearing Aid Speech Quality
+Index; Kates & Arehart, 2022): Evaluates non-linear harmonic distortion,
+envelope fidelity, and spectral fine-structure cross-correlation between
+aided and reference speech signals. Computing HASPI and HASQI requires
+convolving continuous speech (.wav) through a time-domain dynamic range
+compression engine (such as openMHA; Herzke et al., 2017). Because
+Open-NL currently operates strictly at the steady-state prescriptive
+target level (Johnson & Dillon, 2011), it lacks the native time-domain
+waveform processing required to compute HASPI and HASQI. Consequently,
+the objective metric differentials reported in Table III and Figure 3
+are presented as theoretical bounds tests---quantifying the mathematical
 consequences of removing clinical heuristics---rather than as direct
 clinical superiority claims. 2. #strong[Binaural Loudness Summation and
 the Collapse of Monaural Frontiers];: The comparative loudness
