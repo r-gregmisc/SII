@@ -590,8 +590,8 @@ penalty variables.
 \pandocbounded{\includegraphics[keepaspectratio,alt={Parameter Sensitivity Analysis}]{figures/Figure1_Sensitivity.png}}
 \emph{Figure 1. Distribution of resulting ANSI SII scores and
 physiological loudness penalties across 768 permutations (256 \(\times\)
-3 profiles) for clinical profiles A2 (Reverse Slope), A4 (Profound), and
-A5 (Severe), illustrating how the active physiological loudness
+3 profiles) for clinical profiles A2 (Reverse Slope), A4 (Severe), and
+A5 (Profound), illustrating how the active physiological loudness
 constraint dominates the optimization space, severely restricting the
 variance caused by heuristic parameter modifications.}
 
@@ -988,14 +988,14 @@ sensitivity is evaluated across seven canonical audiometric profiles
 (A1--A7). Profiles A1--A5 represent the standard sensorineural
 configurations utilized by Johnson \& Dillon (2011) (derived from the
 foundational profiles of Byrne), spanning mild-sloping (A1),
-reverse-slope (A2), and profound (A4, A5) pathologies. Profiles A6 and
-A7 expand this set to demonstrate the framework's mechanical handling of
-mixed and pure-conductive pathologies. While evaluating a large-scale
-real-world corpus (e.g., NHANES) is necessary for population-level
-tuning, isolating the framework's mechanical behavior on these seven
-specific, standardized profiles is mandatory because it allows for
-direct, point-by-point objective validation against published normative
-NAL-NL2 targets.
+reverse-slope (A2), and severe to profound (A4, A5) pathologies.
+Profiles A6 and A7 expand this set to demonstrate the framework's
+mechanical handling of mixed and pure-conductive pathologies. While
+evaluating a large-scale real-world corpus (e.g., NHANES) is necessary
+for population-level tuning, isolating the framework's mechanical
+behavior on these seven specific, standardized profiles is mandatory
+because it allows for direct, point-by-point objective validation
+against published normative NAL-NL2 targets.
 
 To prevent convergence bias, Open-NL's C++ objective function avoids
 sparse-array Riemann approximations, dynamically interpolating the
@@ -1016,18 +1016,18 @@ Inputs.}
 Inputs across standard audiometric profiles, illustrating Open-NL's
 multi-level constraint-based optimization relative to NAL-NL2.}
 
-For extreme steeply sloping or profound losses (A4, A5), unmodified SII
-maximization drives substantial high-frequency gain. Although Open-NL
-integrates desensitization penalties to temper this drive, it still
-prescribes substantially more high-frequency gain than NAL-NL2 (e.g.,
-+10.9 dB at 4 kHz for A4, and +11.7 dB for A5 at 65 dB SPL inputs; Table
-IV). In listeners with severe loss, reduced spectral resolution,
-elevated hearing thresholds, and cochlear dead regions account for
-comparable shares of speech recognition variance, with dead regions
-specifically blunting the benefit of restored high-frequency audibility
-(Ching, Dillon, \& Byrne, 1998; Baer, Moore, \& Kluk, 2002; Vestergaard,
-2003; Souza et al., 2018; Moualed, Humphries, \& Ramsden, 2018). While
-high prescribed gain increases physical audibility on paper, it severely
+For severe and profound losses (A4, A5), unmodified SII maximization
+drives substantial high-frequency gain. Although Open-NL integrates
+desensitization penalties to temper this drive, it still prescribes
+substantially more high-frequency gain than NAL-NL2 (e.g., +10.9 dB at 4
+kHz for A4, and +11.7 dB for A5 at 65 dB SPL inputs; Table IV). In
+listeners with severe loss, reduced spectral resolution, elevated
+hearing thresholds, and cochlear dead regions account for comparable
+shares of speech recognition variance, with dead regions specifically
+blunting the benefit of restored high-frequency audibility (Ching,
+Dillon, \& Byrne, 1998; Baer, Moore, \& Kluk, 2002; Vestergaard, 2003;
+Souza et al., 2018; Moualed, Humphries, \& Ramsden, 2018). While high
+prescribed gain increases physical audibility on paper, it severely
 degrades perceptual clarity if suprathreshold distortion is unmodeled
 (Margolis et al., 2025). However, enforcing blanket high-frequency
 suppression based purely on pure-tone audiograms would penalize the
@@ -1665,11 +1665,11 @@ ABG
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{A1} & Flat moderate & 15 & 20 & 30 & 40 & 50 & 60 & 0 dB \\
+\textbf{A1} & Mild & 15 & 20 & 30 & 40 & 50 & 60 & 0 dB \\
 \textbf{A2} & Reverse slope & 60 & 50 & 40 & 30 & 20 & 15 & 0 dB \\
 \textbf{A3} & Moderately sloping & 10 & 20 & 40 & 50 & 55 & 60 & 0 dB \\
-\textbf{A4} & Steeply sloping & 0 & 0 & 10 & 40 & 70 & 80 & 0 dB \\
-\textbf{A5} & Steeply sloping & 10 & 10 & 20 & 60 & 80 & 100 & 0 dB \\
+\textbf{A4} & Severe & 0 & 0 & 10 & 40 & 70 & 80 & 0 dB \\
+\textbf{A5} & Profound & 10 & 10 & 20 & 60 & 80 & 100 & 0 dB \\
 \textbf{A6} & Mixed & 50 & 55 & 60 & 65 & 75 & 80 & 30 dB \\
 \textbf{A7} & Conductive & 50 & 50 & 50 & 50 & 50 & 50 & 50 dB \\
 \end{longtable}
@@ -1702,8 +1702,8 @@ SD-LFP Seed Sones
 A1 (Flat mod) & 0.86 & 7.2 & 0.86 & 7.2 \\
 A2 (Reverse) & 0.88 & 6.3 & 0.88 & 6.0 \\
 A3 (Mod sloping) & 0.79 & 6.8 & 0.79 & 6.8 \\
-A4 (Steeply) & 0.81 & 6.9 & 0.81 & 6.9 \\
-A5 (Steeply) & 0.68 & 7.1 & 0.68 & 6.0 \\
+A4 (Severe) & 0.81 & 6.9 & 0.81 & 6.9 \\
+A5 (Profound) & 0.68 & 7.1 & 0.68 & 6.0 \\
 A6 (Mixed) & 0.82 & 3.0 & 0.82 & 3.0 \\
 A7 (Conductive) & 0.97 & 1.0 & 0.97 & 1.0 \\
 \end{longtable}
