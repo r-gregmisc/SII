@@ -538,14 +538,11 @@ reliability.
 <b.-worked-demonstration-isolating-the-shared-binaural-loudness-vulnerability>
 While the previous section established the tool's numerical stability,
 applying it to a physiological boundary problem demonstrates its
-analytical utility. A central problem in modern audiology is that
-standard clinical models operate on a monaural basis, failing to account
-for idiosyncratic binaural broadband loudness summation. The fact that
-established prescriptions like NAL-NL2 share this vulnerability to
-unpredictable binaural loudness is precisely why having an open,
-parameterizable model like Open-NL is valuable: it provides a testbed to
-isolate and simulate the effect of this field-wide blind spot without it
-being buried under opaque empirical corrections.
+analytical utility. Because established prescriptions like NAL-NL2 share
+the monaural vulnerabilities outlined in Section II.A, having an open,
+parameterizable model like Open-NL provides a testbed to isolate and
+simulate these field-wide blind spots without them being buried under
+opaque empirical corrections.
 
 The following comparison between Open-NL and NAL-NL2 is therefore not
 presented as a finding about Open-NL's amplification superiority, but as
@@ -587,14 +584,10 @@ primary sensorineural profiles. However, using conservative parity to
 claim clinical validation would obscure the central theoretical lesson
 of this computational testbed.
 
-Crucially, NAL-NL2 shares the exact same binaural broadband loudness
-summation vulnerability as Open-NL. NAL-NL2 applies the identical,
-standard level-dependent 2--6 dB bilateral reduction derived from
-normal-hearing listeners, failing equally to account for the excess
-broadband summation documented in hearing-impaired populations (see
-Section II.A). The reason NAL-NL2 does not trigger widespread clinical
-loudness rejection is not because its underlying loudness model is
-physiologically complete, but because its empirical derivations
+Crucially, NAL-NL2 shares the exact same monaural vulnerability as
+Open-NL (see Section II.A). The reason NAL-NL2 avoids widespread
+clinical loudness rejection is not because its underlying loudness model
+is physiologically complete, but because its empirical derivations
 incorporated heavy, post-hoc regularizations---including global gain
 reductions (-2 dB for females, -3 dB for new users), compressed dynamic
 range ceilings, and conservative high-frequency roll-offs---combined
@@ -670,28 +663,18 @@ the objective metric differentials reported in Table III and Figure 3
 are presented as theoretical bounds tests---quantifying the mathematical
 consequences of removing clinical heuristics---rather than as direct
 clinical superiority claims. 2. #strong[Binaural Loudness Summation and
-the Collapse of Monaural Frontiers];: The comparative loudness
-evaluations are fundamentally bounded by the limitations of monaural
-auditory modeling. While standard clinical software applies a nominal 2
-to 6 dB bilateral gain reduction, this static correction reflects
-normal-hearing physiology and fails catastrophically for broadband
-speech in impaired listeners. As detailed in Section II.A, a significant
-cohort of hearing-impaired listeners exhibits extreme excess binaural
-broadband loudness summation that deviates heavily from normal-hearing
-models (van Beurden et al., 2021; Pieper et al., 2021; Denk et al.,
-2025). Crucially, because excess summation is a broadband,
-suprathreshold #emph[sensorineural] effect that does not correlate with
-pure-tone audiograms, an optimization routine operating beneath a
+the Collapse of Monaural Frontiers];: As detailed in Section II.A,
+applying fixed normal-hearing scalars to monaural outputs fails
+catastrophically for impaired listeners (van Beurden et al., 2021;
+Pieper et al., 2021). An optimization routine operating beneath a
 monaural ceiling (e.g., 4.32 sones for profile A5) appears
 mathematically safe in isolation, yet predictably collapses into acute
-acoustic intolerance when fitted bilaterally. Furthermore, there is no
-physiological basis for applying such excess summation models to purely
-conductive etiologies (e.g., A7). Because applying a fixed scalar to
-monaural outputs assumes normal-hearing loudness growth---the exact
-structural flaw this framework critiques---Table III reports canonical
-single-ear monaural loudness exclusively. True bilateral predictions
-require propagating the dynamic full-range signal through a non-linear
-binaural loudness engine.
+acoustic intolerance when fitted bilaterally due to excess summation.
+Because applying a fixed scalar to monaural outputs assumes
+normal-hearing loudness growth---the exact structural flaw this
+framework critiques---Table III reports canonical single-ear monaural
+loudness exclusively. True bilateral predictions require propagating the
+dynamic full-range signal through a non-linear binaural loudness engine.
 
 To execute this evaluation natively in R, the `SII` package implements a
 fast C++ port of the canonical Moore & Glasberg (2004) stationary
