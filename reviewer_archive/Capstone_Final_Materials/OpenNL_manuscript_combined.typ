@@ -313,98 +313,59 @@ inadequate. Subordinating population-level intelligibility maximization
 to individualized physiological safety limits transforms prescriptive
 derivation into a reproducible, distortion-aware computational science.
 
-#strong[TABLE I. Summary of Algorithmic Constants, Evidentiary Support,
-and Proposed Calibration Pathways.]
+#strong[TABLE I. Comprehensive Enumeration of Open-NL Free Parameters
+and Evidentiary Derivation.]
 
-- #strong[Base Gain Anchor] (Value: 0.46)
-  - #emph[Description];: Half-gain multiplier ($G_(b a s e)$)
-  - #emph[Justification];: Balances Lybarger half-gain rule with
-    historical gain preference data (uncalibrated midpoint).
-  - #emph[Proposed Calibration];: Large-scale preferred listening level
-    datasets (e.g., NHANES-derived preference corpus)
-- #strong[New-User Offset] (Value: up to -6 dB based on PTA)
-  - #emph[Description];: Dynamic reduction applied to output gain
-  - #emph[Justification];: Approximates empirical preference for less
-    amplification in naive users (asserted heuristic).
-  - #emph[Proposed Calibration];: Longitudinal acclimatization studies
-    (Categorical Loudness Scaling)
-- #strong[Severe-Loss Booster Slope] (Value: 0.15)
-  - #emph[Description];: Applied linearly to thresholds 70--80 dB HL
-    (default)
-  - #emph[Justification];: Gently assists profound losses without
-    triggering explosive recruitment (asserted heuristic).
-  - #emph[Proposed Calibration];: Individualized UCL/trueLOUDNESS
-    broadband summation limits
-- #strong[High-Frequency Gain Cap Base] (Value: 30 dB)
-  - #emph[Description];: Base limit for $L_(g a i n)$ soft-compression
-  - #emph[Justification];: Manages upward spread of masking and
-    distortion in severe impairments (asserted heuristic).
-  - #emph[Proposed Calibration];: HASPI/HASQI speech-in-noise behavioral
-    thresholds (e.g., WIN/HINT)
-- #strong[High-Frequency Gain Cap Slope] (Value: 0.4)
-  - #emph[Description];: Slope for $L_(g a i n)$ soft-compression
-  - #emph[Justification];: Gradual restriction for high frequencies
-    (asserted heuristic).
-  - #emph[Proposed Calibration];: HASPI/HASQI speech-in-noise behavioral
-    thresholds (e.g., WIN/HINT)
-- #strong[Dynamic Range Squeeze] (Value: 0.2 dB/dB)
-  - #emph[Description];: Gain attenuation per dB of reduced DR
-  - #emph[Justification];: Ensures speech envelope fits within
-    restricted auditory space (uncalibrated heuristic).
-  - #emph[Proposed Calibration];: Envelope correlation mapping (e.g.,
-    normalized covariance optimization)
-- #strong[Dynamic Range CR Shift] (Value: 0.02)
-  - #emph[Description];: Baseline CR shift per dB of DR reduction
-  - #emph[Justification];: Maps identical input range into smaller
-    residual auditory space.
-  - #emph[Proposed Calibration];: Known physiological IHC/OHC
-    compression loss functions
-- #strong[Reverse-Slope Floor] (Value: -10 dB)
-  - #emph[Description];: Gain floor for negative slopes
-  - #emph[Justification];: Cautiously prevents masking of intact basal
-    units (asserted heuristic).
-  - #emph[Proposed Calibration];: Masking release behavioral paradigms
-    (e.g., notched-noise tests)
-- #strong[Explicit DR Roll-off] (Value: 30 dB/oct)
-  - #emph[Description];: Attenuation past 1.7x Dead Region boundary
-  - #emph[Justification];: #strong[Mixed derivation];: The $1.7 f_e$
-    boundary is grounded in psychoacoustic dead-region literature
-    (Moore, 2001) to prevent off-frequency distortion, but the 30
-    dB/octave attenuation slope is a #strong[pragmatic engineering
-    choice] lacking direct empirical validation.
-  - #emph[Proposed Calibration];: TEN-test validated behavioral roll-off
-    boundaries
-- #strong[ABG Restoration Fraction] (Value: 75%)
-  - #emph[Description];: Mixed/conductive linear restoration fraction
-  - #emph[Justification];: #strong[Pragmatic engineering choice]
-    (Johnson, 2013a; Scollie et al., 2005) preventing hardware
-    saturation; lacking direct empirical derivation from listener
-    preference.
-  - #emph[Proposed Calibration];: Bone-conduction/Air-conduction
-    loudness matching and preference trials
-- #strong[Comfort-in-Noise (CIN) Clamp] (Value: $lt.eq 1.5 : 1$)
-  - #emph[Description];: Upper ceiling on CR in noise/comfort mode
-  - #emph[Justification];: #strong[Uncalibrated engineering heuristic]
-    inspired by NAL-NL3 (Kitterick et al., 2026) to reduce listening
-    fatigue; lacking direct empirical derivation.
-  - #emph[Proposed Calibration];: Speech-in-noise quality ratings and
-    subjective listening effort paradigms
-- #strong[Compression Ratio Soft Penalty ($P_(c r)$)] (Value: 3.0:1
-  target)
-  - #emph[Description];: Soft penalty on emergent sensorineural CR
-  - #emph[Justification];: #strong[Strong empirical support];: Anchored
-    in literature (Souza, 2002) demonstrating speech degradation for CR
-    $> 3.0 : 1$. By enforcing this penalty alongside a strict
-    post-optimization clamp, Open-NL successfully constrains emergent
-    multi-level input/output mapping to empirically safe limits.
-  - #emph[Proposed Calibration];: Robust existing empirical literature;
-    formalizing hard absolute architectural bounds
-- #strong[Desensitization Penalty] (Value: Variable)
-  - #emph[Description];: Johnson & Dillon (2011) piecewise scalar
-  - #emph[Justification];: Modifies pure audibility to account for
-    severe-loss distortion (asserted clinical proxy).
-  - #emph[Proposed Calibration];: HASPI/HASQI stochastic optimization vs
-    subjective rejection curves
+#figure(
+  align(center)[#table(
+    columns: (25%, 25%, 25%, 25%),
+    align: (left,left,left,left,),
+    table.header([Parameter Category], [Specific Free
+      Parameters], [Default / Evaluated Value], [Evidentiary Support &
+      Derivation],),
+    table.hline(),
+    [#strong[Objective Penalties];], [Loudness Cap Knots
+    (`cap_knots`)], [$L_(c a p)$ vectors (Section S.I.12)], [Derived
+    from normal/impaired physiological loudness growth models.],
+    [], [Optimizer Penalty Weights
+    ($lambda_(1 - 8)$)], [$lambda_1 = 450 \, dots.h \, lambda_8 = 20$
+    (Sec S.I.12)], [Pragmatic engineering constraints balancing target
+    convergence.],
+    [], [CR Soft Penalty Target ($P_(c r)$)], [$lt.eq 3.0 : 1$
+    Compression Ratio], [#strong[Strong empirical derivation];: Souza
+    (2002) speech degradation limits.],
+    [#strong[Prescriptive Anchors];], [Base Gain Anchor
+    ($G_(b a s e)$)], [0.46], [Uncalibrated midpoint balancing half-gain
+    rules and preference data.],
+    [], [New-User Offset ($Delta_(e x p)$)], [0 to -6 dB based on
+    PTA], [Assumed heuristic approximating acclimatization
+    preferences.],
+    [], [Severe-Loss Booster (Slope / Onset)], [0.15 slope / 70 dB HL
+    onset], [Assumed heuristic assisting profound loss without explosive
+    recruitment.],
+    [], [ABG Restoration Fraction], [75% (Linear)], [Engineering choice
+    preventing hardware saturation (Johnson, 2013a).],
+    [#strong[Compression Limits];], [Compression Kneepoint (CT)
+    Range], [30 to 45 dB SPL], [Pragmatic limit aligning with standard
+    real-world WDRC kneepoints.],
+    [], [High-Frequency Soft-Compression], [Base 30 dB, Slope
+    0.4], [Heuristic managing upward spread of masking in severe
+    losses.],
+    [], [DR Squeeze / CR Shift], [0.2 dB/dB, 0.02 CR/dB], [Heuristics
+    fitting speech envelope into reduced physiological space.],
+    [], [MPO/LDL Predictor Coefficients], [See Stage 8], [Statistical
+    predictions based on population normative UCL datasets.],
+    [#strong[Frequency Limits];], [Reverse-Slope Floor], [-10
+    dB], [Cautious heuristic preventing masking of intact basal cochlear
+    units.],
+    [], [Dead Region / Transducer Roll-off], [30 dB/oct past $1.7 f_e$,
+    $w_(b w)$], [Standard transducer limits and dead-region literature
+    (Moore, 2001).],
+    [], [Acoustic Coupling Loss], [Occluded/Vented Vectors (Table
+    S4)], [Deterministic physical hardware measurements.],
+  )]
+  , kind: table
+  )
 
 == III. ANALYTICAL CENTERPIECE: DISTINGUISHING HEURISTIC SENSITIVITY FROM SOLVER STOCHASTICITY
 <iii.-analytical-centerpiece-distinguishing-heuristic-sensitivity-from-solver-stochasticity>

@@ -93,72 +93,24 @@ For a computational testbed to provide lasting inferential value, demonstrating 
 
 Crucially, the outer-loop objective function must incorporate an asymmetric, veto-based cost function: any parameter configuration violating individualized broadband loudness tolerance (trueLOUDNESS; Oetting et al., 2017) in simulated outlier listeners must incur an overwhelming penalty. As detailed in Section II.A, because excess binaural broadband summation cannot be predicted from pure-tone thresholds, static 2–6 dB bilateral corrections are structurally inadequate. Subordinating population-level intelligibility maximization to individualized physiological safety limits transforms prescriptive derivation into a reproducible, distortion-aware computational science.
 
-**TABLE I. Summary of Algorithmic Constants, Evidentiary Support, and Proposed Calibration Pathways.**
+**TABLE I. Comprehensive Enumeration of Open-NL Free Parameters and Evidentiary Derivation.**
 
-- **Base Gain Anchor** (Value: 0.46)
-  - *Description*: Half-gain multiplier ($G_{base}$)
-  - *Justification*: Balances Lybarger half-gain rule with historical gain preference data (uncalibrated midpoint).
-  - *Proposed Calibration*: Large-scale preferred listening level datasets (e.g., NHANES-derived preference corpus)
-
-- **New-User Offset** (Value: up to -6 dB based on PTA)
-  - *Description*: Dynamic reduction applied to output gain
-  - *Justification*: Approximates empirical preference for less amplification in naive users (asserted heuristic).
-  - *Proposed Calibration*: Longitudinal acclimatization studies (Categorical Loudness Scaling)
-
-- **Severe-Loss Booster Slope** (Value: 0.15)
-  - *Description*: Applied linearly to thresholds 70–80 dB HL (default)
-  - *Justification*: Gently assists profound losses without triggering explosive recruitment (asserted heuristic).
-  - *Proposed Calibration*: Individualized UCL/trueLOUDNESS broadband summation limits
-
-- **High-Frequency Gain Cap Base** (Value: 30 dB)
-  - *Description*: Base limit for $L_{gain}$ soft-compression
-  - *Justification*: Manages upward spread of masking and distortion in severe impairments (asserted heuristic).
-  - *Proposed Calibration*: HASPI/HASQI speech-in-noise behavioral thresholds (e.g., WIN/HINT)
-
-- **High-Frequency Gain Cap Slope** (Value: 0.4)
-  - *Description*: Slope for $L_{gain}$ soft-compression
-  - *Justification*: Gradual restriction for high frequencies (asserted heuristic).
-  - *Proposed Calibration*: HASPI/HASQI speech-in-noise behavioral thresholds (e.g., WIN/HINT)
-
-- **Dynamic Range Squeeze** (Value: 0.2 dB/dB)
-  - *Description*: Gain attenuation per dB of reduced DR
-  - *Justification*: Ensures speech envelope fits within restricted auditory space (uncalibrated heuristic).
-  - *Proposed Calibration*: Envelope correlation mapping (e.g., normalized covariance optimization)
-
-- **Dynamic Range CR Shift** (Value: 0.02)
-  - *Description*: Baseline CR shift per dB of DR reduction
-  - *Justification*: Maps identical input range into smaller residual auditory space.
-  - *Proposed Calibration*: Known physiological IHC/OHC compression loss functions
-
-- **Reverse-Slope Floor** (Value: -10 dB)
-  - *Description*: Gain floor for negative slopes
-  - *Justification*: Cautiously prevents masking of intact basal units (asserted heuristic).
-  - *Proposed Calibration*: Masking release behavioral paradigms (e.g., notched-noise tests)
-
-- **Explicit DR Roll-off** (Value: 30 dB/oct)
-  - *Description*: Attenuation past 1.7x Dead Region boundary
-  - *Justification*: **Mixed derivation**: The $1.7 f_e$ boundary is grounded in psychoacoustic dead-region literature (Moore, 2001) to prevent off-frequency distortion, but the 30 dB/octave attenuation slope is a **pragmatic engineering choice** lacking direct empirical validation.
-  - *Proposed Calibration*: TEN-test validated behavioral roll-off boundaries
-
-- **ABG Restoration Fraction** (Value: 75%)
-  - *Description*: Mixed/conductive linear restoration fraction
-  - *Justification*: **Pragmatic engineering choice** (Johnson, 2013a; Scollie et al., 2005) preventing hardware saturation; lacking direct empirical derivation from listener preference.
-  - *Proposed Calibration*: Bone-conduction/Air-conduction loudness matching and preference trials
-
-- **Comfort-in-Noise (CIN) Clamp** (Value: $\le 1.5:1$)
-  - *Description*: Upper ceiling on CR in noise/comfort mode
-  - *Justification*: **Uncalibrated engineering heuristic** inspired by NAL-NL3 (Kitterick et al., 2026) to reduce listening fatigue; lacking direct empirical derivation.
-  - *Proposed Calibration*: Speech-in-noise quality ratings and subjective listening effort paradigms
-
-- **Compression Ratio Soft Penalty ($P_{cr}$)** (Value: 3.0:1 target)
-  - *Description*: Soft penalty on emergent sensorineural CR
-  - *Justification*: **Strong empirical support**: Anchored in literature (Souza, 2002) demonstrating speech degradation for CR $> 3.0:1$. By enforcing this penalty alongside a strict post-optimization clamp, Open-NL successfully constrains emergent multi-level input/output mapping to empirically safe limits.
-  - *Proposed Calibration*: Robust existing empirical literature; formalizing hard absolute architectural bounds
-
-- **Desensitization Penalty** (Value: Variable)
-  - *Description*: Johnson & Dillon (2011) piecewise scalar
-  - *Justification*: Modifies pure audibility to account for severe-loss distortion (asserted clinical proxy).
-  - *Proposed Calibration*: HASPI/HASQI stochastic optimization vs subjective rejection curves
+| Parameter Category | Specific Free Parameters | Default / Evaluated Value | Evidentiary Support & Derivation |
+|:---|:---|:---|:---|
+| **Objective Penalties** | Loudness Cap Knots (`cap_knots`) | $L_{cap}$ vectors (Section S.I.12) | Derived from normal/impaired physiological loudness growth models. |
+| | Optimizer Penalty Weights ($\lambda_{1-8}$) | $\lambda_1=450, \dots, \lambda_8=20$ (Sec S.I.12) | Pragmatic engineering constraints balancing target convergence. |
+| | CR Soft Penalty Target ($P_{cr}$) | $\le 3.0:1$ Compression Ratio | **Strong empirical derivation**: Souza (2002) speech degradation limits. |
+| **Prescriptive Anchors** | Base Gain Anchor ($G_{base}$) | 0.46 | Uncalibrated midpoint balancing half-gain rules and preference data. |
+| | New-User Offset ($\Delta_{exp}$) | 0 to -6 dB based on PTA | Assumed heuristic approximating acclimatization preferences. |
+| | Severe-Loss Booster (Slope / Onset) | 0.15 slope / 70 dB HL onset | Assumed heuristic assisting profound loss without explosive recruitment. |
+| | ABG Restoration Fraction | 75% (Linear) | Engineering choice preventing hardware saturation (Johnson, 2013a). |
+| **Compression Limits** | Compression Kneepoint (CT) Range | 30 to 45 dB SPL | Pragmatic limit aligning with standard real-world WDRC kneepoints. |
+| | High-Frequency Soft-Compression | Base 30 dB, Slope 0.4 | Heuristic managing upward spread of masking in severe losses. |
+| | DR Squeeze / CR Shift | 0.2 dB/dB, 0.02 CR/dB | Heuristics fitting speech envelope into reduced physiological space. |
+| | MPO/LDL Predictor Coefficients | See Stage 8 | Statistical predictions based on population normative UCL datasets. |
+| **Frequency Limits** | Reverse-Slope Floor | -10 dB | Cautious heuristic preventing masking of intact basal cochlear units. |
+| | Dead Region / Transducer Roll-off | 30 dB/oct past $1.7f_e$, $w_{bw}$ | Standard transducer limits and dead-region literature (Moore, 2001). |
+| | Acoustic Coupling Loss | Occluded/Vented Vectors (Table S4)| Deterministic physical hardware measurements. |
 
 ## III. ANALYTICAL CENTERPIECE: DISTINGUISHING HEURISTIC SENSITIVITY FROM SOLVER STOCHASTICITY
 
