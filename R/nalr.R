@@ -345,16 +345,6 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
     }
   }
   
-  # 3.8 Comfort in Noise (CIN) Module
-  if (module == "cin") {
-    # Comfort in Noise (CIN) module aims to reduce loudness and improve comfort
-    # in high-level noise environments. Based on evidence, listeners prefer
-    # less compression (linear or 1.5:1) when noise exceeds the compression threshold.
-    cr_loud <- pmin(cr_loud, 1.5)
-    
-    # We lower the WDRC pivot / CT so compression kicks in earlier.
-    ct_band <- ct_band - 10
-  }
   
   # The target gain 'g_65' is prescribed for an input level of 'pivot'.
   # If CT > pivot, the pivot is in the linear region, so the linear gain is simply g_65.
@@ -402,7 +392,9 @@ calculate_open_nl_gain <- function(freq, threshold, input_level, gender = "male"
   # Simulated Real-Ear Aided Response (REAR) by subtracting leakage.
   if (coupling != "custom_occluded") {
     ve_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-    if (coupling == "open_dome") {
+    if (coupling == "bte_13") {
+      ve_loss <- c(0, 0, 0, -1, -5, -15)
+    } else if (coupling == "open_dome") {
       ve_loss <- c(-35, -28, -15, -2, 0, 0)
     } else if (coupling == "tulip_dome") {
       ve_loss <- c(-25, -18, -5, 0, 0, 0)
@@ -507,7 +499,7 @@ calculate_nal_sspl90 <- function(threshold, gain, ldl = NULL, age = "adult", age
 #'
 #' @param freq A numeric vector of frequencies.
 #' @param threshold A numeric vector of hearing thresholds.
-#' @param module The operating module ("standard", "cin", "mhl").
+#' @param module The operating module ("standard", "mhl").
 #' @return A list containing compression recommendations.
 #' @export
 prescribe_compression <- function(freq, threshold, module = "standard") {
@@ -531,9 +523,6 @@ prescribe_compression <- function(freq, threshold, module = "standard") {
   }
   
   ratio_note <- "Target \u2264 2:1. If CR \u2265 3:1 is necessary, use longer release time (e.g., 1000 ms) to preserve clarity."
-  if (module == "cin") {
-    ratio_note <- "Comfort in Noise (CIN): Prescribing lower compression (linear to 1.5:1) for high-level noise."
-  }
   
   return(list(
     pta4 = pta4,

@@ -1,0 +1,5 @@
+library(SII)
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+threshold_A5 <- c(70, 75, 80, 85, 90, 95)
+tgt <- suppressWarnings(suppressMessages(open_nl(speech = 80, threshold = threshold_A5, freq = freqs, return_penalties = TRUE)))
+print(ls(envir = .GlobalEnv))

@@ -2,60 +2,57 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-# Hardcoded data from the final validation table
-data_raw <- list(
-  A1 = list(
-    `50` = list(`NAL-NL2`=c(0.3, 2.0, 12.4, 19.5, 25.6, 25.5), `Open-NL`=c(6.0, 0.0, 9.5, 16.2, 27.3, 26.2)),
-    `65` = list(`NAL-NL2`=c(0.0, 0.0, 7.3, 12.1, 18.0, 19.1), `Open-NL`=c(0.0, 0.0, 8.5, 11.2, 19.7, 18.1)),
-    `80` = list(`NAL-NL2`=c(0.0, 0.0, 0.2, 2.7, 7.0, 9.3), `Open-NL`=c(0.0, 0.0, 4.7, 5.7, 10.5, 3.1))
-  ),
-  A2 = list(
-    `50` = list(`NAL-NL2`=c(15.8, 17.3, 18.7, 14.2, 8.6, 6.6), `Open-NL`=c(18.3, 15.1, 17.6, 14.1, 10.2, 5.2)),
-    `65` = list(`NAL-NL2`=c(10.1, 9.3, 12.2, 8.3, 3.9, 4.0), `Open-NL`=c(7.4, 10.2, 14.0, 10.7, 9.7, 4.4)),
-    `80` = list(`NAL-NL2`=c(0.0, 0.0, 3.2, 0.3, 0.0, 0.0), `Open-NL`=c(0.0, 2.7, 6.5, 2.2, 0.0, 0.0))
-  ),
-  A3 = list(
-    `50` = list(`NAL-NL2`=c(0.0, 2.7, 15.9, 24.4, 28.2, 27.8), `Open-NL`=c(0.0, 0.0, 18.7, 24.7, 28.5, 22.0)),
-    `65` = list(`NAL-NL2`=c(0.0, 0.0, 9.9, 16.8, 20.7, 21.6), `Open-NL`=c(0.0, 0.0, 13.8, 16.8, 18.5, 7.0)),
-    `80` = list(`NAL-NL2`=c(0.0, 0.0, 1.9, 6.5, 9.3, 11.5), `Open-NL`=c(0.0, 0.0, 8.1, 8.4, 9.7, 0.0))
-  ),
-  A4 = list(
-    `50` = list(`NAL-NL2`=c(0.0, 0.0, 3.1, 19.2, 27.8, 26.6), `Open-NL`=c(0.0, 0.0, 0.0, 6.7, 41.5, 38.4)),
-    `65` = list(`NAL-NL2`=c(0.0, 0.0, 0.9, 12.5, 21.8, 21.8), `Open-NL`=c(0.0, 0.0, 0.0, 0.0, 29.0, 38.4)),
-    `80` = list(`NAL-NL2`=c(0.0, 0.0, 0.0, 3.0, 11.3, 12.6), `Open-NL`=c(0.0, 0.0, 0.0, 0.0, 14.0, 23.4))
-  ),
-  A5 = list(
-    `50` = list(`NAL-NL2`=c(0.0, 0.0, 11.3, 26.8, 32.1, 30.9), `Open-NL`=c(0.0, 0.0, 0.0, 7.4, 38.8, 33.2)),
-    `65` = list(`NAL-NL2`=c(0.0, 0.0, 6.6, 20.7, 27.1, 26.6), `Open-NL`=c(0.0, 0.0, 0.0, 5.5, 25.3, 18.2)),
-    `80` = list(`NAL-NL2`=c(0.0, 0.0, 0.2, 11.0, 17.2, 17.7), `Open-NL`=c(0.0, 0.0, 0.0, 0.0, 17.9, 15.8))
-  ),
-  A6 = list(
-    `50` = list(`NAL-NL2`=c(28.0, 29.5, 37.7, 42.3, 48.2, 48.2), `Open-NL`=c(28.6, 36.4, 42.8, 44.1, 48.2, 39.0)),
-    `65` = list(`NAL-NL2`=c(22.5, 24.2, 32.9, 35.6, 41.4, 42.6), `Open-NL`=c(23.6, 31.4, 37.8, 39.1, 43.2, 34.0)),
-    `80` = list(`NAL-NL2`=c(20.7, 20.7, 26.3, 27.3, 31.6, 33.9), `Open-NL`=c(18.6, 26.4, 32.8, 34.1, 38.2, 29.0))
-  ),
-  A7 = list(
-    `50` = list(`NAL-NL2`=c(34.7, 34.6, 34.7, 34.8, 35.0, 35.1), `Open-NL`=c(37.5, 37.5, 37.5, 37.5, 37.5, 37.5)),
-    `65` = list(`NAL-NL2`=c(34.7, 34.6, 34.7, 34.8, 35.0, 35.1), `Open-NL`=c(37.5, 37.5, 37.5, 37.5, 37.5, 37.5)),
-    `80` = list(`NAL-NL2`=c(34.7, 34.6, 34.7, 34.8, 35.0, 35.1), `Open-NL`=c(37.5, 37.5, 37.5, 37.5, 37.5, 37.5))
-  )
-)
+devtools::load_all(".", quiet=TRUE)
+source("R/benchmark_targets.R")
 
 freqs <- c(250, 500, 1000, 2000, 4000, 8000)
 df_list <- list()
 
-for (p in names(data_raw)) {
-  for (lvl in names(data_raw[[p]])) {
-    for (method in names(data_raw[[p]][[lvl]])) {
-      gains <- data_raw[[p]][[lvl]][[method]]
-      df_list[[length(df_list) + 1]] <- data.frame(
-        Profile = p,
-        Level = factor(lvl, levels=c("50", "65", "80")),
-        Method = method,
-        Frequency = freqs,
-        Gain = gains
-      )
+profiles <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7")
+levels <- c(50, 65, 80)
+
+cat("Dynamically generating plot data (this will take a few minutes)...\n")
+
+for (p in profiles) {
+  loss <- rep(0, 6)
+  if (p == "a6") loss <- rep(30, 6)
+  if (p == "a7") loss <- rep(50, 6)
+  
+  target_data <- jd2011_targets[[p]]
+  
+  # Calculate 65 dB target first to use as constraint
+  opennl_65 <- open_nl(speech=65, threshold=target_data$threshold, freq=freqs, loss=loss, optimize=TRUE, enable_severe_booster=TRUE, booster_onset=60)
+  
+  for (lvl in levels) {
+    cat(sprintf("Evaluating %s at %d dB SPL...\n", toupper(p), lvl))
+    
+    # NAL-NL2
+    nal_raw <- get_nalnl2_v2_target(p, "NAL-NL2", target_data$freq, lvl)
+    nal_interp <- approx(log10(target_data$freq), nal_raw, log10(freqs), rule=2)$y
+    
+    # Open-NL
+    if (lvl == 65) {
+      opennl_gains <- opennl_65$gain
+    } else {
+      res_opennl <- open_nl(speech=lvl, threshold=target_data$threshold, freq=freqs, loss=loss, optimize=TRUE, enable_severe_booster=TRUE, booster_onset=60, constraint_gain=opennl_65$gain)
+      opennl_gains <- res_opennl$gain
     }
+    
+    df_list[[length(df_list) + 1]] <- data.frame(
+      Profile = toupper(p),
+      Level = factor(lvl, levels=c("50", "65", "80")),
+      Method = "NAL-NL2",
+      Frequency = freqs,
+      Gain = nal_interp
+    )
+    
+    df_list[[length(df_list) + 1]] <- data.frame(
+      Profile = toupper(p),
+      Level = factor(lvl, levels=c("50", "65", "80")),
+      Method = "Open-NL",
+      Frequency = freqs,
+      Gain = opennl_gains
+    )
   }
 }
 

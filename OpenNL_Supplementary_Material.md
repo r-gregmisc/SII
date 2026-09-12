@@ -203,6 +203,8 @@ Table S1 provides the reference audiometric profiles (A1–A7, Johnson & Dillon,
 | A6 (Mixed) | 0.82 | 3.0 | 0.82 | 3.0 |
 | A7 (Conductive) | 0.97 | 1.0 | 0.97 | 1.0 |
 
+*(Note: For profiles A1, A3, and notably A4, the SD-LFP ablation appears numerically inert despite their slopes mathematically triggering the penalty. This occurs because their unconstrained low-frequency target gain is already at or near 0 dB due to near-normal low-frequency thresholds. When the SD-LFP penalty drives the theoretical target negative, the universal insertion-gain floor—which prevents active attenuation—absorbs the penalty entirely. Consequently, the SD-LFP stage only demonstrably alters the initial seed for steeply sloping profiles that possess sufficient pre-existing low-frequency loss to elevate the baseline target above the floor, such as A5).*
+
 ---
 
 ## S.I.6. Stage 6: Severe-Loss Audibility Booster
@@ -285,7 +287,7 @@ Simultaneously, the baseline compression ratio increases by $+0.02$ per dB of sq
 
 ## S.I.9. Stage 9: Transducer Bandwidth Roll-off
 
-Acoustic transducers physically struggle to reproduce frequencies at the extremes of the spectrum ($\le 250$ Hz and $\ge 6000$ Hz), where massive gain leads to distortion and feedback. Open-NL applies a continuous fractional bandwidth roll-off multiplier $M_{bw}(f)$ defined over seven anchor frequencies:
+Acoustic transducers physically struggle to reproduce frequencies at the extremes of the spectrum ($\le 250$ Hz and $\ge 6000$ Hz), where excessive gain leads to distortion and feedback. Open-NL applies a continuous fractional bandwidth roll-off multiplier $M_{bw}(f)$ defined over seven anchor frequencies:
 
 \begin{equation}
 \mathbf{f}_{bw} = [250, 500, 1000, 2000, 4000, 6000, 8000]\text{ Hz}
@@ -355,22 +357,45 @@ Target gain at arbitrary overall input level $L_{in}$ (e.g., 50, 65, 80 dB SPL) 
    \end{equation}
    where $\Delta_{gender} = -1.5$ dB (female), $\Delta_{config} = +3.0$ dB (unilateral), and $\Delta_{exp} = -\min\left(6.0, 0.3 \cdot \max\left(0, \text{PTA}_{500,1k,2k} - 40\right)\right)$ for new users.
 
-**TABLE S3. Effective Compression Ratios (50 to 80 dB SPL Inputs) across A1-A7 Audiograms.** *Note: Dashes (-) indicate frequency regions where prescribed gain is exactly 0 dB for both 50 and 80 dB SPL inputs (linear amplification, CR = 1.0). Note that these values represent the emergent multi-level input/output ratios measured dynamically between 50 and 80 dB SPL inputs, rather than the prescribed static channel CRs calculated internally in Stage 10. To strictly enforce the 3.0:1 maximum bound, Open-NL applies dual constraints: a soft objective penalty ($P_{cr}$) during optimization, followed by a strict hard clamp, ensuring that pure intelligibility maximization never violates empirical psychoacoustic limits.*
+**TABLE S3. Interval-Specific Compression Ratios (50–65 and 65–80 dB SPL) across A1-A7 Audiograms.** *Note: Dashes (-) indicate frequency regions where prescribed gain is exactly 0 dB across the input interval (linear amplification, CR = 1.0). NAL-NL2 naturally exceeds the 3.0:1 threshold at high input levels (e.g., A1 at 4000 Hz, A3 at 4000 Hz, A4 at 4000 Hz). To incorporate the 3.0:1 target bound natively, Open-NL evaluates the 3.0:1 constraint via a heavy soft quadratic penalty ($\lambda_{cr} = 200.0$) directly inside the objective wrapper. This strongly discourages pure intelligibility maximization from prescribing values that violate empirical psychoacoustic limits, flattening the realized CRs well below 3.0:1.*
 
-| Profile | Formula | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
-|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Profile | Formula | Interval | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
+|:---|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| A1 | NAL-NL2 | 50-65 | 1.02 | 1.15 | 1.52 | 1.97 | 2.03 | 1.74 |
+| A1 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 1.90 | 2.68 | 3.75 | 2.88 |
+| A1 | Open-NL | 50-80 | - | - | 1.34 | 1.65 | 1.97 | 2.06 |
+| A2 | NAL-NL2 | 50-65 | 1.61 | 2.14 | 1.76 | 1.65 | 1.46 | 1.21 |
+| A2 | NAL-NL2 | 65-80 | 3.06 | 2.63 | 2.50 | 2.14 | 1.35 | 1.36 |
+| A2 | Open-NL | 50-80 | 1.73 | 1.88 | 1.91 | 1.74 | 1.20 | - |
+| A3 | NAL-NL2 | 50-65 | 1.00 | 1.22 | 1.67 | 2.03 | 2.00 | 1.70 |
+| A3 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 2.14 | 3.19 | 4.17 | 3.06 |
+| A3 | Open-NL | 50-80 | - | - | 1.68 | 1.99 | 2.16 | 2.06 |
+| A4 | NAL-NL2 | 50-65 | 1.00 | 1.00 | 1.17 | 1.81 | 1.67 | 1.47 |
+| A4 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 1.06 | 2.73 | 3.33 | 2.59 |
+| A4 | Open-NL | 50-80 | - | - | - | 1.50 | 1.50 | 1.50 |
+| A5 | NAL-NL2 | 50-65 | 1.00 | 1.00 | 1.46 | 1.69 | 1.50 | 1.40 |
+| A5 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 1.74 | 2.83 | 2.94 | 2.46 |
+| A5 | Open-NL | 50-80 | - | - | - | 1.00 | 1.00 | - |
+| A6 | NAL-NL2 | 50-65 | 1.58 | 1.55 | 1.47 | 1.81 | 1.83 | 1.60 |
+| A6 | NAL-NL2 | 65-80 | 1.14 | 1.30 | 1.79 | 2.24 | 2.88 | 2.38 |
+| A6 | Open-NL | 50-80 | 1.16 | 1.27 | 1.38 | 1.47 | 1.65 | 1.71 |
+| A7 | NAL-NL2 | 50-65 | 1.00 | 1.00 | 1.00 | 1.00 | 1.01 | 1.00 |
+| A7 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| A7 | Open-NL | 50-80 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+
+---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | A1 | NAL-NL2 | 1.01 | 1.07 | 1.69 | 2.27 | 2.63 | 2.17 |
-| A1 | Open-NL | 1.25 | - | 1.19 | 1.54 | 2.27 | 4.35 |
+| A1 | Open-NL | - | - | 1.34 | 1.65 | 1.97 | 2.06 |
 | A2 | NAL-NL2 | 2.11 | 2.36 | 2.07 | 1.86 | 1.40 | 1.28 |
-| A2 | Open-NL | 2.56 | 1.70 | 1.59 | 1.66 | 1.52 | 1.21 |
+| A2 | Open-NL | 1.73 | 1.88 | 1.91 | 1.74 | 1.20 | - |
 | A3 | NAL-NL2 | - | 1.10 | 1.88 | 2.48 | 2.70 | 2.19 |
-| A3 | Open-NL | - | - | 1.55 | 2.19 | 2.68 | 3.75 |
+| A3 | Open-NL | - | - | 1.68 | 1.99 | 2.16 | 2.06 |
 | A4 | NAL-NL2 | - | - | 1.12 | 2.17 | 2.22 | 1.88 |
-| A4 | Open-NL | - | - | - | 1.29 | 12.00 | 2.00 |
+| A4 | Open-NL | - | - | - | 1.50 | 1.50 | 1.50 |
 | A5 | NAL-NL2 | - | - | 1.59 | 2.11 | 1.99 | 1.79 |
-| A5 | Open-NL | - | - | - | 1.33 | 3.30 | 2.38 |
+| A5 | Open-NL | - | - | - | 1.00 | 1.00 | - |
 | A6 | NAL-NL2 | 1.32 | 1.42 | 1.61 | 2.00 | 2.24 | 1.91 |
-| A6 | Open-NL | 1.50 | 1.50 | 1.50 | 1.50 | 1.50 | 1.50 |
+| A6 | Open-NL | 1.16 | 1.27 | 1.38 | 1.47 | 1.65 | 1.71 |
 | A7 | NAL-NL2 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 | A7 | Open-NL | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 
@@ -455,11 +480,11 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
    \begin{equation}
    P_{loud} = 2000.0 \cdot \max(0, \text{Sones}_{MG04}(\mathbf{G}) - \text{Cap})
    \end{equation}
-   *(Note: While gain-based penalties in this framework are squared to strongly penalize large deviations, the loudness penalty is explicitly linear. This is a deliberate choice: because sones inherently represent a compressive power-law transformation of physical acoustic energy, a linear penalty in the sone domain naturally exerts an exponentially growing restriction on the underlying insertion gain. Squaring the sone error introduces severe mathematical stiffness and destabilizes the simplex gradient.)*
-   where $\text{Sones}_{MG04}$ is the Moore & Glasberg (2004) specific-loudness integration computed via native C++. The dynamic U-shaped cap is interpolated across Pure Tone Average knots $\mathbf{PTA}_{knots} = [10, 32.5, 52.5, 72.5, 90]$ dB HL from level-specific sone vectors:
-   - $L_{in} = 50$ dB SPL: $\mathbf{K}_{50} = [1.5, 1.0, 0.8, 1.2, 1.2]$ sones
-   - $L_{in} = 65$ dB SPL: $\mathbf{K}_{65} = [7.0, 4.5, 4.0, 6.5, 6.0]$ sones
-   - $L_{in} = 80$ dB SPL: $\mathbf{K}_{80} = [20.0, 12.0, 10.0, 15.0, 14.0]$ sones
+   *(Note: While gain-based penalties in this framework are squared to strongly penalize large deviations, the loudness penalty is explicitly linear. This is a deliberate choice: because sones inherently represent a compressive power-law transformation of physical acoustic energy, a linear penalty in the sone domain naturally exerts an exponentially growing restriction on the underlying insertion gain. Squaring the sone error introduces severe mathematical stiffness and destabilizes the simplex gradient. Furthermore, coupling a linear penalty slope of $\lambda_{loud} = 2000.0$ against the intelligibility objective term ($-100 \cdot \text{SII}$) means that violating the cap requires a marginal objective benefit of $\partial \text{SII}/\partial S > 20 \text{ sone}^{-1}$. Because the SII is strictly bounded between 0 and 1, this condition is physically impossible to satisfy, turning the soft penalty into a rigorous, guaranteed mathematical boundary.)*
+   where $\text{Sones}_{MG04}$ is the Moore & Glasberg (2004) specific-loudness integration computed via native C++. The dynamic U-shaped cap is interpolated across Pure Tone Average knots $\mathbf{PTA}_{knots} = [10, 32.5, 52.5, 72.5, 90]$ dB HL from level-specific monaural sone vectors (note: these vectors represent single-ear monaural limits, which equal exactly half of their binaural equivalents under the simple-doubling convention of the 2004 framework):
+   - $L_{in} = 50$ dB SPL: $\mathbf{K}_{50} = [1.5, 1.0, 0.8, 1.2, 1.2]$ monaural sones
+   - $L_{in} = 65$ dB SPL: $\mathbf{K}_{65} = [7.0, 5.0, 5.5, 6.5, 6.5]$ monaural sones
+   - $L_{in} = 80$ dB SPL: $\mathbf{K}_{80} = [20.0, 12.0, 10.0, 15.0, 14.0]$ monaural sones
    \begin{equation}
    \text{Cap}_{base} = \text{interp}\left(\text{PTA}_{sn}, \mathbf{PTA}_{knots}, \mathbf{K}_{L_{in}}\right)
    \end{equation}
@@ -475,6 +500,7 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
    \begin{equation}
    P_{spl} = 2000.0 \cdot \max\left(0, \text{SPL}_{aided} - 110.0\right)
    \end{equation}
+   *(Note: This 110 dB SPL penalty evaluates the summed broadband RMS power of the entire amplified signal to enforce an overall physiological safety limit. It operates independently of the 120 dB SPL Maximum Power Output (MPO) ceiling defined in Eq. 44, which dictates the absolute hardware saturation threshold for individual narrow bands. For example, while multiple individual frequency bands may operate safely below their respective 120 dB SPL MPO limits, their combined acoustic energy can still sum to a broadband level that triggers this 110 dB SPL overall penalty, ensuring aggregate exposure remains bounded.)*
 
 5. **Spectral Roughness Penalty** ($\lambda_{rough} = 0.5$):
    \begin{equation}
@@ -497,7 +523,7 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
    200.0 \sum_{j=1}^6 \max\left(0, (G_{65, j} - G_{80, j}) - \Delta_{max, j}\right)^2, & \text{for } L_{in} = 80 
    \end{cases}
    \end{equation}
-   where $\Delta_{max, j} = 10.0 \cdot (1 - \text{ABG}_j / \max(0.001, \text{HTL}_j))$ for soft speech, bounding emergent compression ratios safely below 3.0:1 for sensorineural loss while enforcing linear amplification for conductive components. This 3.0:1 ceiling represents the best-supported parameter in the algorithm, firmly grounded in empirical psychoacoustic literature (Souza, 2002; Souza et al., 2006) demonstrating severe envelope flattening, loss of acoustic contrast, and speech-in-noise deficits for CRs $> 3.0:1$.
+   where $\Delta_{max, j} = 10.0 \cdot (1 - \text{ABG}_j / \max(0.001, \text{HTL}_j))$ for soft speech, bounding emergent compression ratios safely below 3.0:1 for sensorineural loss while enforcing linear amplification for conductive components. This 3.0:1 ceiling represents the best-supported parameter in the algorithm, firmly grounded in empirical psychoacoustic literature (Souza, 2002; Souza et al., 2006) demonstrating severe envelope flattening, loss of acoustic contrast, and speech-in-noise deficits for CRs $> 3.0:1$. Because this is enforced as a soft penalty ($\lambda_{cr} = 200.0$) rather than a hard algorithmic clamp, the solver can mathematically violate it when pushed against even stronger boundaries (e.g., yielding CRs $> 3.0$ in profound losses like A4 or A5), effectively transitioning from wide dynamic range compression to hard limiting.
 
 8. **Air-Bone Gap Excursion Penalty** ($\lambda_{abg} = 1.0$):
    \begin{equation}
@@ -522,7 +548,7 @@ Denk, F., Oetting, D., Latzel, M., Bonsel, H., & Husstedt, H. (2025). Prevalence
 
 Engler, M., Digeser, F., & Hoppe, U. (2026). Speech recognition and real-ear-measured amplification in hearing-aid users with various grades of hearing loss. *International Journal of Audiology*, 65(7), 834–845. https://doi.org/10.1080/14992027.2024.2426009
 
-Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026). Evolving the philosophy: From the NAL rule to NAL-NL3. *International Journal of Audiology*, 65(6), 513–524. https://doi.org/10.1080/14992027.2026.4234266
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026a). Evolving the philosophy: From the NAL rule to NAL-NL3. Advance online publication. 1-10. https://doi.org/10.1080/14992027.2026.2690236
 
 Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., & Wilson, R. H. (2025). Predicted and measured word-recognition scores unmask distortion in the impaired auditory system. *The Journal of the Acoustical Society of America*, 157(2), 555–568. https://doi.org/10.1121/10.0036461
 

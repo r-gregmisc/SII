@@ -1,0 +1,5 @@
+library(SII)
+freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+threshold_A5 <- c(70, 75, 80, 85, 90, 95)
+assign("TEST_VAR", "it works", envir = .GlobalEnv)
+print(TEST_VAR)

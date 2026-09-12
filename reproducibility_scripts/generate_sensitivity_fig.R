@@ -15,39 +15,55 @@ floors <- seq(-20, 0, length.out=4)
 profiles <- c("a2", "a4", "a5")
 
 grid <- expand.grid(Profile = profiles, anc = anchors, trig = triggers, byp = bypasses, flr = floors, stringsAsFactors=FALSE)
-cat("Running", nrow(grid), "permutations across 8 cores...\n")
+grid$id <- paste(toupper(grid$Profile), sprintf("%f,%f,%f,%f", grid$anc, grid$trig, grid$byp, grid$flr), sep=",")
+
+csv_file <- "manuscript_figures/sensitivity_progress.csv"
+
+if (file.exists(csv_file)) {
+  existing <- tryCatch(read.csv(csv_file, stringsAsFactors=FALSE), error=function(e) data.frame())
+  if (nrow(existing) > 0 && "Profile" %in% names(existing)) {
+    existing_ids <- paste(toupper(existing$Profile), sprintf("%f,%f,%f,%f", existing$Anchor, existing$Trigger, existing$Bypass, existing$Floor), sep=",")
+    grid <- grid[!(grid$id %in% existing_ids), ]
+    cat(sprintf("Found %d existing results. Resuming with remaining %d permutations...\n", nrow(existing), nrow(grid)))
+  } else {
+    cat("Profile,Anchor,Trigger,Bypass,Floor,SII,Sones\n", file=csv_file)
+  }
+} else {
+  cat("Profile,Anchor,Trigger,Bypass,Floor,SII,Sones\n", file=csv_file)
+}
+
+cat("Running remaining permutations across 8 cores...\n")
 cat("NOTE: Progress is being written to 'manuscript_figures/sensitivity_progress.csv' in real time.\n")
 cat("To watch progress, open a second terminal and run:\n  tail -f manuscript_figures/sensitivity_progress.csv\n\n")
 
-csv_file <- "manuscript_figures/sensitivity_progress.csv"
-cat("Profile,Anchor,Trigger,Bypass,Floor,SII,Sones\n", file=csv_file)
-
-invisible(mclapply(1:nrow(grid), function(idx) {
-  p <- grid$Profile[idx]
-  anc <- grid$anc[idx]
-  trig <- grid$trig[idx]
-  byp <- grid$byp[idx]
-  flr <- grid$flr[idx]
-  
-  target_data <- jd2011_targets[[p]]
-  freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-  
-  presc <- open_nl(
-    speech = 65, threshold = target_data$threshold, loss = rep(0, 6), freq = freqs, 
-    optimize = TRUE, optim_method = "Nelder-Mead", enable_severe_booster = TRUE,
-    booster_onset = 60,
-    anchor = anc, slope_trigger = trig, bypass_pta = byp, rs_floor = flr
-  )
-  
-  obj <- sii(speech="normal", threshold=target_data$threshold, freq=freqs, prescription=presc, interpolate=TRUE)
-  s_val <- calculate_loudness(presc)$total
-  
-  # Write immediately to the CSV so you can track progress
-  cat(sprintf("%s,%f,%f,%f,%f,%f,%f\n", toupper(p), anc, trig, byp, flr, obj$sii, s_val), file=csv_file, append=TRUE)
-  
-  # Also print to stderr so it shows up in the console
-  cat(sprintf("Finished %s permutation...\n", toupper(p)), file=stderr())
-}, mc.cores = 8))
+if (nrow(grid) > 0) {
+  invisible(mclapply(1:nrow(grid), function(idx) {
+    p <- grid$Profile[idx]
+    anc <- grid$anc[idx]
+    trig <- grid$trig[idx]
+    byp <- grid$byp[idx]
+    flr <- grid$flr[idx]
+    
+    target_data <- jd2011_targets[[tolower(p)]]
+    freqs <- c(250, 500, 1000, 2000, 4000, 8000)
+    
+    presc <- open_nl(
+      speech = 65, threshold = target_data$threshold, loss = rep(0, 6), freq = freqs, 
+      optimize = TRUE, optim_method = "Nelder-Mead", enable_severe_booster = TRUE,
+      booster_onset = 60,
+      anchor = anc, slope_trigger = trig, bypass_pta = byp, rs_floor = flr
+    )
+    
+    obj <- sii(speech="normal", threshold=target_data$threshold, freq=freqs, prescription=presc, interpolate=TRUE)
+    s_val <- calculate_loudness(presc)$total
+    
+    # Write immediately to the CSV so you can track progress
+    cat(sprintf("%s,%f,%f,%f,%f,%f,%f\n", toupper(p), anc, trig, byp, flr, obj$sii, s_val), file=csv_file, append=TRUE)
+    
+    # Also print to stderr so it shows up in the console
+    cat(sprintf("Finished %s permutation...\n", toupper(p)), file=stderr())
+  }, mc.cores = 8))
+}
 
 df <- read.csv(csv_file, stringsAsFactors=FALSE)
 
@@ -75,7 +91,14 @@ for (p in unique(df$Profile)) {
 }
 
 df_melt <- melt(df[, c("Profile", "SII", "Sones")], id.vars="Profile")
+# Rename facet variables for clarity
+df_melt$variable <- as.character(df_melt$variable)
+df_melt$variable[df_melt$variable == "SII"] <- "ANSI SII"
+df_melt$variable[df_melt$variable == "Sones"] <- "Loudness Penalty (sones)"
+df_melt$variable <- factor(df_melt$variable, levels = c("ANSI SII", "Loudness Penalty (sones)"))
+
 p4 <- ggplot(df_melt, aes(x=Profile, y=value, fill=Profile)) +
   geom_boxplot() + facet_wrap(~variable, scales="free_y") +
-  theme_minimal() + theme(legend.position="none")
+  theme_minimal() + theme(legend.position="none") +
+  labs(y = "")
 ggsave("manuscript_figures/Figure4_Sensitivity.png", p4, width=8, height=5, dpi=300)
