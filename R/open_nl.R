@@ -34,7 +34,7 @@
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
 #' @export
-open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ..., 
+open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floor = -10, ..., 
                     gender = "male", experience = "experienced", 
                     config = "bilateral", 
                     coupling = "custom_occluded", module = "standard", 
@@ -119,7 +119,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ...,
         out_of_bounds_penalty <- (sum(pmax(0, shifts - 30)^2) + sum(pmax(0, -shifts - 60)^2)) * 1000.0
         clamped_shifts <- pmax(-60, pmin(30, shifts))
         shift_21 <- approx(x = log10(hl_freqs), y = clamped_shifts, xout = log10(freq), rule = 2)$y
-        gain_array <- pmax(-10, pmin(80, final_gain_base + shift_21))
+        gain_array <- pmax(vent_floor, pmin(80, final_gain_base + shift_21))
         
         # --- Guardrails ---
         order_penalty <- 0.0
@@ -293,7 +293,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ...,
       # Keep shift_needed well within the out_of_bounds_penalty threshold (30 dB)
       start_par <- pmin(20.0, pmax(0, shift_needed))
       if (eval_level < 65) start_par <- start_par + 3.0
-      if (eval_level > 65) start_par <- pmax(-10, start_par - 5.0)
+      if (eval_level > 65) start_par <- pmax(vent_floor, start_par - 5.0)
       
       for (i in 1:3) {
         current_start_par <- start_par
@@ -312,7 +312,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ...,
       
       clamped_shifts <- pmax(-60, pmin(30, best_shifts))
       best_shifts_21 <- approx(x = log10(hl_freqs), y = clamped_shifts, xout = log10(freq), rule = 2)$y
-      final_gain_out <- pmax(-10, pmin(80, final_gain_base + best_shifts_21))
+      final_gain_out <- pmax(vent_floor, pmin(80, final_gain_base + best_shifts_21))
       
       # Hard constraint enforcement post-optimization
       if (!is.null(constraint_gain)) {
@@ -335,7 +335,6 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ...,
         }
       }
       
-      return(list(gain = final_gain_out, mpo = mpo_base))
     }
     
     # 1. Optimize 65 dB anchor always
