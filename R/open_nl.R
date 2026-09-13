@@ -153,12 +153,12 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
             # G_50 >= G_65
             order_penalty <- sum(pmax(0, cg_oct - gain_oct)^2) * 2000.0
             # CR <= Dynamic: G_50 - G_65 <= max_shift
-            cr_penalty <- sum(pmax(0, (gain_oct - cg_oct) - max_shift_oct)^2) * 200.0
+            cr_penalty <- sum(pmax(0, (gain_oct - cg_oct) - max_shift_oct)^2) * getOption('open_nl_lambda_cr', 200.0)
           } else if (eval_level > 65) {
             # G_80 <= G_65
             order_penalty <- sum(pmax(0, gain_oct - cg_oct)^2) * 2000.0
             # CR <= Dynamic: G_65 - G_80 <= max_shift
-            cr_penalty <- sum(pmax(0, (cg_oct - gain_oct) - max_shift_oct)^2) * 200.0
+            cr_penalty <- sum(pmax(0, (cg_oct - gain_oct) - max_shift_oct)^2) * getOption('open_nl_lambda_cr', 200.0)
           }
         }
         
@@ -226,7 +226,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
             cap_knots <- c(7.0, 4.5, 4.0, 6.5, 6.0)
           }
           
-          dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y
+          dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y * getOption('open_nl_cap_scalar', 1.0)
           
           # Reverse slope penalty: If lows are significantly worse than highs,
           # restrict the loud input cap to prevent overamplifying near-normal high frequencies.
@@ -248,7 +248,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           if (!is.null(cap_override)) dynamic_cap <- cap_override
           if (loudness_sones > dynamic_cap) {
             excess <- loudness_sones - dynamic_cap
-            loudness_penalty <- excess * 2000.0 
+            loudness_penalty <- excess * getOption('open_nl_lambda_loud', 2000.0) 
           }
         }
         
