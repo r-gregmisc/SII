@@ -82,14 +82,14 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  if (!exists(data.name, envir = environment())) {
+  if (!exists(data.name, envir = .GlobalEnv)) {
     if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
-      load(file.path("data", paste0(data.name, ".rda")), envir=environment())
+      load(file.path("data", paste0(data.name, ".rda")), envir=.GlobalEnv)
     } else {
-      data(list=data.name, package="SII", envir=environment())
+      data(list=data.name, package="SII", envir=.GlobalEnv)
     }
   }
-  table <- get(data.name, envir=environment())
+  table <- get(data.name, envir=.GlobalEnv)
 
   ## Get the correct importance functions
   if(missing(importance) || is.character(importance) )
@@ -98,14 +98,14 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          if (!exists(sic.name, envir = environment())) {
+          if (!exists(sic.name, envir = .GlobalEnv)) {
             if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
-              load(file.path("data", paste0(sic.name, ".rda")), envir=environment())
+              load(file.path("data", paste0(sic.name, ".rda")), envir=.GlobalEnv)
             } else {
-              data(list=sic.name, package="SII", envir=environment())
+              data(list=sic.name, package="SII", envir=.GlobalEnv)
             }
           }
-          sic.table <- get(sic.name, envir=environment())
+          sic.table <- get(sic.name, envir=.GlobalEnv)
           table[,"Ii"] <- sic.table[[importance]]
         }
     }
@@ -451,65 +451,26 @@ sii <- function(
           sii.tab$"Ci" <- -80 + 0.6*( sii.tab$"Bi" + 10*log10(table$"fi") - 6.353 )          
         }
 
-      if(method=="critical" ||
-         method=="equal-contributing")
-        {
-          Zifun <- function(i) 
-            {
-              slow <- TRUE
-
-              if(slow)
-                {
-                  accum <- 10 ^ (0.1 * sii.tab[i,"N'i"])
-                  if(i>1)
-                    for(k in 1:(i-1))
-                      accum <- accum + 10 ^ (0.1 * (sii.tab[k,"Bi"] + 3.32*sii.tab[k,"Ci"] * log10( table[i,"fi"] / table[k,"hi"] ) ) )
-                  retval <- 10 * log10(accum)
-                }
-              else
-                {
-                  if(i>1)
-                    inner <- sum( 10 ^ (0.1 * ( sii.tab[1:(i-1),"Bi"] + 3.32*sii.tab[1:(i-1),"Ci"] * log10( table[i,"fi"] / table[1:(i-1),"hi"] ) ) ) )
-                  else
-                    inner <- 0
-                  retval <- 10 * log10( 10 ^ (0.1 * sii.tab[i,"N'i"] ) + inner )
-                }
-
-              retval
-            }
-          
-          sii.tab$"Zi" = sapply(1:nrow(sii.tab), Zifun)
-
+      N_i <- sii.tab$"N'i"
+      B_i <- sii.tab$"Bi"
+      C_i <- sii.tab$"Ci"
+      f_i <- table$"fi"
+      h_i <- table$"hi"
+      Zi <- numeric(nrow(sii.tab))
+      Zi[1] <- B_i[1]
+      
+      if(method=="critical" || method=="equal-contributing") {
+        for(i in 2:nrow(sii.tab)) {
+          inner <- sum( 10 ^ (0.1 * ( B_i[1:(i-1)] + 3.32*C_i[1:(i-1)] * log10( f_i[i] / h_i[1:(i-1)] ) ) ) )
+          Zi[i] <- 10 * log10( 10 ^ (0.1 * N_i[i]) + inner )
         }
-      else # method=="one-third octave"
-        {
-
-          
-          Zifun <- function(i) 
-            {
-              slow <- FALSE
-              
-              if(slow)
-                {
-                  accum <- 10 ^ (0.1 * sii.tab[i,"N'i"])
-                  if(i>1)
-                    for(k in 1:(i-1))
-                      accum <- accum + 10 ^ (0.1 * ( sii.tab[k,"Bi"] + 3.32*sii.tab[k,"Ci"] * log10( 0.89 * table[i,"fi"] / table[k,"fi"] ) )  )
-                  retval <- 10 * log10(accum)
-                }
-              else
-                {
-
-                  if(i>1)
-                    inner <- sum( 10 ^ (0.1 * ( sii.tab[1:(i-1),"Bi"] + 3.32*sii.tab[1:(i-1),"Ci"] * log10( 0.89 * table[i,"fi"] / table[1:(i-1),"fi"] ) ) ) )
-                  else
-                    inner <- 0
-              
-                  retval <- 10 * log10( 10 ^ (0.1 * sii.tab[i,"N'i"] ) + inner )
-                }
-            }
-          sii.tab$"Zi" = sapply(1:nrow(sii.tab), Zifun)
+      } else { # method=="one-third octave"
+        for(i in 2:nrow(sii.tab)) {
+          inner <- sum( 10 ^ (0.1 * ( B_i[1:(i-1)] + 3.32*C_i[1:(i-1)] * log10( 0.89 * f_i[i] / f_i[1:(i-1)] ) ) ) )
+          Zi[i] <- 10 * log10( 10 ^ (0.1 * N_i[i]) + inner )
         }
+      }
+      sii.tab$"Zi" <- Zi
 
       ## 4.3.2.4
       sii.tab[1,"Zi"] <- sii.tab[1,"Bi"]
