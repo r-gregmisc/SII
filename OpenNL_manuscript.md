@@ -60,6 +60,22 @@ However, robust psychoacoustic evidence demonstrates a stark contrast in impaire
 
 Standard monaural and narrowband loudness models cannot predict this broadband suprathreshold phenomenon from the pure-tone audiogram alone. Therefore, an algorithm optimized beneath a monaural ceiling becomes structurally anti-conservative when translated to bilateral fittings. Consequently, Open-NL's U-shaped loudness constraint must be interpreted as an illustrative computational boundary for single-ear simulation, rather than an empirical safety guarantee for bilateral clinical use.
 
+To guarantee algorithmic transparency, the exact objective function optimized by Open-NL for an input vector of frequency-specific gain shifts $s = \{s_1, ..., s_6\}$ (where total gain $G(s) = G_{base} + s$) is formally defined as:
+
+$$
+\min_{s} \mathcal{L}(s) = -100 \times \text{SII}(s) + \sum_{k=1}^{8} \lambda_k P_k(s)
+$$
+
+where the eight weighted penalty terms ($P_1$ through $P_8$) are strictly defined as:
+1. **Loudness ($P_{loud}$)**: Enforces physiological comfort. $\lambda_1 = 2000.0$. $P_{loud} = \max(0, L_{sones} - L_{cap})$
+2. **Bounds ($P_{bounds}$)**: Restricts extreme simplex aberrations. $\lambda_2 = 1000.0$. $P_{bounds} = \sum_{i=1}^6 \big( \max(0, s_i - 30)^2 + \max(0, -s_i - 60)^2 \big)$
+3. **SPL Limit ($P_{spl}$)**: Prevents absolute acoustic trauma. $\lambda_3 = 2000.0$. $P_{spl} = \max(0, SPL_{overall} - 110.0)$
+4. **Gain Monotonicity ($P_{order}$)**: Enforces $G_{50} \ge G_{65} \ge G_{80}$. $\lambda_4 = 2000.0$. $P_{order} = \sum_{i=1}^6 \max(0, \Delta G_{violation})^2$
+5. **Compression Ratio ($P_{cr}$)**: Enforces dynamic CR limits (e.g., CR $\le 3.0$). $\lambda_5 = 200.0$. $P_{cr} = \sum_{i=1}^6 \max(0, \Delta CR_{violation})^2$
+6. **Spectral Roughness ($P_{rough}$)**: Prevents abrupt inter-channel jumps. $\lambda_6 = 0.5$. $P_{rough} = \sum_{i=1}^5 (s_{i+1} - s_i)^2$
+7. **L1 Anchor ($P_{anchor}$)**: Sparsity penalty pulling towards the clinical base. $\lambda_7 = 0.1$. $P_{anchor} = \sum_{i=1}^6 |s_i|$
+8. **Conductive Restraint ($P_{abg}$)**: Penalizes purely positive exploratory shifts for mixed/conductive losses to enforce the 75% ABG rule. $\lambda_8 = 1.0$. $P_{abg} = \sum_{i=1}^6 \max(0, s_i)^2$ (applies only if Air-Bone Gap $> 0$).
+
 ### B. Methods and Development
 
 The core ANSI SII calculation engine (the `sii()` function and associated plotting routines) was originally developed by Gregory R. Warnes for earlier package versions. Maintainership transferred to the current author with version 1.1.0, at which point all subsequent Open-NL prescriptive logic, clinical heuristics, and WDRC mathematical implementations—including `open_nl()` and `calculate_loudness()`—were developed by the author as original contributions. 
@@ -102,7 +118,7 @@ The outer-loop objective function must incorporate an asymmetric, veto-based cos
 | Parameter Category | Specific Free Parameters | Default / Evaluated Value | Evidentiary Support & Derivation |
 |:---|:---|:---|:---|
 | **Objective Penalties** | Loudness Cap Knots (`cap_knots`) | $L_{cap}$ vectors (Section S.I.12) | Uncalibrated heuristic derived from population loudness boundaries; the least-justified dominant parameter. |
-| | Optimizer Penalty Weights ($\lambda_{1-8}$) | $\lambda_{loud}=2000$, $\lambda_{cr}=200$, etc. (Sec S.I.12) | Pragmatic engineering constraints balancing target convergence and physical limits. |
+| | Optimizer Penalty Weights ($\lambda_{1-8}$) | $\lambda_{loud}=2000$, $\lambda_{cr}=200$, etc. (Section II.A) | Pragmatic engineering constraints balancing target convergence and physical limits. |
 | | CR Soft Penalty Target ($P_{cr}$) | $\le 3.0:1$ Compression Ratio | **Strong empirical derivation**: Souza (2002) speech degradation limits. |
 | **Prescriptive Anchors** | Base Gain Anchor ($G_{base}$) | 0.46 | Uncalibrated midpoint balancing half-gain rules (Lybarger, 1944) and preference data. |
 | | New-User Offset ($\Delta_{exp}$) | 0 to -6 dB based on PTA | Assumed heuristic approximating acclimatization preferences. |
