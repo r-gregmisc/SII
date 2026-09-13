@@ -34,7 +34,7 @@
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
 #' @export
-open_nl <- function(speech = 65, threshold, freq, ..., 
+open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, ..., 
                     gender = "male", experience = "experienced", 
                     config = "bilateral", 
                     coupling = "custom_occluded", module = "standard", 
@@ -202,7 +202,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
         dense_l <- dense_l + (overall - current_spl)
         
         loud_res <- tryCatch({
-          calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l,
+          calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l - dense_abg,
             HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss,
             NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
         }, error = function(e) NULL)
@@ -245,6 +245,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
               }
           }
           
+          if (!is.null(cap_override)) dynamic_cap <- cap_override
           if (loudness_sones > dynamic_cap) {
             excess <- loudness_sones - dynamic_cap
             loudness_penalty <- excess * 2000.0 
