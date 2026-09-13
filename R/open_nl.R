@@ -272,7 +272,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         return(-score + anchor_penalty + loudness_penalty + out_of_bounds_penalty + spl_penalty + order_penalty + cr_penalty + roughness_penalty + abg_penalty)
       }
       
-      best_score <- -obj_fn(rep(0, 6))
+      cat("Calling obj_fn\n"); best_score <- -obj_fn(rep(0, 6)); cat("Done obj_fn\n")
       best_shifts <- rep(0, 6)
       
       # Determine the CR to map the 65 dB SPL anchor to the evaluation level
@@ -295,14 +295,15 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
       if (eval_level < 65) start_par <- start_par + 3.0
       if (eval_level > 65) start_par <- pmax(vent_floor, start_par - 5.0)
       
-      for (i in 1:3) {
+      open_nl_starts <- getOption('open_nl_starts', 3)
+      for (i in seq_len(open_nl_starts)) {
         current_start_par <- start_par
         
         if (i > 1 || !is.null(seed_noise)) {
           jitter_amount <- if (!is.null(seed_noise)) seed_noise else 5
           current_start_par <- current_start_par + runif(6, -jitter_amount, jitter_amount)
         }
-        opt_res <- suppressWarnings(optim(par = current_start_par, fn = obj_fn, method = optim_method, control = list(maxit = 800)))
+        opt_res <- suppressWarnings(optim(par = current_start_par, fn = obj_fn, method = optim_method, control = list(maxit = getOption('open_nl_maxit', 800))))
         current_score <- -opt_res$value
         if (current_score > best_score) {
           best_score <- current_score
@@ -335,6 +336,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         }
       }
       
+      return(list(gain = final_gain_out, mpo = mpo_base))
     }
     
     # 1. Optimize 65 dB anchor always
