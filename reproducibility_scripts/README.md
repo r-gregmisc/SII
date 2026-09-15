@@ -10,8 +10,11 @@ This directory contains the complete suite of standalone R and Octave/MATLAB scr
 
 | Manuscript Item | Description | Script to Run | Output Artifact |
 |:---|:---|:---|:---|
+| **JAAA Fig 1** | Loudness Budget Decomposition ($L_{cap} - L_0$) | `Rscript reproducibility_scripts/gen_budget_decomposition.R` | Console / `data_output/budget_decomposition.md` |
+| **JAAA Fig 2** | 2D Feasibility Maps for Steeply Sloping Profiles | `Rscript reproducibility_scripts/gen_feasibility_maps.R` | `figures/feasibility_a4.png`, `figures/feasibility_a5.png` |
+| **JAAA Table 2** | Iso-Loudness Control (NAL-NL2 vs Open-NL SII) | `Rscript reproducibility_scripts/gen_iso_loudness_control.R` | Console |
+| **JAAA Sens.** | Variance Decomposition (L_cap & vent_floor) | `Rscript reproducibility_scripts/gen_variance_decomposition.R` | Console |
 | **Figure 1** | ANSI SII vs Effective SII (50, 65, 80 dB SPL) | `Rscript reproducibility_scripts/plot_fig1_sii_grouped.R` | `manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png` |
-| **Figure 2** | Insertion Gain Targets across A1–A7 (50, 65, 80 dB SPL) | `Rscript reproducibility_scripts/plot_final_gains.R` | `manuscript_figures/OpenNL_vs_NALNL2_Gain_Final.png` |
 | **Figure 4** | Monte Carlo Stability & Hyperparameter Sensitivity Sweep | `Rscript reproducibility_scripts/generate_sensitivity_fig.R` | `manuscript_figures/Figure4_Sensitivity.png` |
 | **Table III** | Effective Compression Ratios (Gain50 / Gain80) | `Rscript reproducibility_scripts/generate_table3_cr.R` | Markdown table to console |
 | **Table IV** | 256-Parameter Sensitivity Sweep Variance | `Rscript reproducibility_scripts/generate_sensitivity_fig.R` | `manuscript_figures/sensitivity_progress.csv` |

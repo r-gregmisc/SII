@@ -42,11 +42,9 @@ calc_bramslow_sones <- function(gain_tgt, threshold, loss, freqs = hl_freqs, tar
   dense_l <- dense_l + (overall - current_spl)
   
   sn_loss <- pmax(threshold - loss, 0)
-  ohc_loss <- pmin(sn_loss, 65)
-  ihc_loss <- pmax(sn_loss - 65, 0)
   
   res <- tryCatch({
-    calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l, HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss, NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
+    calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l, HLcf = hl_freqs, HLdB = sn_loss, NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
   }, error = function(e) { NULL })
   
   if(is.null(res)) return(NA)

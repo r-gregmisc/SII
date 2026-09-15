@@ -48,7 +48,7 @@ double interp1(double x, const std::vector<double>& xp, const std::vector<double
 // Bramslow ERB energy
 void bramslow2004_erbenergy(const std::vector<double>& F, const std::vector<double>& L_linear,
                             const std::vector<double>& agfs_e, const std::vector<double>& ag_loss,
-                            const std::vector<double>& ag_ohc_loss, const std::vector<double>& ret4153, bool widen,
+                            const std::vector<double>& ret4153, bool widen,
                             int NoChan, double E_Beg, double E_End,
                             std::vector<double>& E_SPL, std::vector<double>& f0_Hz, std::vector<double>& E_Bin) {
     
@@ -62,7 +62,7 @@ void bramslow2004_erbenergy(const std::vector<double>& F, const std::vector<doub
         
         double HTL;
         if (widen) {
-            HTL = interp1(E_Bin[c], agfs_e, ag_ohc_loss);
+            HTL = interp1(E_Bin[c], agfs_e, ag_loss);
         } else {
             HTL = interp1(E_Bin[c], agfs_e, ret4153);
         }
@@ -102,7 +102,7 @@ void bramslow2004_erbenergy(const std::vector<double>& F, const std::vector<doub
 //        (bramslow2004_roexfilt.m line 177) instead of simplified two-step.
 void bramslow2004_roexfilt(const std::vector<double>& F, const std::vector<double>& L_linear,
                            const std::vector<double>& E_SPL, const std::vector<double>& agfs_e, const std::vector<double>& ag_loss,
-                           const std::vector<double>& ag_ohc_loss, const std::vector<double>& ret4153, bool widen,
+                           const std::vector<double>& ret4153, bool widen,
                            int NoChan, const std::vector<double>& E_Bin, const std::vector<double>& f0_Hz,
                            std::vector<double>& E_Vector) {
     
@@ -116,7 +116,7 @@ void bramslow2004_roexfilt(const std::vector<double>& F, const std::vector<doubl
     for (int c = 0; c < NoChan; ++c) {
         double HTLL;
         if (widen) {
-            HTLL = interp1(E_Bin[c], agfs_e, ag_ohc_loss);
+            HTLL = interp1(E_Bin[c], agfs_e, ag_loss);
         } else {
             HTLL = interp1(E_Bin[c], agfs_e, ret4153);
         }
@@ -173,7 +173,7 @@ void bramslow2004_roexfilt(const std::vector<double>& F, const std::vector<doubl
 //        used for UCL calibration (reference: bramslow2004_ucl.m line 97).
 void simulate_tone(double F_tone, double L_tone_dB,
                    const std::vector<double>& agfs_e, const std::vector<double>& ag_loss,
-                   const std::vector<double>& ag_ohc_loss, const std::vector<double>& ret4153,
+                   const std::vector<double>& ret4153,
                    int NoChan, double E_Beg, double E_End, const std::vector<double>& E_Bin, const std::vector<double>& f0_Hz,
                    std::vector<double>& E_Vector_Out, bool force_narrow = false, bool is_coupler = false, bool widen = false) {
     
@@ -197,14 +197,14 @@ void simulate_tone(double F_tone, double L_tone_dB,
     std::vector<double> L_linear = {std::pow(10.0, (L_tone_dB + iec303_corr + zwick) / 10.0)};
     
     std::vector<double> E_SPL(NoChan);
-    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ag_ohc_loss, ret4153, widen, NoChan, E_Beg, E_End, E_SPL, const_cast<std::vector<double>&>(f0_Hz), const_cast<std::vector<double>&>(E_Bin));
+    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ret4153, widen, NoChan, E_Beg, E_End, E_SPL, const_cast<std::vector<double>&>(f0_Hz), const_cast<std::vector<double>&>(E_Bin));
     
     // Force narrow filters for UCL calibration
     if (force_narrow) {
         for (int c = 0; c < NoChan; ++c) E_SPL[c] = 20.0;
     }
     
-    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ag_ohc_loss, ret4153, widen, NoChan, E_Bin, f0_Hz, E_Vector_Out);
+    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ret4153, widen, NoChan, E_Bin, f0_Hz, E_Vector_Out);
 }
 
 //' Calculate Canonical Loudness (Native C++ Engine)
@@ -215,8 +215,7 @@ void simulate_tone(double F_tone, double L_tone_dB,
 //' @param inputF Vector of input frequencies (Hz)
 //' @param inputLdB Vector of input spectrum levels (dB/Hz, free field)
 //' @param HLcf Audiogram frequencies (Hz)
-//' @param HLohcdB0 OHC loss at audiogram frequencies (dB)
-//' @param HLihcdB0 IHC loss at audiogram frequencies (dB)
+//' @param HLdB Total hearing loss at audiogram frequencies (dB HL)
 //' @param NoChan Number of ERB channels (default 30)
 //' @param E_Beg Lowest ERB rate (default 3.0)
 //' @param E_End Highest ERB rate (default 32.0)
@@ -225,7 +224,7 @@ void simulate_tone(double F_tone, double L_tone_dB,
 //' @export
 // [[Rcpp::export]]
 List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB, 
-                              NumericVector HLcf, NumericVector HLohcdB0, NumericVector HLihcdB0,
+                              NumericVector HLcf, NumericVector HLdB,
                               int NoChan = 30, double E_Beg = 3.0, double E_End = 32.0, int Binaural = 0) {
     
     // 2048-point FFT parameters (at 44100 Hz sampling rate)
@@ -263,12 +262,9 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
     }
     
     std::vector<double> hl_cf(HLcf.begin(), HLcf.end());
-    std::vector<double> hl_ohc(HLohcdB0.begin(), HLohcdB0.end());
-    std::vector<double> hl_ihc(HLihcdB0.begin(), HLihcdB0.end());
+    std::vector<double> hl_total(HLdB.begin(), HLdB.end());
     std::vector<double> agfs_e(hl_cf.size());
     std::vector<double> ag_loss(hl_cf.size());
-    std::vector<double> ag_ohc_loss(hl_cf.size());
-    std::vector<double> hl_ohc_plus_ihc(hl_cf.size());
     
     // RET4153: ISO 389 thresholds in dB SPL as measured on the ear-simulator (4153) coupler.
     std::vector<double> ret4153_freqs = {125.0, 250.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 6000.0, 8000.0, 10000.0, 12500.0};
@@ -278,11 +274,9 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
     
     for(size_t i=0; i<hl_cf.size(); ++i) {
         agfs_e[i] = f2erbrate(hl_cf[i]);
-        hl_ohc_plus_ihc[i] = hl_ohc[i] + hl_ihc[i];
         // Safely interpolate the RET4153 value to dynamically align with whatever freq array R passed!
         ret4153_aligned[i] = interp1(hl_cf[i], ret4153_freqs, ret4153_dB);
-        ag_loss[i] = hl_ohc[i] + hl_ihc[i] + ret4153_aligned[i];
-        ag_ohc_loss[i] = hl_ohc[i] + ret4153_aligned[i];
+        ag_loss[i] = hl_total[i] + ret4153_aligned[i];
     }
     
     std::vector<double> E_Bin(NoChan);
@@ -290,10 +284,10 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
     std::vector<double> E_SPL(NoChan);
     
     // For speech signal, widen is true
-    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ag_ohc_loss, ret4153_aligned, true, NoChan, E_Beg, E_End, E_SPL, f0_Hz, E_Bin);
+    bramslow2004_erbenergy(F, L_linear, agfs_e, ag_loss, ret4153_aligned, true, NoChan, E_Beg, E_End, E_SPL, f0_Hz, E_Bin);
     
     std::vector<double> E_Vector(NoChan);
-    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ag_ohc_loss, ret4153_aligned, true, NoChan, E_Bin, f0_Hz, E_Vector);
+    bramslow2004_roexfilt(F, L_linear, E_SPL, agfs_e, ag_loss, ret4153_aligned, true, NoChan, E_Bin, f0_Hz, E_Vector);
     
     // Canonical Specific Loudness Integration (bramslow2004_specloudn)
     double TotLoudn = 0.0;
@@ -330,18 +324,18 @@ List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB,
         std::vector<double> e0_vec(NoChan), etq_vec(NoChan), eucl_vec(NoChan);
         
         // E_0: excitation from 0 dB SPL tone (free-field, so is_coupler=false)
-        simulate_tone(f0_Hz[c], 0.0, agfs_e, ag_loss, ag_ohc_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, e0_vec, false, false, false);
+        simulate_tone(f0_Hz[c], 0.0, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, e0_vec, false, false, false);
         
         // Find absolute threshold
         double RET = interp1(f0_Hz[c], hl_cf, ret4153_aligned);
         double HTL = std::max(30.708, interp1(f0_Hz[c], hl_cf, ag_loss));
         
         // E_TQ: excitation from HTL tone (coupler, so is_coupler=true)
-        simulate_tone(f0_Hz[c], HTL, agfs_e, ag_loss, ag_ohc_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, etq_vec, false, true, false);
+        simulate_tone(f0_Hz[c], HTL, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, etq_vec, false, true, false);
         
         // E_UCL: excitation from UCL tone (forced narrow filters, coupler, so is_coupler=true)
         // Default AG_UCL is 120 dB HL
-        simulate_tone(f0_Hz[c], 120.0 + RET, agfs_e, ag_loss, ag_ohc_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, eucl_vec, true, true, false);
+        simulate_tone(f0_Hz[c], 120.0 + RET, agfs_e, ag_loss, ret4153_aligned, NoChan, E_Beg, E_End, E_Bin, f0_Hz, eucl_vec, true, true, false);
         
         // Fix 3: E_0 and E_TQ use total summed excitation across all channels
         // (reference: bramslow2004_exc0dbspl.m line 108, bramslow2004_htl.m line 98)

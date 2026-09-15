@@ -9,15 +9,14 @@
 #' @param inputF Vector of input frequencies (Hz)
 #' @param inputLdB Vector of input spectrum levels (dB/Hz, free field)
 #' @param HLcf Audiogram frequencies (Hz)
-#' @param HLohcdB0 OHC loss at audiogram frequencies (dB)
-#' @param HLihcdB0 IHC loss at audiogram frequencies (dB)
+#' @param HLdB Total hearing loss at audiogram frequencies (dB HL)
 #' @param NoChan Number of ERB channels (default 30)
 #' @param E_Beg Lowest ERB rate (default 3.0)
 #' @param E_End Highest ERB rate (default 32.0)
 #' @param Binaural Integer indicating whether to compute binaural loudness (default 0L)
 #' @return A list containing Loudness (sones), Excitation, Cams, and CFs.
 #' @export
-calculate_loudness_cpp <- function(inputF, inputLdB, HLcf, HLohcdB0, HLihcdB0, NoChan = 30L, E_Beg = 3.0, E_End = 32.0, Binaural = 0L) {
-    .Call(`_SII_calculate_loudness_cpp`, inputF, inputLdB, HLcf, HLohcdB0, HLihcdB0, NoChan, E_Beg, E_End, Binaural)
+calculate_loudness_cpp <- function(inputF, inputLdB, HLcf, HLdB, NoChan = 30L, E_Beg = 3.0, E_End = 32.0, Binaural = 0L) {
+    .Call(`_SII_calculate_loudness_cpp`, inputF, inputLdB, HLcf, HLdB, NoChan, E_Beg, E_End, Binaural)
 }
 

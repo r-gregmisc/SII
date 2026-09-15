@@ -26,10 +26,8 @@ calc_amt_loudness_cpp <- function(gain_tgt, htl, cond, target_level) {
   offset <- overall - current_spl
   dense_l <- dense_l + offset
   sn_loss <- htl - cond
-  ohc <- sn_loss
-  ihc <- rep(0, length(sn_loss))
   loudness_res <- calculate_loudness_cpp(
-    inputF = dense_f, inputLdB = dense_l, HLcf = freqs, HLohcdB0 = ohc, HLihcdB0 = ihc, Binaural = 0
+    inputF = dense_f, inputLdB = dense_l, HLcf = freqs, HLdB = sn_loss, Binaural = 0
   )
   return(loudness_res$Ldn)
 }

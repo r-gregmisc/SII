@@ -42,8 +42,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
                     loss = NULL, distortion_category = NULL, 
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
-                    abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
-                    desensitization_scale = 1.0) {
+                    abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE) {
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -89,6 +88,8 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
     hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
     htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
     sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
+    ohc_loss <- sn_htl
+    ihc_loss <- rep(0, length(sn_htl))
     
     sn_octaves <- approx(x = log10(freq), y = (threshold - local_loss), xout = log10(c(500, 1000, 2000, 4000)), rule = 2)$y
     pta_sn_local <- mean(sn_octaves, na.rm = TRUE)
@@ -177,8 +178,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           sii(speech = speech_spec_base, noise = rep(-50, length(freq)), 
               threshold = threshold, loss = loss, freq = freq, 
               prescription = temp_target, interpolate = TRUE, 
-              nal_ldf = TRUE, desensitization = "johnson2011_smoothed",
-              desensitization_scale = desensitization_scale)
+              nal_ldf = TRUE, desensitization = "johnson2011_smoothed")
         }, error = function(e) NULL)
         
         if (is.null(res)) return(1000)
@@ -203,7 +203,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         
         loud_res <- tryCatch({
           calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l - dense_abg,
-            HLcf = hl_freqs, HLdB = sn_htl,
+            HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss,
             NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
         }, error = function(e) NULL)
         
@@ -363,8 +363,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         sii(speech = speech_spec, noise = rep(-50, length(freq)),
             threshold = threshold, loss = loss, freq = freq,
             prescription = temp_tgt, interpolate = TRUE,
-            nal_ldf = TRUE, desensitization = "johnson2011_smoothed",
-            desensitization_scale = desensitization_scale),
+            nal_ldf = TRUE, desensitization = "johnson2011_smoothed"),
         error = function(e) list(sii = 0)
       )
       res$sii

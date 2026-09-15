@@ -13,40 +13,23 @@ Open-NL operates as a multi-stage parameterized shape generator. Rather than rel
 
 *Terminology Note:* Throughout this framework, the algorithm utilizes two distinct discomfort predictors for different theoretical purposes: an HL-domain "LDL" (Loudness Discomfort Level) predictor used for estimating clinical audiometric dynamic range (Stage 8), and an SPL-domain "UCL" (Uncomfortable Loudness Level) predictor for establishing physical device saturation limits (Stage 11). A visual flowchart mapping each predictor to its downstream algorithm function is provided in Diagram 1.
 
-```text
-===========================================================================
-                  DIAGRAM 1. Open-NL Discomfort Predictors
-===========================================================================
-
-       [ CLINICAL DYNAMIC RANGE ]          [ PHYSICAL DEVICE LIMITS ]
-                   |                                   |
-                   v                                   v
-             LDL Predictor                       UCL Predictor
-                (dB HL)                            (dB SPL)
-                   |                                   |
-    100 + max(0, HTL - 40)*0.5 + Loss_cond    105 + 0.5 * max(0, HTL - 20)
-                   |                                   |
-                   v                                   v
-        Dynamic Range "Squeeze"            Maximum Power Output (MPO) 
-      (Insertion Gain Attenuation)       (Saturation Limit & CR Calc)
-
-===========================================================================
-```
+![Open-NL Discomfort Predictors Diagram](figures/Diagram1_Predictors.png)
+*Figure S1. Flowchart mapping the LDL and UCL discomfort predictors to their downstream algorithm functions.*
 
 The twelve modules operate in a strictly defined cascaded execution order to prevent unintended interactions between additive boosters and soft limiters:
 
-1. **Stage 1: Conductive Component Separation & Dynamic Range Baseline** (Section II.D)
-2. **Stage 2: Decoupled Half-Gain Base Anchor Calculation** (Section II.E)
-3. **Stage 3: Experience-Level Shaping & Log-Frequency $C_{vals}$ Interpolation** (Section II.F)
-4. **Stage 4: Reverse-Slope Low-Frequency Attenuation Floor** (Section II.G)
-5. **Stage 5: Slope-Dependent Low-Frequency Penalty (SD-LFP) with Profound HF Bypass** (Section II.H)
-6. **Stage 6: Severe-Loss Audibility Booster** (Section II.I)
-7. **Stage 7: Soft-Compression High-Frequency Desensitization** (Section II.J)
-8. **Stage 8: Dynamic Range Mapping (LDL Squeeze)** (Section II.K)
-9. **Stage 9: Transducer Bandwidth Roll-off** (Section II.L)
-10. **Stage 10: Multi-Channel WDRC Mapping, Input/Output Pivot, and Demographic Adjustments** (Section II.M)
-11. **Stage 11: Acoustic Venting, Coupling Loss, and Receiver Saturation Limits** (Section II.N)
-12. **Stage 12: Embedded Nelder-Mead Simplex Optimization & Physiological Loudness Ceilings** (Section II.O)
+1. **Stage 1: Conductive Component Separation & Dynamic Range Baseline** (Section S.I.1)
+2. **Stage 2: Decoupled Half-Gain Base Anchor Calculation** (Section S.I.2)
+3. **Stage 3: Experience-Level Shaping & Log-Frequency $C_{vals}$ Interpolation** (Section S.I.3)
+4. **Stage 4: Reverse-Slope Low-Frequency Attenuation Floor** (Section S.I.4)
+5. **Stage 5: Slope-Dependent Low-Frequency Penalty (SD-LFP) with Profound HF Bypass** (Section S.I.5)
+6. **Stage 6: Severe-Loss Audibility Booster** (Section S.I.6)
+7. **Stage 7: Soft-Compression High-Frequency Desensitization** (Section S.I.7)
+8. **Stage 8: Dynamic Range Mapping (LDL Squeeze)** (Section S.I.8)
+9. **Stage 9: Transducer Bandwidth Roll-off** (Section S.I.9)
+10. **Stage 10: Multi-Channel WDRC Mapping, Input/Output Pivot, and Demographic Adjustments** (Section S.I.10)
+11. **Stage 11: Acoustic Venting, Coupling Loss, and Receiver Saturation Limits** (Section S.I.11)
+12. **Stage 12: Embedded Nelder-Mead Simplex Optimization & Physiological Loudness Ceilings** (Section S.I.12)
 
 ---
 
@@ -89,7 +72,7 @@ where $\alpha = 0.46$ is the nominal half-gain multiplier (loosely derived from 
 
 ## S.I.3. Stage 3: Experience-Level Shaping & Log-Frequency $C_{vals}$ Interpolation
 
-To account for listener acclimatization and preferred listening levels (Keidser et al., 2012a), Open-NL modulates the frequency-shaping array $C_{interp}$ across eight discrete anchor frequencies:
+To account for listener acclimatization and preferred listening levels (Keidser et al., 2012), Open-NL modulates the frequency-shaping array $C_{interp}$ across eight discrete anchor frequencies:
 \begin{equation}
 \mathbf{f}_c = [250, 500, 1000, 2000, 3000, 4000, 6000, 8000]\text{ Hz}
 \end{equation}
@@ -383,53 +366,36 @@ Target gain at arbitrary overall input level $L_{in}$ (e.g., 50, 65, 80 dB SPL) 
 | A7 | NAL-NL2 | 65-80 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 | A7 | Open-NL | 50-80 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 
----|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| A1 | NAL-NL2 | 1.01 | 1.07 | 1.69 | 2.27 | 2.63 | 2.17 |
-| A1 | Open-NL | - | - | 1.34 | 1.65 | 1.97 | 2.06 |
-| A2 | NAL-NL2 | 2.11 | 2.36 | 2.07 | 1.86 | 1.40 | 1.28 |
-| A2 | Open-NL | 1.73 | 1.88 | 1.91 | 1.74 | 1.20 | - |
-| A3 | NAL-NL2 | - | 1.10 | 1.88 | 2.48 | 2.70 | 2.19 |
-| A3 | Open-NL | - | - | 1.68 | 1.99 | 2.16 | 2.06 |
-| A4 | NAL-NL2 | - | - | 1.12 | 2.17 | 2.22 | 1.88 |
-| A4 | Open-NL | - | - | - | 1.50 | 1.50 | 1.50 |
-| A5 | NAL-NL2 | - | - | 1.59 | 2.11 | 1.99 | 1.79 |
-| A5 | Open-NL | - | - | - | 1.00 | 1.00 | - |
-| A6 | NAL-NL2 | 1.32 | 1.42 | 1.61 | 2.00 | 2.24 | 1.91 |
-| A6 | Open-NL | 1.16 | 1.27 | 1.38 | 1.47 | 1.65 | 1.71 |
-| A7 | NAL-NL2 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| A7 | Open-NL | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-
 ---
 
-## S.I.11. Stage 11: Acoustic Venting, Coupling Loss, and Receiver Saturation Limits
+## S.I.11. Stage 11: Passive Insertion Loss and Receiver Saturation Limits
 
-Real-Ear Aided Responses (REAR) are heavily influenced by acoustic coupling. Low-frequency leakage is modeled by log-frequency interpolation over anchor frequencies $\mathbf{f}_{vent} = [250, 500, 1000, 2000, 4000, 8000]\text{ Hz}$:
+Real-Ear Aided Responses (REAR) are heavily constrained by physical acoustic coupling. The maximum physical attenuation (passive insertion loss) afforded by the hearing aid physical form factor is modeled by log-frequency interpolation over anchor frequencies $\mathbf{f}_{vent} = [250, 500, 1000, 2000, 4000, 8000]\text{ Hz}$:
 
 \begin{equation}
 V_{loss}(f) = \text{interp}_{\log_{10}}\left(f, \mathbf{f}_{vent}, \mathbf{v}_c\right)
 \end{equation}
 
-where $\mathbf{v}_c$ is the coupling-specific attenuation vector defined in Table S4.
+where $\mathbf{v}_c$ is the coupling-specific passive attenuation vector defined in Table S4.
 
-**TABLE S4. Acoustic Coupling Real-Ear Insertion Loss Vectors ($\mathbf{v}_c$, in dB).**
+**Table S4: Passive Acoustic Attenuation Vectors ($\mathbf{v}_c$) in dB**
+| Coupling Type | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `custom_occluded` | -15 | -15 | -20 | -25 | -30 | -35 |
+| `open_dome` | 0 | 0 | 0 | 0 | 0 | 0 |
+| `tulip_dome` | -2 | -2 | -5 | -10 | -15 | -20 |
+| `double_dome` | -5 | -5 | -10 | -15 | -20 | -25 |
+| `vent_1mm_solid` | -25 | -25 | -25 | -30 | -30 | -35 |
+| `vent_2mm_solid` | -20 | -20 | -25 | -25 | -30 | -35 |
+| `vent_3mm_solid` | -15 | -15 | -20 | -25 | -30 | -35 |
+| `vent_1mm_hollow` | -15 | -15 | -20 | -25 | -30 | -35 |
+| `vent_2mm_hollow` | -5 | -5 | -10 | -15 | -20 | -25 |
+| `vent_3mm_hollow` | -2 | -2 | -5 | -10 | -15 | -20 |
 
-| Coupling Configuration | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| `custom_occluded` | 0 | 0 | 0 | 0 | 0 | 0 |
-| `open_dome` | -35 | -28 | -15 | -2 | 0 | 0 |
-| `tulip_dome` | -25 | -18 | -5 | 0 | 0 | 0 |
-| `double_dome` | -20 | -10 | 0 | 0 | 0 | 0 |
-| `vent_1mm_solid` | -3 | -1 | 0 | 0 | 0 | 0 |
-| `vent_2mm_solid` | -8 | -2 | 0 | 0 | 0 | 0 |
-| `vent_3mm_solid` | -12 | -4 | 0 | 0 | 0 | 0 |
-| `vent_1mm_hollow` | -12 | -3 | 0 | 0 | 0 | 0 |
-| `vent_2mm_hollow` | -22 | -12 | -5 | -2 | 0 | 0 |
-| `vent_3mm_hollow` | -25 | -15 | -8 | -4 | 0 | 0 |
-
-Conductive air-bone gaps are restored linearly with a 75% fraction: $G_{cond}(f) = 0.75 \cdot \text{Loss}_{cond}(f)$ *(Note: This 75% restoration fraction is a pragmatic engineering convention—adapted from clinical practice to prevent excessive output demands and MPO clipping; Johnson, 2013a—without direct empirical derivation from listener preference)*. To prevent active anti-phase cancellation demands and comb filtering, insertion gain is floored at $V_{loss}(f) - 10$ dB:
+Conductive air-bone gaps are restored linearly with a 75% fraction: $G_{cond}(f) = 0.75 \cdot \text{Loss}_{cond}(f)$ *(Note: This 75% restoration fraction is a pragmatic engineering convention—adapted from clinical practice to prevent excessive output demands and MPO clipping; Johnson, 2013—without direct empirical derivation from listener preference)*. To physically ground the heuristic and prevent mathematically hallucinating active anti-phase cancellation, insertion gain is floored slightly below the passive insertion loss of the specified coupling:
 
 \begin{equation}
-G_{heuristic}(f, L_{in}) = \max\left(G_{target}(f, L_{in}) + 0.75 \cdot \text{Loss}_{cond}(f) + V_{loss}(f),\, V_{loss}(f) - 10\right)
+G_{heuristic}(f, L_{in}) = \max\left(G_{target}(f, L_{in}) + 0.75 \cdot \text{Loss}_{cond}(f) + V_{loss}(f),\, V_{floor}\right)
 \end{equation}
 
 Hardware receiver limits (MPO/SSPL90) are established to avoid severe saturation distortion:
@@ -443,17 +409,21 @@ Hardware receiver limits (MPO/SSPL90) are established to avoid severe saturation
 
 When `optimize = TRUE`, Open-NL adjusts the heuristic targets by minimizing an unconstrained multi-objective loss function via Nelder-Mead simplex search (`stats::optim`).
 
-### Parameter Vector and Gain Formation
-The optimization parameter vector is $\boldsymbol{\delta} = [\delta_{250}, \delta_{500}, \delta_{1000}, \delta_{2000}, \delta_{4000}, \delta_{8000}]^T \in \mathbb{R}^6$. During evaluation, shifts are clamped:
+### Parameter Vector and Execution Flow
+The optimization parameter vector generated by the Nelder-Mead simplex is the raw shift vector $\boldsymbol{\delta} = [\delta_{250}, \delta_{500}, \delta_{1000}, \delta_{2000}, \delta_{4000}, \delta_{8000}]^T \in \mathbb{R}^6$.
 
+To evaluate a candidate vector, the engine executes the following sequential steps:
+
+1. **Boundary Penalty Evaluation:** The out-of-bounds penalty ($P_{bounds}$) is evaluated strictly on the *raw, unclamped* vector $\boldsymbol{\delta}$. This step is critical; if the penalty were evaluated on the clamped vector, it would be identically zero. Evaluating on the raw vector ensures the Nelder-Mead simplex receives a continuous, mathematically steep gradient when exploring outside the feasible region.
+2. **Parameter Clamping:** The raw vector is then strictly clamped into the feasible acoustic domain:
 \begin{equation}
 \delta_{clamped, j} = \max(-60, \min(30, \delta_j))
 \end{equation}
-
-Candidate insertion gains $\mathbf{G} \in [0, 80]$ dB are interpolated to calculation frequencies:
+3. **Gain Interpolation and Floor Limits:** The clamped shifts are interpolated to calculation frequencies and bounded by the physical attenuation limit of the specified coupling ($V_{floor}$) and receiver saturation limits (80 dB):
 \begin{equation}
-G(f) = \max\left(0, \min\left(80, G_{heuristic}(f) + \delta_{clamped}(f)\right)\right)
+G(f) = \max\left(V_{floor}, \min\left(80, G_{heuristic}(f) + \delta_{clamped}(f)\right)\right)
 \end{equation}
+4. **Downstream Objective Evaluation:** The resulting clamped gain vector $\mathbf{G}$ is then routed through the C++ engine to compute the final desensitized SII and evaluate all remaining acoustic and physiological penalties (e.g., $P_{loud}$, $P_{cr}$).
 
 ### Loss Function Formulation
 The Nelder-Mead solver minimizes:
@@ -500,7 +470,7 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
    \begin{equation}
    P_{spl} = 2000.0 \cdot \max\left(0, \text{SPL}_{aided} - 110.0\right)
    \end{equation}
-   *(Note: This 110 dB SPL penalty evaluates the summed broadband RMS power of the entire amplified signal to enforce an overall physiological safety limit. It operates independently of the 120 dB SPL Maximum Power Output (MPO) ceiling defined in Eq. 44, which dictates the absolute hardware saturation threshold for individual narrow bands. For example, while multiple individual frequency bands may operate safely below their respective 120 dB SPL MPO limits, their combined acoustic energy can still sum to a broadband level that triggers this 110 dB SPL overall penalty, ensuring aggregate exposure remains bounded.)*
+   *(Note: This 110 dB SPL penalty evaluates the summed broadband RMS power of the entire amplified signal to enforce an overall physiological safety limit. It operates independently of the 120 dB SPL Maximum Power Output (MPO) ceiling defined in Eq. 43, which dictates the absolute hardware saturation threshold for individual narrow bands. For example, while multiple individual frequency bands may operate safely below their respective 120 dB SPL MPO limits, their combined acoustic energy can still sum to a broadband level that triggers this 110 dB SPL overall penalty, ensuring aggregate exposure remains bounded.)*
 
 5. **Spectral Roughness Penalty** ($\lambda_{rough} = 0.5$):
    \begin{equation}
@@ -538,24 +508,125 @@ where $\text{SII}_{desens}$ is the effective Speech Intelligibility Index calcul
 - **Iteration Ceiling**: `control = list(maxit = 800)`.
 - **Convergence Tolerance**: Relative convergence tolerance `reltol = sqrt(.Machine$double.eps) \approx 1.49 \times 10^{-8}`.
 - **Initial Simplex Seeding**: Seeding incorporates an audibility projection $\boldsymbol{\delta}_{start} = \min(20, \max(0, \text{target\_aided} - G_{heuristic}))$, where $\text{target\_aided} = \min(\text{UCL} - 5, \max(L_{in}, \text{HTL} + 10))$. Soft inputs receive $+3$ dB shift; loud inputs receive $\max(-10, \boldsymbol{\delta}_{start} - 5)$ dB shift.
-- **Multi-Start Strategy**: A 5-iteration multi-start routine (seeding the initial simplex with the NAL-R target and executing four additional randomized restarts with uniform random jitter $\boldsymbol{\delta}_{start} \leftarrow \boldsymbol{\delta}_{start} + \mathcal{U}(-5, +5)$) is deployed to stabilize numerical convergence, though Nelder-Mead inherently lacks formal global convergence guarantees.
+- **Multi-Start Strategy**: A 3-iteration multi-start routine (seeding the initial simplex with the NAL-R target and executing two additional randomized restarts with uniform random jitter $\boldsymbol{\delta}_{start} \leftarrow \boldsymbol{\delta}_{start} + \mathcal{U}(-5, +5)$) is deployed to stabilize numerical convergence, though Nelder-Mead inherently lacks formal global convergence guarantees.
 
 ---
 
+
+## S.II. Full Objective Reference Tables
+
+The following tables provide the complete prescriptive target data for all seven reference profiles (A1-A7; Johnson & Dillon, 2011) evaluated at 65 dB SPL. These tables report canonical single-ear monaural loudness calculations exclusively (binaural equivalence requires propagating the dynamic full-range signal through a non-linear binaural loudness engine).
+
+**TABLE S5. Monaural Loudness (Sones) and Desensitized SII across A1-A7 Audiograms (65 dB SPL Input).**
+
+| Profile | Formula | Monaural Loudness (sones) | Desensitized SII |
+|---|---|---|---|
+| A1 | NAL-NL2 | 3.99 | 0.73 |
+|  | Open-NL (Occluded) | 4.44 | 0.81 |
+|  | Open-NL (Vented) | 4.43 | 0.78 |
+| A2 | NAL-NL2 | 3.10 | 0.77 |
+|  | Open-NL (Occluded) | 4.44 | 0.83 |
+|  | Open-NL (Vented) | 4.45 | 0.84 |
+| A3 | NAL-NL2 | 3.51 | 0.61 |
+|  | Open-NL (Occluded) | 4.28 | 0.76 |
+|  | Open-NL (Vented) | 4.28 | 0.72 |
+| A4 | NAL-NL2 | 5.96 | 0.67 |
+|  | Open-NL (Occluded) | 4.78 | 0.76 |
+|  | Open-NL (Vented) | 5.21 | 0.56 |
+| A5 | NAL-NL2 | 5.36 | 0.54 |
+|  | Open-NL (Occluded) | 4.24 | 0.65 |
+|  | Open-NL (Vented) | 4.26 | 0.46 |
+| A6 | NAL-NL2 | 2.32 | 0.78 |
+|  | Open-NL (Occluded) | 3.33 | 0.82 |
+|  | Open-NL (Vented) | 3.32 | 0.82 |
+| A7 | NAL-NL2 | 1.15 | 0.98 |
+|  | Open-NL (Occluded) | 1.63 | 0.96 |
+|  | Open-NL (Vented) | 1.63 | 0.96 |
+
+
+**TABLE S6. Insertion Gain Targets (dB) across A1-A7 Audiograms (65 dB SPL Input).**
+
+| Profile | Formula | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz |
+|---|---|---|---|---|---|---|---|
+| A1 | NAL-NL2 | 0.0 | 0.0 | 7.3 | 12.1 | 18.0 | 19.1 |
+| A1 | Open-NL (Occluded) | -0.2 | -5.5 | -3.6 | 7.6 | 22.2 | 14.0 |
+| | Open-NL (Vented) | -2.6 | -4.8 | -2.7 | 8.0 | 22.0 | 12.7 |
+| A2 | NAL-NL2 | 10.1 | 9.3 | 12.2 | 8.3 | 3.9 | 4.0 |
+| A2 | Open-NL (Occluded) | -2.3 | -5.9 | 6.4 | 17.5 | 26.2 | 23.4 |
+| | Open-NL (Vented) | -0.5 | -5.0 | 5.1 | 17.6 | 26.2 | 13.8 |
+| A3 | NAL-NL2 | 0.0 | 0.0 | 9.9 | 16.8 | 20.7 | 21.6 |
+| A3 | Open-NL (Occluded) | -3.7 | -5.7 | 17.4 | 36.0 | 36.8 | 33.8 |
+| | Open-NL (Vented) | -5.4 | -6.1 | 14.9 | 37.3 | 40.8 | 19.5 |
+| A4 | NAL-NL2 | 0.0 | 0.0 | 10.5 | 18.0 | 21.8 | 21.8 |
+| A4 | Open-NL (Occluded) | -5.3 | -10.0 | 10.2 | 36.0 | 48.8 | 23.0 |
+| | Open-NL (Vented) | -5.2 | -8.7 | 7.3 | 39.4 | 41.4 | 29.8 |
+| A5 | NAL-NL2 | 0.0 | 0.0 | 14.9 | 24.3 | 27.5 | 27.5 |
+| A5 | Open-NL (Occluded) | 12.7 | 21.4 | 34.9 | 48.9 | 41.4 | 23.0 |
+| | Open-NL (Vented) | 18.5 | 18.8 | 34.1 | 49.1 | 41.7 | 23.8 |
+| A6 | NAL-NL2 | 18.5 | 18.5 | 24.0 | 25.7 | 25.7 | 11.6 |
+| A6 | Open-NL (Occluded) | 34.6 | 38.9 | 43.9 | 47.0 | 50.5 | 49.6 |
+| | Open-NL (Vented) | 0.0 | 11.0 | 29.0 | 45.1 | 50.5 | 49.6 |
+| A7 | NAL-NL2 | 34.7 | 34.7 | 34.7 | 36.6 | 38.0 | 35.1 |
+| A7 | Open-NL (Occluded) | 34.6 | 38.9 | 40.2 | 39.5 | 39.2 | 34.6 |
+| | Open-NL (Vented) | 0.0 | 11.0 | 25.4 | 37.6 | 39.2 | 34.6 |
+
+
 ## References
+
+Byrne, D., & Dillon, H. (1986). The National Acoustic Laboratories' (NAL) new procedure for selecting the gain and frequency response of a hearing aid. *Ear and Hearing*, 7(4), 257-265.
+
+Byrne, D., Parkinson, A., & Newall, P. (1990). Hearing aid gain and frequency response requirements for the severely/profoundly hearing impaired. *Ear and Hearing*, 11(1), 40-49.
+
+Ching, T. Y., Dillon, H., & Byrne, D. (2001). Children's amplification needs—same or different from adults? *The Hearing Journal*, 54(11), 43-48.
+
+Cox, R. M., Johnson, J. A., & Xu, J. (2014). Impact of hearing aid technology on outcomes in daily life I: the patients' perspective. *Ear and Hearing*, 35(6), 663-679.
+
+Dao, A., Folkeard, P., Baker, S., Pumford, J., & Scollie, S. (2021). Fit-to-target and real-ear-to-coupler difference (RECD) in adult hearing aid fittings. *International Journal of Audiology*, 60(9), 676-684.
 
 Denk, F., Oetting, D., Latzel, M., Bonsel, H., & Husstedt, H. (2025). Prevalence of excess binaural broadband loudness summation in the hearing-impaired population and implications for hearing aid gain targets. *PLOS ONE*, 20(3), e0319236. https://doi.org/10.1371/journal.pone.0319236
 
-Engler, M., Digeser, F., & Hoppe, U. (2026). Speech recognition and real-ear-measured amplification in hearing-aid users with various grades of hearing loss. *International Journal of Audiology*, 65(7), 834–845. https://doi.org/10.1080/14992027.2024.2426009
+Dillon, H. (2012). *Hearing Aids* (2nd ed.). Boomerang Press.
 
-Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026a). Evolving the philosophy: From the NAL rule to NAL-NL3. Advance online publication. 1-10. https://doi.org/10.1080/14992027.2026.2690236
+Herzke, T., Kaysko, P., & Hohmann, V. (2017). OpenMHA—An open-source software platform for hearing aid research. *Trends in Hearing*, 21.
+
+Johnson, E. E. (2013). Hearing aid benefit in patients with mild sensorineural hearing loss: a systematic review. *Journal of the American Academy of Audiology*, 24(4), 293-310.
+
+Johnson, E. E., & Dillon, H. (2011). A comparison of gain for adults from generic hearing aid prescriptive methods: impacts on predicted loudness, frequency bandwidth, and speech intelligibility. *Journal of the American Academy of Audiology*, 22(7), 441-459.
+
+Kates, J. M., & Arehart, K. H. (2022). The Hearing-Aid Speech Perception Index (HASPI) Version 2. *Speech Communication*, 138, 54-65.
+
+Keidser, G., Brew, C., & Peck, A. (2007). Proprietary fitting algorithms compared with one another and with generic formulas. *The Hearing Journal*, 60(3), 28-36.
+
+Keidser, G., Dillon, H., Carter, L., & O'Brien, A. (2012). NAL-NL2 empirical adjustments. *Trends in Amplification*, 16(4), 211-223.
+
+Kitterick, P. T., Zakis, J. A., & Edwards, B. (2026). Evolving the philosophy: From the NAL rule to NAL-NL3. Advance online publication. 1-10. https://doi.org/10.1080/14992027.2026.2690236
+
+Lybarger, S. F. (1944). U.S. Patent Application SN 543,278.
+
+Majdak, P., Hollmach, V., & Baumgartner, R. (2022). AMT: A Python/MATLAB toolbox for auditory modeling. *Acta Acustica*, 6, 19.
 
 Margolis, R. H., Hornsby, B. W. Y., Saly, G. L., & Wilson, R. H. (2025). Predicted and measured word-recognition scores unmask distortion in the impaired auditory system. *The Journal of the Acoustical Society of America*, 157(2), 555–568. https://doi.org/10.1121/10.0036461
 
+Moore, B. C. (2001). Dead regions in the cochlea: Diagnosis, perceptual consequences, and implications for the fitting of hearing aids. *Trends in Amplification*, 5(1), 1-34.
+
 Moore, B. C., & Glasberg, B. R. (2004). A revised model of loudness perception applied to cochlear hearing loss. *Hearing Research*, 188(1-2), 70-88.
+
+Moore, B. C., Glasberg, B. R., & Stone, M. A. (2010). Development of a new method for deriving initial fittings for hearing aids with multi-channel compression: CAMEQ2-HF. *International Journal of Audiology*, 49(3), 216-227.
+
+Moore, B. C., Glasberg, B. R., Varathanathan, A., & Schlittenlacher, J. (2014). A loudness model for time-varying sounds incorporating binaural inhibition. *The Journal of the Acoustical Society of America*, 136(6), 3187-3209.
+
+Oetting, D., Hohmann, V., Appell, J. E., Kollmeier, B., & Ewert, S. D. (2016). Restoring perceived loudness for listeners with hearing loss. *Ear and Hearing*, 37(6), 666-678.
+
+Oetting, D., Hohmann, V., Appell, J. E., Kollmeier, B., & Ewert, S. D. (2017). trueLOUDNESS: A loudness-based fitting procedure. *International Journal of Audiology*, 56(7), 498-508.
+
+Pieper, I., Hohmann, V., & Ewert, S. D. (2021). A loudness model for hearing-impaired listeners with individualized binaural summation. *The Journal of the Acoustical Society of America*, 149(3), 1636-1647.
 
 Scollie, S., Seewald, R., Cornelisse, L., Moodie, S., Bagatto, M., Laurnagaray, D., Beaulac, S., & Pumford, J. (2005). The Desired Sensation Level multistage input/output algorithm. *Trends in Amplification*, 9(4), 159-197.
 
 Souza, P. E. (2002). Effects of compression on speech acoustics, intelligibility, and sound quality. *Trends in Amplification*, 6(4), 131-165.
 
 Souza, P. E., Jenstad, L. M., & Boike, K. T. (2006). Measuring the acoustic effects of compression amplification on speech in noise. *The Journal of the Acoustical Society of America*, 119(1), 41-44. https://doi.org/10.1121/1.2108861
+
+Valente, M., Oeding, K., Brockmeyer, A., Smith, S., & Kalluri, S. (2018). Differences in word and phoneme recognition in quiet, sentence recognition in noise, and subjective outcomes between manufacturer first-fit and hearing aids programmed to NAL-NL2 using real-ear measures. *Journal of the American Academy of Audiology*, 29(8), 706-721.
+
+van Beurden, M. F., Boymans, M., Kraaijenga, V. J., & Dreschler, W. A. (2021). Validation of a loudness model for hearing impaired listeners. *International Journal of Audiology*, 60(3), 177-185.

@@ -8,16 +8,15 @@
 #' @param inputF Vector of dense input frequency values (Hz, typically 1 Hz spaced)
 #' @param inputLdB Vector of input spectrum levels (dB/Hz)
 #' @param HLcf Audiogram frequencies
-#' @param HLohcdB0 OHC loss at audiogram frequencies
-#' @param HLihcdB0 IHC loss at audiogram frequencies
-#' @param cambin Spacing [ERB] between successive auditory filter CFs
-#' @param flow Lowest center frequency of an auditory filter
-#' @param fhigh Highest center frequency of an auditory filter
-#' @param outerearcorrection "FreeField", "PDR10", or "Eardrum"
-#'
-#' @return A list containing Loudness (sones), Excitation, Cams, and CFs.
+#' @param HLdB Hearing loss at audiogram frequencies (dB HL)
+#' @param cambin ERB spacing (default 0.1)
+#' @param flow Lowest frequency (Hz, default 50)
+#' @param fhigh Highest frequency (Hz, default 15000)
+#' @param outerearcorrection 'FreeField' (default) or 'Eardrum'
+#' 
+#' @return A list containing Loudness (sones), Specific Loudness, Excitation, and CFs
 #' @export
-calculate_loudness_bramslow2004 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB0=NULL, HLihcdB0=NULL, cambin=0.1, flow=50, fhigh=15000, outerearcorrection="FreeField") {
+calculate_loudness_bramslow2004 <- function(inputF, inputLdB, HLcf=NULL, HLdB=NULL, cambin=0.1, flow=50, fhigh=15000, outerearcorrection="FreeField") {
   
   if (length(inputF) != length(inputLdB)) {
     stop('inputF and inputLdB should be dB/Hz and have same length')
@@ -30,15 +29,15 @@ calculate_loudness_bramslow2004 <- function(inputF, inputLdB, HLcf=NULL, HLohcdB
   Cam <- seq(f2erbrate(flow), f2erbrate(fhigh), by=cambin)
   CF <- erbrate2f(Cam)
   
-  if (is.null(HLcf) || is.null(HLohcdB0) || is.null(HLihcdB0)) {
-    HLohcdB <- rep(0, length(CF))
-    HLihcdB <- rep(0, length(CF))
+  if (is.null(HLcf) || is.null(HLdB)) {
+    HLdB_CF <- rep(0, length(CF))
   } else {
-    HLohcdB <- approx(HLcf, HLohcdB0, xout=CF, rule=2)$y
-    HLihcdB <- approx(HLcf, HLihcdB0, xout=CF, rule=2)$y
+    HLdB_CF <- approx(HLcf, HLdB, xout=CF, rule=2)$y
   }
-  HLohcdB <- pmax(HLohcdB, 0)
-  HLihcdB <- pmax(HLihcdB, 0)
+  HLdB_CF <- pmax(HLdB_CF, 0)
+  
+  HLohcdB <- pmin(HLdB_CF, 50)
+  HLihcdB <- pmax(0, HLdB_CF - 50)
   
   # step1: outer ear correction
   if (outerearcorrection == "FreeField") {

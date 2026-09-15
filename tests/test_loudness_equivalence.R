@@ -12,8 +12,7 @@ cat("======================================================\n\n")
 
 # Test 1: Normal Hearing (0 dB HL)
 cat("--- TEST 1: Normal Hearing (0 dB HL) at 1 kHz ---\n")
-HLohcdB0_NH <- rep(0, length(HLcf))
-HLihcdB0_NH <- rep(0, length(HLcf))
+HLdB_NH <- rep(0, length(HLcf))
 
 levels <- c(30, 50, 65, 80, 100)
 
@@ -21,7 +20,7 @@ for (L in levels) {
   inputF <- c(1000)
   inputLdB <- c(L)
   
-  res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLohcdB0_NH, HLihcdB0_NH)
+  res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLdB_NH)
   
   cat(sprintf("Input: 1 kHz @ %3d dB SPL\n", L))
   cat(sprintf("  -> Total Loudness : %7.3f sones\n", res$Ldn))
@@ -32,16 +31,15 @@ for (L in levels) {
 }
 
 
-# Test 2: Hearing Impaired (50 dB OHC loss flat)
-cat("--- TEST 2: Hearing Impaired (50 dB OHC flat) at 1 kHz ---\n")
-HLohcdB0_HI <- rep(50, length(HLcf))
-HLihcdB0_HI <- rep(0, length(HLcf))
+# Test 2: Hearing Impaired (50 dB loss flat)
+cat("--- TEST 2: Hearing Impaired (50 dB flat) at 1 kHz ---\n")
+HLdB_HI <- rep(50, length(HLcf))
 
 for (L in levels) {
   inputF <- c(1000)
   inputLdB <- c(L)
   
-  res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLohcdB0_HI, HLihcdB0_HI)
+  res <- calculate_loudness_cpp(inputF, inputLdB, HLcf, HLdB_HI)
   
   cat(sprintf("Input: 1 kHz @ %3d dB SPL\n", L))
   cat(sprintf("  -> Total Loudness : %7.3f sones\n", res$Ldn))

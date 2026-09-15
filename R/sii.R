@@ -26,6 +26,7 @@ sii <- function(
                 interpolate=FALSE,
                 prescription=NULL,
                 desensitization=FALSE,
+                desensitization_scale=1.0,
                 ldl=NULL,
                 gender="male",
                 experience="experienced",
@@ -421,8 +422,8 @@ sii <- function(
   ## Step 2: Equivalent speech E'i, noise N'i, and hearing threshold
   ##         T'i spectra. (ANSI S3.5: E'i and N'i are decreased by conductive loss Ji)
   #####
-  sii.tab$"E'i" <- speech - loss
-  sii.tab$"N'i" <- noise - loss
+  sii.tab$"E'i" <- speech
+  sii.tab$"N'i" <- noise
   sii.tab$"T'i" <- threshold
   sii.tab$"Ji"  <- loss
 
@@ -484,9 +485,7 @@ sii <- function(
   sii.tab$"Xi" <- table$"Xi"
   
   ## Calculate  X'i
-  ## Conductive loss (Ji) acts as a pre-cochlear attenuator and does NOT elevate
-  ## internal cochlear noise. Only the sensorineural component contributes to Xi.
-  sii.tab$"X'i" <- sii.tab$"Xi" + pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
+  sii.tab$"X'i" <- sii.tab$"Xi" + sii.tab$"T'i" 
 
   #####
   ## Step 5: Equivalent disturbance spectrum, Di
@@ -510,12 +509,11 @@ sii <- function(
   if (nal_ldf) {
     # NAL-NL2 modifies the LDF onset based on the degree of hearing loss
     # Impaired ears tolerate higher presentation levels without losing intelligibility.
-    # We shift the penalty onset by 0.5 * sensorineural threshold. 
-    # Conductive losses act as pre-cochlear attenuators and are already subtracted from E'i.
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - (0.5 * pmax(0, sii.tab$"T'i" - sii.tab$"Ji")))/160
+    # We shift the penalty onset by 0.5 * threshold.
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" - (0.5 * sii.tab$"T'i"))/160
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   } else {
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10)/160 
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" )/160 
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   }
   
@@ -525,29 +523,31 @@ sii <- function(
   
   if (desensitization == "johnson2011_smoothed" || desensitization == "johnson2011_complete") {
     # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
-    # Use sensorineural threshold only: conductive loss (Ji) does not cause
-    # cochlear desensitization, only sensorineural loss does.
-    T_hl <- pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
+    # Use sensorineural threshold only (subtract conductive component)
+    T_sn <- pmax(sii.tab$"T'i" - sii.tab$"Ji", 0)
     
-    # Calculate m and p variables based on frequency-specific hearing loss (T)
-    m <- 1 / (1 + exp(0.075 * (T_hl - 66)))
-    p <- (T_hl / 8) - 15
+    # Calculate m and p variables based on sensorineural hearing loss
+    m <- 1 / (1 + exp(0.075 * (T_sn - 66)))
+    p <- (T_sn / 8) - 15
     
     # Prevent division by exactly zero for mathematical safety
     p[p == 0] <- -1e-6
     
+    # Save raw Ki before desensitization
+    Ki_raw <- sii.tab$"Ki"
+    
     if (desensitization == "johnson2011_smoothed") {
-      # Apply desensitization to the audibility index (Ki)
-      # Using a linear multiplier instead of a hard asymptotic cap allows the numerical 
-      # optimizer (L-BFGS-B) to maintain a non-zero gradient while still penalizing dead regions.
-      sii.tab$"Ki" <- sii.tab$"Ki" * m
+      Ki_desens <- Ki_raw * m
     } else if (desensitization == "johnson2011_complete") {
       # Apply the full asymptotic formula: k' = [(k/30)^p + m^p]^(1/p)
       # Bounding Ki prevents 0^negative = Inf errors.
-      Ki_safe <- pmax(sii.tab$"Ki", 1e-10)
-      sii.tab$"Ki" <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
+      Ki_safe <- pmax(Ki_raw, 1e-10)
+      Ki_desens <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
     }
+    Ki_desens <- enforce.range(Ki_desens)
     
+    # Scale: 0.0 = raw ANSI SII (no penalty), 1.0 = full Johnson 2011
+    sii.tab$"Ki" <- (1 - desensitization_scale) * Ki_raw + desensitization_scale * Ki_desens
     sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
   }
   
@@ -570,7 +570,8 @@ sii <- function(
      
      unaided_obj <- sii(speech = unaided_speech, noise = orig_noise, threshold = threshold, 
                         loss = loss, freq = freq, method = method, importance = importance, 
-                        interpolate = FALSE, desensitization = desensitization)
+                        interpolate = FALSE, desensitization = desensitization,
+                        desensitization_scale = desensitization_scale)
      retval$unaided_sii <- unaided_obj$sii
   }
 
@@ -599,6 +600,7 @@ sii <- function(
   retval$table     <- sii.tab
   retval$sii       <- sii.val
   retval$desensitization <- desensitization
+  retval$desensitization_scale <- desensitization_scale
   retval$module    <- module
   retval$measured_wrs <- measured_wrs
   retval$predicted_wrs <- predicted_wrs
@@ -698,20 +700,17 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
   dense_l[dense_f < hl_freqs[1]] <- aided_spl[1] - 24 * log2(hl_freqs[1] / dense_f[dense_f < hl_freqs[1]])
   dense_l[dense_f > hl_freqs[6]] <- aided_spl[6] - 24 * log2(dense_f[dense_f > hl_freqs[6]] / hl_freqs[6])
 
-  # Step 3: OHC/IHC split of sensorineural loss
-  sn_loss  <- pmax(threshold - loss, 0)
-  ohc_loss <- pmin(sn_loss, 65)
-  ihc_loss <- pmax(sn_loss - 65, 0)
-  
-  res <- tryCatch({
-    calculate_loudness_cpp(
-      inputF = dense_f, 
-      inputLdB = dense_l,
-      HLcf = hl_freqs, 
-      HLohcdB0 = ohc_loss, 
-      HLihcdB0 = ihc_loss
-    )
-  }, error = function(e) NULL)
+   # Sensorineural hearing loss (total, for Bramslow 2004 loudness model)
+   sn_loss  <- pmax(threshold - loss, 0)
+   
+   res <- tryCatch({
+     calculate_loudness_cpp(
+       inputF = dense_f, 
+       inputLdB = dense_l,
+       HLcf = hl_freqs, 
+       HLdB = sn_loss
+     )
+   }, error = function(e) NULL)
   
   if (is.null(res)) return(NA)
   
