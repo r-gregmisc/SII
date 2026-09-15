@@ -11,6 +11,8 @@ open_nl(
   speech = 65,
   threshold,
   freq,
+  cap_override = NULL,
+  vent_floor = -10,
   ...,
   gender = "male",
   experience = "experienced",
@@ -27,7 +29,8 @@ open_nl(
   abg_fraction = 0.75,
   enable_severe_booster = FALSE,
   booster_onset = 70,
-  disable_sdlfp = FALSE
+  disable_sdlfp = FALSE,
+  desensitization_scale = 1
 )
 
 \method{print}{prescription_target}(x, ...)
@@ -42,6 +45,8 @@ open_nl(
 \item{threshold}{Hearing threshold level at each frequency.}
 
 \item{freq}{Frequencies at which the thresholds are measured.}
+
+\item{...}{Additional graphical or printing parameters.}
 
 \item{gender}{Gender of the patient ("male", "female").}
 
@@ -74,11 +79,6 @@ open_nl(
 \item{booster_onset}{Threshold for the severe-loss booster (default: 70).}
 
 \item{disable_sdlfp}{Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).}
-
-\item{x}{A \code{prescription_target} object.}
-\item{object}{A \code{prescription_target} object.}
-
-\item{...}{Additional graphical or printing parameters.}
 }
 \value{
 An object of class \code{prescription_target}.

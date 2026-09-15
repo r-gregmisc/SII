@@ -16,3 +16,11 @@ scratch/
 OpenNL_Manuscript.pdf
 Figure6_LDL_UCL.png
 cran-comments.md
+
+# Build artifacts and logs
+*.aux
+*.log
+texput.log
+SII_*.tar.gz
+*.o
+SII.Rcheck/

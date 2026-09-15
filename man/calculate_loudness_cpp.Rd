@@ -8,8 +8,7 @@ calculate_loudness_cpp(
   inputF,
   inputLdB,
   HLcf,
-  HLohcdB0,
-  HLihcdB0,
+  HLdB,
   NoChan = 30L,
   E_Beg = 3,
   E_End = 32,
@@ -23,9 +22,7 @@ calculate_loudness_cpp(
 
 \item{HLcf}{Audiogram frequencies (Hz)}
 
-\item{HLohcdB0}{OHC loss at audiogram frequencies (dB)}
-
-\item{HLihcdB0}{IHC loss at audiogram frequencies (dB)}
+\item{HLdB}{Total hearing loss at audiogram frequencies (dB HL)}
 
 \item{NoChan}{Number of ERB channels (default 30)}
 
