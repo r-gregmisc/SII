@@ -35,11 +35,13 @@
 #' @param enable_severe_booster Logical flag to enable severe-loss booster.
 #' @param booster_onset Threshold for the severe-loss booster (default: 70).
 #' @param disable_sdlfp Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).
+#' @param cap_rule Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.
 #' @param ... Additional graphical or printing parameters.
 #'
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
 #' @export
+
 open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floor = -10, ..., 
                     gender = "male", experience = "experienced", 
                     config = "bilateral", 
@@ -49,7 +51,8 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
                     abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
-                    desensitization_scale = 1.0) {
+                    desensitization_scale = 1.0, cap_rule = c("normal", "legacy")) {
+  cap_rule <- match.arg(cap_rule)
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -221,38 +224,32 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         if (!is.null(loud_res)) {
           loudness_sones <- loud_res$total
           
-          # Loudness cap knots based on user-provided table
-          pta_knots <- c(10, 32.5, 52.5, 72.5, 90)
-          
-          # U-Shaped Clinical Loudness Tolerance:
-          # Normal hearing (PTA=0) tolerates full natural loudness.
-          # Mild/Moderate losses (PTA 30-50) have severe recruitment/narrow dynamic ranges, requiring heavy compression (low sones).
-          # Severe/Profound losses (PTA 70-90) require raw power just to be audible, necessitating higher loudness caps.
-          if (abs(eval_level - 50) < 0.1) {
-            cap_knots <- c(1.5, 1.0, 0.8, 1.2, 1.2)
-          } else if (abs(eval_level - 80) < 0.1) {
-            cap_knots <- c(20.0, 12.0, 10.0, 15.0, 14.0)
-          } else { # 65 dB
-            cap_knots <- c(7.0, 4.5, 4.0, 6.5, 6.0)
-          }
-          
-          dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y * getOption('open_nl_cap_scalar', 1.0)
-          
-          # Reverse slope penalty: If lows are significantly worse than highs,
-          # restrict the loud input cap to prevent overamplifying near-normal high frequencies.
-          low_hf_diff <- mean(htl[1:2]) - mean(htl[5:6])
-          if (low_hf_diff > 10 && eval_level >= 75) {
-              dynamic_cap <- dynamic_cap - (low_hf_diff * 0.10)
-          }
-          
-          if (pta_abg_local > 0) {
-              if (eval_level >= 75) {
-                  # For loud inputs, restrict the loudness cap for mixed losses to avoid overamplification 
-                  # and level distortion, bringing gain down closer to NAL-NL2 levels.
-                  dynamic_cap <- dynamic_cap - (pta_abg_local * 0.25)
-              } else {
-                  dynamic_cap <- dynamic_cap + (pta_abg_local * 0.10)
-              }
+          if (cap_rule == "normal") {
+            dynamic_cap <- normal_speech_loudness(eval_level) * getOption('open_nl_cap_scalar', 1.0)
+          } else {
+            # Legacy heuristic cap table (PTA-based knots)
+            pta_knots <- c(10, 32.5, 52.5, 72.5, 90)
+            if (abs(eval_level - 50) < 0.1) {
+              cap_knots <- c(1.5, 1.0, 0.8, 1.2, 1.2)
+            } else if (abs(eval_level - 80) < 0.1) {
+              cap_knots <- c(20.0, 12.0, 10.0, 15.0, 14.0)
+            } else { # 65 dB
+              cap_knots <- c(7.0, 4.5, 4.0, 6.5, 6.0)
+            }
+            dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y * getOption('open_nl_cap_scalar', 1.0)
+            
+            low_hf_diff <- mean(htl[1:2]) - mean(htl[5:6])
+            if (low_hf_diff > 10 && eval_level >= 75) {
+                dynamic_cap <- dynamic_cap - (low_hf_diff * 0.10)
+            }
+            
+            if (pta_abg_local > 0) {
+                if (eval_level >= 75) {
+                    dynamic_cap <- dynamic_cap - (pta_abg_local * 0.25)
+                } else {
+                    dynamic_cap <- dynamic_cap + (pta_abg_local * 0.10)
+                }
+            }
           }
           
           if (!is.null(cap_override)) dynamic_cap <- cap_override

@@ -30,7 +30,8 @@ open_nl(
   enable_severe_booster = FALSE,
   booster_onset = 70,
   disable_sdlfp = FALSE,
-  desensitization_scale = 1
+  desensitization_scale = 1,
+  cap_rule = c("normal", "legacy")
 )
 
 \method{print}{prescription_target}(x, ...)
@@ -85,6 +86,8 @@ open_nl(
 \item{disable_sdlfp}{Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).}
 
 \item{desensitization_scale}{Scaling factor for high-frequency desensitization (default: 1.0).}
+
+\item{cap_rule}{Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.}
 
 \item{x}{Object for S3 method.}
 
