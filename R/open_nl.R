@@ -205,7 +205,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l - dense_abg,
             HLcf = hl_freqs, HLdB = sn_htl,
             NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
-        }, error = function(e) NULL)
+        }, error = function(e) stop("Loudness engine failed: ", conditionMessage(e), call. = FALSE))
         
         loudness_penalty <- 0.0
         if (!is.null(loud_res)) {

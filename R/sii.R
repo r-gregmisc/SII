@@ -664,7 +664,7 @@ get_specific_loudness <- function(x) {
   return(list(E_prime = E_prime, X_prime = X_prime))
 }
 
-calculate_loudness <- function(x, ohc_proportion = 0.65) {
+calculate_loudness <- function(x) {
   if (is.null(x$gain)) {
     return(NA) # Cannot compute loudness without aided gain
   }
@@ -710,7 +710,7 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
        HLcf = hl_freqs, 
        HLdB = sn_loss
      )
-   }, error = function(e) NULL)
+   }, error = function(e) stop("Loudness engine failed: ", conditionMessage(e), call. = FALSE))
   
   if (is.null(res)) return(NA)
   
