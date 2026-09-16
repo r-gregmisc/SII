@@ -95,6 +95,10 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
     hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
     htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
     sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
+    amt_freqs <- c(125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 10000, 12500)
+    sn_htl_13 <- approx(x = log10(hl_freqs), y = sn_htl, xout = log10(amt_freqs), rule = 2)$y
+    ucl_13 <- rep(120, 13)  # AUDMOD default UCL (dB HL); ldl is not used by the loudness engine
+    audmod_ref <- audmod_reference_cpp(fs = 32000, N = 8192, AGLoss_HL = sn_htl_13, AG_UCL_HL = ucl_13)
     
     sn_octaves <- approx(x = log10(freq), y = (threshold - local_loss), xout = log10(c(500, 1000, 2000, 4000)), rule = 2)$y
     pta_sn_local <- mean(sn_octaves, na.rm = TRUE)
@@ -207,15 +211,15 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         current_spl <- 10 * log10(sum(10^(dense_l / 10) * 10))
         dense_l <- dense_l + (overall - current_spl)
         
-        loud_res <- tryCatch({
-          calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l - dense_abg,
-            HLcf = hl_freqs, HLdB = sn_htl,
-            NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
-        }, error = function(e) stop("Loudness engine failed: ", conditionMessage(e), call. = FALSE))
+        loud_res <- calculate_loudness_audmod(
+          freq = dense_f, level_dB_per_Hz = dense_l - dense_abg,
+          audiogram_freq = hl_freqs, audiogram_HL = sn_htl,
+          fs = 32000, N = 8192, ref = audmod_ref
+        )
         
         loudness_penalty <- 0.0
         if (!is.null(loud_res)) {
-          loudness_sones <- loud_res$Ldn
+          loudness_sones <- loud_res$total
           
           # Loudness cap knots based on user-provided table
           pta_knots <- c(10, 32.5, 52.5, 72.5, 90)

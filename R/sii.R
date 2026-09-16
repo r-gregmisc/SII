@@ -689,9 +689,6 @@ calculate_loudness <- function(x) {
   # Step 1: Dense 10 Hz grid
   dense_f <- seq(10, 23990, by = 10)
   
-  # Convert 1/3-octave band levels to spectrum density (dB/Hz) before interpolating to 10 Hz grid
-  # A 1/3-octave band has bandwidth ~ 0.23 * fc
-  
   dense_l <- approx(log10(hl_freqs), aided_spl, log10(dense_f), rule = 2)$y
 
   dense_l[dense_f < hl_freqs[1]] <- aided_spl[1] - 24 * log2(hl_freqs[1] / dense_f[dense_f < hl_freqs[1]])
@@ -700,19 +697,18 @@ calculate_loudness <- function(x) {
    # Sensorineural hearing loss (total, for Bramslow 2004 loudness model)
    sn_loss  <- pmax(threshold - loss, 0)
    
-   res <- tryCatch({
-     calculate_loudness_cpp(
-       inputF = dense_f, 
-       inputLdB = dense_l,
-       HLcf = hl_freqs, 
-       HLdB = sn_loss
-     )
-   }, error = function(e) stop("Loudness engine failed: ", conditionMessage(e), call. = FALSE))
+   res <- calculate_loudness_audmod(
+     freq = dense_f, 
+     level_dB_per_Hz = dense_l,
+     audiogram_freq = hl_freqs, 
+     audiogram_HL = sn_loss,
+     fs = 32000, N = 8192
+   )
   
   if (is.null(res)) return(NA)
   
   # Return both total loudness (Ldn), specific loudness array (N_prime), and excitation (E)
-  return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF, E = res$E, Cam = res$Cam))
+  return(list(total = res$total, specific = res$specific, freq = res$fc, E = res$E, Cam = res$ref$EC))
 }
 
 #' Calculate Psychoacoustic Binaural Loudness (Sones)

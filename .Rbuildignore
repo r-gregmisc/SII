@@ -12,7 +12,7 @@
 ^new_table\.md$
 ^reviewer_response\.md$
 ^OpenNL_.*$
-^.*\.csv$
+^[^/]*\.csv$
 ^reviewer_analyses$
 ^manuscript_figures$
 ^reproducibility_scripts$
