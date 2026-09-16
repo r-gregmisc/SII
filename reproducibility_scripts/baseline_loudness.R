@@ -1,11 +1,15 @@
-devtools::load_all()
+#!/usr/bin/env Rscript
+set.seed(20260916)
+source("reproducibility_scripts/helpers_jaaa.R")
+
+write_run_metadata("reproducibility_scripts/output/jaaa_audmod")
+out_dir <- "reproducibility_scripts/output/jaaa_audmod/"
 
 hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-ltass_65  <- c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78)
 levels <- c(50, 65, 80)
-profiles <- c("Normal", "a1", "a2", "a3", "a4", "a5")
+profiles <- c("Normal", paste0("a", 1:7))
 
-# Load targets
+source("R/benchmark_targets.R")
 
 results_total <- data.frame()
 results_nprime <- data.frame()
@@ -13,49 +17,40 @@ results_nprime <- data.frame()
 for (prof in profiles) {
   if (prof == "Normal") {
     htl <- rep(0, 6)
+    loss <- rep(0, 6)
   } else {
     htl <- jd2011_targets[[prof]]$threshold
+    loss <- rep(0, 6)
+    if (prof == "a6") loss <- rep(30, 6)
+    if (prof == "a7") loss <- rep(50, 6)
   }
   
   for (lvl in levels) {
-    input_speech <- ltass_65 + (lvl - 65)
-    aided_spl <- input_speech
-    
-    dense_f <- seq(10, 23990, by = 10)
-    dense_l <- approx(log10(hl_freqs), aided_spl, log10(dense_f), rule = 2)$y
-
-    dense_l[dense_f < hl_freqs[1]] <- aided_spl[1] - 24 * log2(hl_freqs[1] / dense_f[dense_f < hl_freqs[1]])
-    dense_l[dense_f > hl_freqs[6]] <- aided_spl[6] - 24 * log2(dense_f[dense_f > hl_freqs[6]] / hl_freqs[6])
-
-    res <- calculate_loudness_cpp(
-      inputF = dense_f, 
-      inputLdB = dense_l,
-      HLcf = hl_freqs, 
-      HLdB = htl
-    )
+    res <- loudness_of(lvl, rep(0, 6), htl, loss)
     
     results_total <- rbind(results_total, data.frame(
       profile = prof,
       level = lvl,
-      Ldn = res$Ldn
+      Ldn = res$total
     ))
+    
+    # Wait, the AMT ported list object might have slightly different names
+    # audmod_loudness_cpp returns E_Vector and N_prime according to user previous requests.
+    # But in calculate_loudness_audmod, we return:
+    # list(total = ..., specific = N_prime, E_Vector = E_Vector, fc = fc)
+    # Let's ensure this matches the list returned.
     
     tmp_nprime <- data.frame(
       profile = prof,
       level = lvl,
-      channel = 1:length(res$N_prime),
-      CF = res$CF,
-      Cam = res$Cam,
-      N_prime = res$N_prime
+      channel = 1:length(res$specific),
+      CF = res$fc,
+      E = res$E,
+      N_prime = res$specific
     )
     results_nprime <- rbind(results_nprime, tmp_nprime)
   }
 }
 
-write.csv(results_total, "baseline_loudness_before.csv", row.names=FALSE)
-write.csv(results_nprime, "baseline_nprime_before.csv", row.names=FALSE)
-
-cat("baseline_loudness_before.csv:\n")
-print(head(results_total))
-cat("\nbaseline_nprime_before.csv:\n")
-print(head(results_nprime))
+write.csv(results_total, file.path(out_dir, "baseline_loudness_audmod.csv"), row.names=FALSE)
+write.csv(results_nprime, file.path(out_dir, "baseline_nprime_audmod.csv"), row.names=FALSE)

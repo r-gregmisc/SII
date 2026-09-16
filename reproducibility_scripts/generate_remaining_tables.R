@@ -1,41 +1,19 @@
-devtools::load_all(".", quiet=TRUE)
-source("R/benchmark_targets.R")
-source("R/open_nl.R")
-source("R/nalr.R")
-Rcpp::sourceCpp("src/bramslow2004.cpp")
+#!/usr/bin/env Rscript
+set.seed(20260916)
+source("reproducibility_scripts/helpers_jaaa.R")
 
-calc_amt_loudness_cpp <- function(gain_tgt, htl, cond, target_level) {
-  freqs <- c(250, 500, 1000, 2000, 4000, 8000)
-  input_speech <- c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78) + (target_level - 65)
-  aided_spl <- input_speech + gain_tgt - cond
-  f_half <- seq(0, 24000, by = 0.5)
-  f_half[1] <- 1
-  levels_interp <- approx(x = log10(freqs), y = aided_spl, xout = log10(f_half), rule = 2)$y
-  idx_low <- which(f_half < freqs[1])
-  if (length(idx_low) > 0) levels_interp[idx_low] <- aided_spl[1] - 24 * log2(freqs[1] / pmax(f_half[idx_low], 1))
-  idx_high <- which(f_half > freqs[length(freqs)])
-  if (length(idx_high) > 0) levels_interp[idx_high] <- aided_spl[length(aided_spl)] - 24 * log2(f_half[idx_high] / freqs[length(freqs)])
-  overall <- 10 * log10(sum(10^(levels_interp/10)) * 0.5)
-  dense_f <- seq(1, 24000, by = 5)
-  dense_l <- approx(x = log10(freqs), y = aided_spl, xout = log10(dense_f), rule = 2)$y
-  idx_low <- which(dense_f < freqs[1])
-  if (length(idx_low) > 0) dense_l[idx_low] <- aided_spl[1] - 24 * log2(freqs[1] / dense_f[idx_low])
-  idx_high <- which(dense_f > freqs[length(freqs)])
-  if (length(idx_high) > 0) dense_l[idx_high] <- aided_spl[length(aided_spl)] - 24 * log2(dense_f[idx_high] / freqs[length(freqs)])
-  current_spl <- 10 * log10(sum(10^(dense_l/10) * 5))
-  offset <- overall - current_spl
-  dense_l <- dense_l + offset
-  sn_loss <- htl - cond
-  loudness_res <- calculate_loudness_cpp(
-    inputF = dense_f, inputLdB = dense_l, HLcf = freqs, HLdB = sn_loss, Binaural = 0
-  )
-  return(loudness_res$Ldn)
-}
+write_run_metadata("reproducibility_scripts/output/jaaa_audmod")
+out_file <- "reproducibility_scripts/output/jaaa_audmod/table_remaining.md"
 
 profiles <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7")
 profile_names <- c("A1", "A2", "A3", "A4", "A5", "A6", "A7")
 
+source("R/benchmark_targets.R")
+
+sink(out_file)
 cat("\n### Table II Markdown Output (Seeds):\n")
+cat("| Profile | Unconstrained SII | Unconstrained Sones | Constrained SII | Constrained Sones |\n")
+cat("|---|---|---|---|---|\n")
 for (i in seq_along(profiles)) {
   p <- profiles[i]
   p_name <- profile_names[i]
@@ -47,14 +25,14 @@ for (i in seq_along(profiles)) {
   if (p == "a7") loss <- rep(50, 6)
 
   # Unconstrained (disable_sdlfp=TRUE)
-  seed_unconstrained <- calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=TRUE)
-  obj_raw_unconstrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_unconstrained, method="octave", transducer="none", desensitization=FALSE)
-  sones_unconstrained <- calc_amt_loudness_cpp(seed_unconstrained, threshold, loss, 65)
+  seed_unconstrained <- SII:::calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=TRUE)
+  obj_raw_unconstrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_unconstrained, method="octave", transducer="none", desensitization="none")
+  sones_unconstrained <- loudness_of(65, seed_unconstrained, threshold, loss)$total
 
   # Constrained (disable_sdlfp=FALSE)
-  seed_constrained <- calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=FALSE)
-  obj_raw_constrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_constrained, method="octave", transducer="none", desensitization=FALSE)
-  sones_constrained <- calc_amt_loudness_cpp(seed_constrained, threshold, loss, 65)
+  seed_constrained <- SII:::calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=FALSE)
+  obj_raw_constrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_constrained, method="octave", transducer="none", desensitization="none")
+  sones_constrained <- loudness_of(65, seed_constrained, threshold, loss)$total
 
   cat(sprintf("| %s | %.2f | %.1f | %.2f | %.1f |\n", p_name, obj_raw_unconstrained$sii, sones_unconstrained, obj_raw_constrained$sii, sones_constrained))
 }
@@ -84,3 +62,5 @@ for (i in seq_along(profiles)) {
               opennl_tgt$gain[1], opennl_tgt$gain[2], opennl_tgt$gain[3], 
               opennl_tgt$gain[4], opennl_tgt$gain[5], opennl_tgt$gain[6]))
 }
+sink()
+cat(sprintf("Wrote %s\n", out_file))
