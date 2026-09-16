@@ -46,6 +46,10 @@ open_nl(
 
 \item{freq}{Frequencies at which the thresholds are measured.}
 
+\item{cap_override}{Optional manual loudness cap override in sones.}
+
+\item{vent_floor}{Optional manual vent floor limit.}
+
 \item{...}{Additional graphical or printing parameters.}
 
 \item{gender}{Gender of the patient ("male", "female").}
@@ -79,6 +83,12 @@ open_nl(
 \item{booster_onset}{Threshold for the severe-loss booster (default: 70).}
 
 \item{disable_sdlfp}{Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).}
+
+\item{desensitization_scale}{Scaling factor for high-frequency desensitization (default: 1.0).}
+
+\item{x}{Object for S3 method.}
+
+\item{object}{Object for S3 method.}
 }
 \value{
 An object of class \code{prescription_target}.

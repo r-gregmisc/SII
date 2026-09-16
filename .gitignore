@@ -24,3 +24,5 @@ texput.log
 SII_*.tar.gz
 *.o
 SII.Rcheck/
+/doc/
+/Meta/

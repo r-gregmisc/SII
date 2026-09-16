@@ -83,14 +83,13 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  if (!exists(data.name, envir = .GlobalEnv)) {
-    if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
-      load(file.path("data", paste0(data.name, ".rda")), envir=.GlobalEnv)
-    } else {
-      data(list=data.name, package="SII", envir=.GlobalEnv)
-    }
+  local_env <- new.env(parent = emptyenv())
+  if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
+    load(file.path("data", paste0(data.name, ".rda")), envir=local_env)
+  } else {
+    data(list=data.name, package="SII", envir=local_env)
   }
-  table <- get(data.name, envir=.GlobalEnv)
+  table <- get(data.name, envir=local_env)
 
   ## Get the correct importance functions
   if(missing(importance) || is.character(importance) )
@@ -99,14 +98,12 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          if (!exists(sic.name, envir = .GlobalEnv)) {
-            if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
-              load(file.path("data", paste0(sic.name, ".rda")), envir=.GlobalEnv)
-            } else {
-              data(list=sic.name, package="SII", envir=.GlobalEnv)
-            }
+          if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
+            load(file.path("data", paste0(sic.name, ".rda")), envir=local_env)
+          } else {
+            data(list=sic.name, package="SII", envir=local_env)
           }
-          sic.table <- get(sic.name, envir=.GlobalEnv)
+          sic.table <- get(sic.name, envir=local_env)
           table[,"Ii"] <- sic.table[[importance]]
         }
     }

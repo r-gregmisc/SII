@@ -20,6 +20,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     interpolate=FALSE,
     prescription=NULL,
     desensitization=FALSE,
+    desensitization_scale=1.0,
     ldl=NULL,
     gender="male",
     experience="experienced",
@@ -74,6 +75,7 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     scale.}
   \item{prescription}{A character string (e.g. \code{"NAL-R"}, \code{"Open-NL"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
   \item{desensitization}{Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).}
+  \item{desensitization_scale}{Scaling factor for high-frequency desensitization (default: 1.0).}
   \item{ldl}{Numeric vector specifying Loudness Discomfort Levels (LDL) in dB HL for each frequency. If \code{NULL}, limits are estimated based on hearing thresholds.}
   \item{gender}{Character string specifying patient gender ("male" or "female"). Used for prescriptive algorithms. Defaults to "male".}
   \item{experience}{Character string specifying user hearing aid experience ("experienced", "new"). Defaults to "experienced".}

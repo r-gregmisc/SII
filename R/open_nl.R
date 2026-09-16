@@ -18,6 +18,12 @@
 #' @param coupling Acoustic coupling ("custom_occluded", "open_dome", "tulip_dome", "double_dome", "vent_1mm_solid", etc.).
 #' @param module Fitting module ("standard", "cin").
 #' @param ldl Loudness Discomfort Levels (optional).
+#' @param cap_override Optional manual loudness cap override in sones.
+#' @param vent_floor Optional manual vent floor limit.
+#' @param desensitization_scale Scaling factor for high-frequency desensitization (default: 1.0).
+#' @param x Object for S3 method.
+#' @param object Object for S3 method.
+#' @param ... Additional arguments passed to methods.
 #' @param loss Conductive hearing loss component (optional).
 #' @param distortion_category Distortion category ("Normal", "Low", "Moderate", "High").
 
