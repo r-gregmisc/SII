@@ -31,31 +31,26 @@ for (p in profiles) {
   
   nal_loudness <- loudness_of(lvl, nal_gain_6, htl, loss)$total
   
-  tgt_nal <- build_target(hl_freqs, input_speech, htl, loss, nal_gain_6)
+  tgt_nal <- build_target(hl_freqs, input_speech, htl, loss, nal_gain_6, eval_level = lvl)
   sii_nal_desens <- report_sii(tgt_nal, "johnson2011_complete")
   sii_nal_raw <- report_sii(tgt_nal, "none", nal_ldf=FALSE)
   sii_nal_smooth <- report_sii(tgt_nal, "johnson2011_smoothed")
   
   # For Open NL
-  options(open_nl_maxit = 800)
   res_0 <- open_nl(speech = lvl, threshold = htl, freq = hl_freqs, loss = loss, cap_override = nal_loudness, vent_floor = 0)
-  tgt_0 <- build_target(hl_freqs, input_speech, htl, loss, res_0$gain)
+  tgt_0 <- build_target(hl_freqs, input_speech, htl, loss, res_0$gain, eval_level = lvl)
   sii_onl_0_desens <- report_sii(tgt_0, "johnson2011_complete")
   sii_onl_0_raw <- report_sii(tgt_0, "none", nal_ldf=FALSE)
   sii_onl_0_smooth <- report_sii(tgt_0, "johnson2011_smoothed")
+  onl_0_loudness <- loudness_of(lvl, res_0$gain, htl, loss)$total
   
   res_10 <- open_nl(speech = lvl, threshold = htl, freq = hl_freqs, loss = loss, cap_override = nal_loudness, vent_floor = -10)
-  tgt_10 <- build_target(hl_freqs, input_speech, htl, loss, res_10$gain)
+  tgt_10 <- build_target(hl_freqs, input_speech, htl, loss, res_10$gain, eval_level = lvl)
   sii_onl_10_desens <- report_sii(tgt_10, "johnson2011_complete")
   sii_onl_10_raw <- report_sii(tgt_10, "none", nal_ldf=FALSE)
   sii_onl_10_smooth <- report_sii(tgt_10, "johnson2011_smoothed")
+  onl_10_loudness <- loudness_of(lvl, res_10$gain, htl, loss)$total
   
-  if (sii_onl_10_desens < sii_onl_0_desens) {
-     sii_onl_10_desens <- sii_onl_0_desens
-     sii_onl_10_raw <- sii_onl_0_raw
-     sii_onl_10_smooth <- sii_onl_0_smooth
-  }
-
   max_diff_smooth <- max(abs(sii_onl_0_desens - sii_onl_0_smooth), abs(sii_onl_10_desens - sii_onl_10_smooth))
   
   results <- rbind(results, data.frame(
@@ -65,16 +60,23 @@ for (p in profiles) {
     NAL_SII_Raw = sii_nal_raw,
     NAL_SII_Smooth = sii_nal_smooth,
     ONL0_SII_Desens = sii_onl_0_desens,
+    ONL0_SII_Smooth = sii_onl_0_smooth,
     ONL0_SII_Raw = sii_onl_0_raw,
+    ONL0_Loudness = onl_0_loudness,
     ONL10_SII_Desens = sii_onl_10_desens,
+    ONL10_SII_Smooth = sii_onl_10_smooth,
     ONL10_SII_Raw = sii_onl_10_raw,
+    ONL10_Loudness = onl_10_loudness,
     Opt_Effect_Desens = sii_onl_0_desens - sii_nal_desens,
     Opt_Effect_Raw = sii_onl_0_raw - sii_nal_raw,
     Opt_Effect_Smooth = sii_onl_0_smooth - sii_nal_smooth,
     Floor_Effect_Desens = sii_onl_10_desens - sii_onl_0_desens,
     Floor_Effect_Raw = sii_onl_10_raw - sii_onl_0_raw,
     Floor_Effect_Smooth = sii_onl_10_smooth - sii_onl_0_smooth,
-    Max_Diff_Smooth = max_diff_smooth
+    Max_Diff_Smooth = max_diff_smooth,
+    NAL_G250 = nal_gain_6[1], NAL_G500 = nal_gain_6[2], NAL_G1000 = nal_gain_6[3], NAL_G2000 = nal_gain_6[4], NAL_G4000 = nal_gain_6[5], NAL_G8000 = nal_gain_6[6],
+    ONL0_G250 = res_0$gain[1], ONL0_G500 = res_0$gain[2], ONL0_G1000 = res_0$gain[3], ONL0_G2000 = res_0$gain[4], ONL0_G4000 = res_0$gain[5], ONL0_G8000 = res_0$gain[6],
+    ONL10_G250 = res_10$gain[1], ONL10_G500 = res_10$gain[2], ONL10_G1000 = res_10$gain[3], ONL10_G2000 = res_10$gain[4], ONL10_G4000 = res_10$gain[5], ONL10_G8000 = res_10$gain[6]
   ))
 }
 

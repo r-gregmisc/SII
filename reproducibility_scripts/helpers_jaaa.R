@@ -1,6 +1,8 @@
 load('data/critical.rda')
 tryCatch(pkgload::unload("SII"), error = function(e) NULL); devtools::load_all(".", reset = TRUE, quiet=TRUE)
 
+options(open_nl_maxit = 800)
+
 build_dense_spectrum <- function(level, gain6, abg6) {
   hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
   ltass_65 <- c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78)
