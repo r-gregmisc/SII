@@ -3,17 +3,21 @@ set.seed(20260916)
 source("reproducibility_scripts/helpers_jaaa.R")
 
 write_run_metadata("reproducibility_scripts/output/jaaa_audmod")
-out_file <- "reproducibility_scripts/output/jaaa_audmod/table_remaining.md"
+is_smoke <- Sys.getenv("JAAA_SMOKE") == "1"
+is_smoke <- Sys.getenv("JAAA_SMOKE") == "1"
+is_smoke <- Sys.getenv("JAAA_SMOKE") == "1"
+out_dir <- if (is_smoke) "reproducibility_scripts/output/jaaa_audmod_smoke/" else "reproducibility_scripts/output/jaaa_audmod/"
+out_file <- file.path(out_dir, "table_remaining.md")
 
-profiles <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7")
-profile_names <- c("A1", "A2", "A3", "A4", "A5", "A6", "A7")
+profiles <- if (is_smoke) c("a1", "a2") else c("a1", "a2", "a3", "a4", "a5", "a6", "a7")
+profile_names <- if (is_smoke) c("A1", "A2") else c("A1", "A2", "A3", "A4", "A5", "A6", "A7")
 
 source("R/benchmark_targets.R")
 
 sink(out_file)
 cat("\n### Table II Markdown Output (Seeds):\n")
-cat("| Profile | Unconstrained SII | Unconstrained Sones | Constrained SII | Constrained Sones |\n")
-cat("|---|---|---|---|---|\n")
+cat("| Profile | Unconstrained SII | Unconstrained Sones | G250 | G500 | G1000 | G2000 | G4000 | G8000 | Constrained SII | Constrained Sones | G250 | G500 | G1000 | G2000 | G4000 | G8000 |\n")
+cat("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
 for (i in seq_along(profiles)) {
   p <- profiles[i]
   p_name <- profile_names[i]
@@ -26,15 +30,17 @@ for (i in seq_along(profiles)) {
 
   # Unconstrained (disable_sdlfp=TRUE)
   seed_unconstrained <- SII:::calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=TRUE)
-  obj_raw_unconstrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_unconstrained, method="octave", transducer="none", desensitization="none")
+  tgt_uncon <- build_target(freqs, build_opennl_speech(freqs, 65), threshold, loss, seed_unconstrained)
+  obj_raw_unconstrained <- list(sii = report_sii(tgt_uncon, "none", nal_ldf=FALSE))
   sones_unconstrained <- loudness_of(65, seed_unconstrained, threshold, loss)$total
 
   # Constrained (disable_sdlfp=FALSE)
   seed_constrained <- SII:::calculate_open_nl_gain(freq=freqs, threshold=threshold, input_level=65, loss=loss, enable_severe_booster=TRUE, booster_onset=60, disable_sdlfp=FALSE)
-  obj_raw_constrained <- sii(speech=c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78), threshold=threshold, loss=loss, freq=freqs, custom_gain=seed_constrained, method="octave", transducer="none", desensitization="none")
+  tgt_con <- build_target(freqs, build_opennl_speech(freqs, 65), threshold, loss, seed_constrained)
+  obj_raw_constrained <- list(sii = report_sii(tgt_con, "none", nal_ldf=FALSE))
   sones_constrained <- loudness_of(65, seed_constrained, threshold, loss)$total
 
-  cat(sprintf("| %s | %.2f | %.1f | %.2f | %.1f |\n", p_name, obj_raw_unconstrained$sii, sones_unconstrained, obj_raw_constrained$sii, sones_constrained))
+  cat(sprintf("| %s | %.2f | %.1f | %.1f | %.1f | %.1f | %.1f | %.1f | %.1f | %.2f | %.1f | %.1f | %.1f | %.1f | %.1f | %.1f | %.1f |\n", p_name, obj_raw_unconstrained$sii, sones_unconstrained, seed_unconstrained[1], seed_unconstrained[2], seed_unconstrained[3], seed_unconstrained[4], seed_unconstrained[5], seed_unconstrained[6], obj_raw_constrained$sii, sones_constrained, seed_constrained[1], seed_constrained[2], seed_constrained[3], seed_constrained[4], seed_constrained[5], seed_constrained[6]))
 }
 
 

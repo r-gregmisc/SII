@@ -2,8 +2,10 @@
 set.seed(20260916)
 source("reproducibility_scripts/helpers_jaaa.R")
 
-write_run_metadata("reproducibility_scripts/output/jaaa_audmod")
-out_file <- "reproducibility_scripts/output/jaaa_audmod/table3_multi_level.md"
+is_smoke <- Sys.getenv("JAAA_SMOKE") == "1"
+out_dir <- if (is_smoke) "reproducibility_scripts/output/jaaa_audmod_smoke/" else "reproducibility_scripts/output/jaaa_audmod/"
+write_run_metadata(out_dir)
+out_file <- file.path(out_dir, "table3_multi_level.md")
 
 hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
 profiles <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7")
@@ -14,7 +16,7 @@ sink(out_file)
 cat("| Profile | Input (dB SPL) | Method | ANSI SII | Effective SII | Sones | Gains |\n")
 cat("|---|---|---|---|---|---|---|\n")
 
-for (i in 1:7) {
+for (i in if(is_smoke) 1:2 else 1:7) {
   p <- profiles[i]
   p_name <- profile_names[i]
   target_data <- jd2011_targets[[p]]
@@ -31,14 +33,16 @@ for (i in 1:7) {
       nal_gain_19 <- get_nalnl2_v2_target(p, "NAL-NL2", freqs, lvl)
       nal_gain_6 <- approx(log10(freqs), nal_gain_19, log10(hl_freqs), rule=2)$y
       
-      ltass_65 <- c(37.4, 36.92, 27.66, 19.97, 11.98, 3.78)
-      speech_spec <- ltass_65 + (lvl - 65)
+
+      speech_spec <- build_opennl_speech(hl_freqs, lvl)
       
-      ansi_sii_onl <- sii(speech=speech_spec, threshold=threshold_6, loss=loss_6, freq=hl_freqs, method="octave", transducer="none", custom_gain=onl_gain_6, desensitization="none")$sii
-      ansi_sii_nal <- sii(speech=speech_spec, threshold=threshold_6, loss=loss_6, freq=hl_freqs, method="octave", transducer="none", custom_gain=nal_gain_6, desensitization="none")$sii
+      tgt_onl <- build_target(hl_freqs, speech_spec, threshold_6, loss_6, onl_gain_6, eval_level=lvl)
+      ansi_sii_onl <- report_sii(tgt_onl, "none", nal_ldf=FALSE)
+      tgt_nal <- build_target(hl_freqs, speech_spec, threshold_6, loss_6, nal_gain_6, eval_level=lvl)
+      ansi_sii_nal <- report_sii(tgt_nal, "none", nal_ldf=FALSE)
       
-      eff_sii_onl <- sii(speech=speech_spec, threshold=threshold_6, loss=loss_6, freq=hl_freqs, method="octave", transducer="none", custom_gain=onl_gain_6, desensitization="johnson2011_complete")$sii
-      eff_sii_nal <- sii(speech=speech_spec, threshold=threshold_6, loss=loss_6, freq=hl_freqs, method="octave", transducer="none", custom_gain=nal_gain_6, desensitization="johnson2011_complete")$sii
+      eff_sii_onl <- report_sii(tgt_onl, "johnson2011_complete")
+      eff_sii_nal <- report_sii(tgt_nal, "johnson2011_complete")
       
       sones_onl <- loudness_of(lvl, onl_gain_6, threshold_6, loss_6)$total
       sones_nal <- loudness_of(lvl, nal_gain_6, threshold_6, loss_6)$total
