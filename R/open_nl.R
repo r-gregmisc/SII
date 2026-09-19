@@ -190,7 +190,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           sii(speech = speech_spec_base, noise = rep(-50, length(freq)), 
               threshold = threshold, loss = loss, freq = freq, 
               prescription = temp_target, interpolate = TRUE, 
-              nal_ldf = TRUE, desensitization = "johnson2011_smoothed",
+              nal_ldf = FALSE, desensitization = "johnson2011_smoothed",
               desensitization_scale = desensitization_scale)
         }, error = function(e) NULL)
         
@@ -370,7 +370,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
         sii(speech = speech_spec, noise = rep(-50, length(freq)),
             threshold = threshold, loss = loss, freq = freq,
             prescription = temp_tgt, interpolate = TRUE,
-            nal_ldf = TRUE, desensitization = "johnson2011_smoothed",
+            nal_ldf = FALSE, desensitization = "johnson2011_smoothed",
             desensitization_scale = desensitization_scale),
         error = function(e) list(sii = 0)
       )
