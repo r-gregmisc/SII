@@ -93,6 +93,8 @@ The solutions generated are penalized-optimal rather than strictly SII-optimal. 
 
 Because Nelder-Mead algorithms are prone to local minima in highly constrained, non-convex acoustic spaces, the maps exhibit minor optimization artifacts. For instance, in the A5 map, there is an isolated region of non-convergence near 8.0 sones, and occasional localized inversions (e.g., slightly lower gain achieved at a -10 dB floor compared to a -5 dB floor at strict caps). These artifacts represent local failures of the 3-parameter solver to perfectly converge on the absolute global optimum, rather than true physiological inversions. To mitigate this across the dataset, multi-start initialization was employed across a bounded parameter grid, and the highest achieved SII value was retained.
 
+Additionally, the number of random restarts (`open_nl_starts`) is a fixed setting (set to 3) whose value alters the prescribed gains due to the non-convex parameter space. (Note that because the random number generator seed is deterministic based on the audiogram and level, repeated runs are bit-identical and cannot be used to estimate variability.)
+
 ## Results
 
 ### Loudness Budget Decomposition
