@@ -57,15 +57,15 @@ The study utilizes seven canonical audiometric profiles (A1–A7) representing s
 
 **Table 3. Canonical Audiometric Profiles (dB HL)**
 
-| Profile | Description | 250 Hz | 500 Hz | 1000 Hz | 2000 Hz | 4000 Hz | 8000 Hz | Air-Bone Gap |
-|:---|:---|---:|---:|---:|---:|---:|---:|---:|
-| A1 | Mild | 15 | 20 | 30 | 40 | 50 | 60 | 0 |
-| A2 | Reverse Slope | 60 | 50 | 40 | 30 | 20 | 15 | 0 |
-| A3 | Moderate Sloping | 10 | 20 | 40 | 50 | 55 | 60 | 0 |
-| A4 | Mod-Severe Precipitous | 0 | 0 | 10 | 40 | 70 | 80 | 0 |
-| A5 | Profound Precipitous | 10 | 10 | 20 | 60 | 80 | 100 | 0 |
-| A6 | Mixed | 50 | 55 | 60 | 65 | 75 | 80 | 30 |
-| A7 | Conductive | 50 | 50 | 50 | 50 | 50 | 50 | 50 |
+| Profile | Description | $L_0$ (50) | $L_{cap}$ (50) | $L_0$ (65) | $L_{cap}$ (65) | $L_0$ (80) | $L_{cap}$ (80) |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| A1 | Mild | 0.40 | 3.16 | 2.65 | 9.03 | 9.22 | 22.39 |
+| A2 | Reverse Slope | 0.02 | 3.16 | 1.33 | 9.03 | 6.72 | 22.39 |
+| A3 | Moderate Sloping | 0.43 | 3.16 | 2.29 | 9.03 | 8.01 | 22.39 |
+| A4 | Mod-Severe Precipitous | 1.85 | 3.16 | 5.77 | 9.03 | 15.25 | 22.39 |
+| A5 | Profound Precipitous | 1.16 | 3.16 | 4.34 | 9.03 | 12.10 | 22.39 |
+| A6 | Mixed | 0.00 | 3.16 | 0.00 | 9.03 | 0.17 | 22.39 |
+| A7 | Conductive | 0.00 | 3.16 | 0.00 | 9.03 | 0.28 | 22.39 |
 
 ### The Open-NL Computational Instrument
 To compute the theoretical limits of high-frequency amplification and map the boundary of achievable gain, Open-NL, a modular computational testbed, was employed Open-NL, a modular computational testbed. Open-NL couples a multi-start Nelder-Mead SII optimizer to the specific-loudness engine. Rather than serving as a clinical prescription, Open-NL functions here strictly as an analytical instrument. 
@@ -108,7 +108,7 @@ To avoid arbitrary definitions of tolerance, the normative target ceilings ($L_{
 
 An empirical anchor for this ceiling would be preferable to a normative one, so we tested whether an established rationale provides one. It does not: NAL-NL2-prescribed aided loudness for 65 dB SPL speech, expressed as a fraction of the normative ceiling, scatters by nearly a factor of two with no consistent value (0.46 for A1, 0.39 for A2, 0.40 for A3, 0.73 for A4, and 0.61 for A5). Because NAL-NL2 optimizes loudness against its own criteria rather than targeting a fixed proportion of normal-hearing loudness, it cannot be used to calibrate this parameter.
 
-$L_{cap}$ is therefore a modelling assumption, not a measured quantity. Because true loudness discomfort or target loudness can vary significantly across individual patients and fitting rationales, analyzing a single fixed normative cap for 65 dB SPL speech (e.g., 7.00 sones) fails to capture the full optimization boundary. This is why the feasibility maps treat the loudness cap as a continuous axis rather than a fixed value: the sweep across caps is the sensitivity analysis for this assumption, and conclusions that hold across the range do not depend on the particular value chosen.
+$L_{cap}$ is therefore a modelling assumption, not a measured quantity. Because true loudness discomfort or target loudness can vary significantly across individual patients and fitting rationales, analyzing a single fixed normative cap for 65 dB SPL speech (e.g., 9.03 sones) fails to capture the full optimization boundary. This is why the feasibility maps treat the loudness cap as a continuous axis rather than a fixed value: the sweep across caps is the sensitivity analysis for this assumption, and conclusions that hold across the range do not depend on the particular value chosen.
 
 Table 1 presents this decomposition for the seven canonical audiometric profiles. For mild (A1) or moderate sloping (A3) profiles, unamplified speech consumes a minority of the normative loudness budget across all levels. This leaves ample capacity for prescriptive algorithms to apply positive insertion gain across the frequency spectrum. 
 
@@ -116,15 +116,15 @@ Table 1 presents this decomposition for the seven canonical audiometric profiles
 
 | Profile | Description | $L_0$ (50) | $L_{cap}$ (50) | $L_0$ (65) | $L_{cap}$ (65) | $L_0$ (80) | $L_{cap}$ (80) |
 |:---|:---|:---|:---|:---|:---|:---|:---|
-| A1 | Mild | 0.39 | 1.21 | 2.71 | 7.00 | 9.55 | 20.52 |
-| A2 | Reverse Slope | 0.03 | 1.21 | 1.31 | 7.00 | 6.67 | 20.52 |
-| A3 | Moderate Sloping | 0.46 | 1.21 | 2.46 | 7.00 | 8.62 | 20.52 |
-| A4 | Mod-Severe Precipitous | 1.11 | 1.21 | 5.21 | 7.00 | 15.26 | 20.52 |
-| A5 | Profound Precipitous | 0.92 | 1.21 | 4.26 | 7.00 | 12.45 | 20.52 |
-| A6 | Mixed | 0.00 | 1.21 | 0.00 | 7.00 | 0.14 | 20.52 |
-| A7 | Conductive | 0.00 | 1.21 | 0.00 | 7.00 | 0.00 | 20.52 |
+| A1 | Mild | 0.40 | 3.16 | 2.65 | 9.03 | 9.22 | 22.39 |
+| A2 | Reverse Slope | 0.02 | 3.16 | 1.33 | 9.03 | 6.72 | 22.39 |
+| A3 | Moderate Sloping | 0.43 | 3.16 | 2.29 | 9.03 | 8.01 | 22.39 |
+| A4 | Mod-Severe Precipitous | 1.85 | 3.16 | 5.77 | 9.03 | 15.25 | 22.39 |
+| A5 | Profound Precipitous | 1.16 | 3.16 | 4.34 | 9.03 | 12.10 | 22.39 |
+| A6 | Mixed | 0.00 | 3.16 | 0.00 | 9.03 | 0.17 | 22.39 |
+| A7 | Conductive | 0.00 | 3.16 | 0.00 | 9.03 | 0.28 | 22.39 |
 
-However, a severe structural bottleneck emerges in precipitous profiles (A4 and A5) across the entire dynamic range. For profile A4, near-normal low-frequency thresholds allow unamplified speech at 50 dB SPL to inherently generate 1.11 sones of loudness. Against the normative 1.21 sone ceiling, this leaves only a microscopic 0.10 sones of budget for amplification. At 80 dB SPL, the unamplified speech produces 15.26 sones against a 20.52 cap. Crucially, if a prescriptive formula enforces a rigid low-frequency insertion gain floor of 0 dB (preventing attenuation), these $L_0$ values cannot be reduced. The budget is thus exhausted before the algorithm can allocate the immense high-frequency gain required to cross the profound high-frequency thresholds, causing high-frequency audibility to be systematically crowded out by residual low-frequency hearing at all input levels.
+However, a severe structural bottleneck emerges in precipitous profiles (A4 and A5) across the entire dynamic range. For profile A4, near-normal low-frequency thresholds allow unamplified speech at 50 dB SPL to inherently generate 1.85 sones of loudness. Against the normative 3.16 sone ceiling, this leaves 1.31 sones of budget for amplification. At 80 dB SPL, the unamplified speech produces 15.25 sones against a 22.39 cap. Crucially, if a prescriptive formula enforces a rigid low-frequency insertion gain floor of 0 dB (preventing attenuation), these $L_0$ values cannot be reduced. The budget is thus exhausted before the algorithm can allocate the immense high-frequency gain required to cross the profound high-frequency thresholds, causing high-frequency audibility to be systematically crowded out by residual low-frequency hearing at all input levels.
 
 ### Feasibility Maps
 
@@ -163,15 +163,13 @@ Table 2 details the difference in achieved desensitized SII when both the formul
 | A6 (Mixed) | 2.12 sones | 0.513 | 0.507 | 0.511 | -0.006 | +0.005 |
 | A7 (Conductive) | 1.15 sones | 0.737 | 0.742 | 0.742 | +0.005 |  0.000 |
 
-*Note: The identical value of 4.29 for A1's NAL-NL2 total loudness (Table 2) and A1's available budget (7.00 - 2.71 = 4.29 sones; Table 1) is a purely numerical coincidence.*
-
 Scoring with the desensitized SII reveals a strikingly different decomposition than raw ANSI SII would suggest, and one that is far more clinically realistic. The floor effect is uniformly small across all profiles, with the moderate sloping profile A3 showing the largest benefit (+0.038) from relaxing the low-frequency floor. For the precipitous profiles A4 and A5, the floor effect is negligible (+0.008 and 0.000 respectively). Instead, nearly all of the desensitized SII improvement over NAL-NL2 comes from the optimizer effect: +0.040 for A4 and +0.072 for A5. Because the desensitization penalty heavily discounts audibility in the profoundly impaired high frequencies, freeing up additional loudness capacity via low-frequency attenuation yields almost no marginal desensitized SII benefit — the extra gain is prescribed into frequency regions where the Johnson and Dillon (2011) penalty renders it nearly valueless.
 
 This result has two important implications. First, it confirms that NAL-NL2's conservative high-frequency gain limits are well-aligned with desensitized intelligibility: the gap between NAL-NL2 and the 0 dB optimizer is modest, and relaxing the floor beyond 0 dB adds almost nothing. Second, the structural loudness crowding-out documented in the feasibility maps remains a genuine acoustic boundary, but its *clinical* impact as measured by desensitized SII is substantially attenuated by the very physiological limits that motivated the desensitization correction. The crowding-out constraint is most consequential for profiles where high-frequency loss is moderate enough that the desensitization penalty is small — precisely the profiles (like A3) where the floor effect is largest.
 
 ## Discussion
 
-The computational mapping of the $L_{cap} - L_0$ budget clearly visualizes that the achievable high-frequency gain for precipitous losses is bounded by acoustic arithmetic as an independent constraint. For a profile like A4 at 65 dB SPL, unamplified speech inherently generates 5.21 sones of loudness. If evaluated against a strict 7.00 sone normal-hearing ceiling, this unamplified energy consumes roughly 74% of the total capacity before a single decibel of prescriptive gain is applied, though this exact proportion is highly dependent on the chosen $L_{cap}$. While empirical rationales like NAL-NL2 correctly limit high-frequency gain in these profiles due to physiological desensitization (leaving a small fraction of the loudness budget unused), any clinical attempt to aggressively restore high-frequency audibility beyond these conservative limits (e.g., to maximize raw SII) will immediately collide with this budget constraint. When clinical software enforces a minimum 0 dB insertion gain floor, the remaining budget is quickly exhausted.
+The computational mapping of the $L_{cap} - L_0$ budget clearly visualizes that the achievable high-frequency gain for precipitous losses is bounded by acoustic arithmetic as an independent constraint. For a profile like A4 at 65 dB SPL, unamplified speech inherently generates 5.77 sones of loudness. If evaluated against a strict 9.03 sone normal-hearing ceiling, this unamplified energy consumes roughly 64% of the total capacity before a single decibel of prescriptive gain is applied, though this exact proportion is highly dependent on the chosen $L_{cap}$. While empirical rationales like NAL-NL2 correctly limit high-frequency gain in these profiles due to physiological desensitization (leaving a small fraction of the loudness budget unused), any clinical attempt to aggressively restore high-frequency audibility beyond these conservative limits (e.g., to maximize raw SII) will immediately collide with this budget constraint. When clinical software enforces a minimum 0 dB insertion gain floor, the remaining budget is quickly exhausted.
 
 This constraint forces a harsh physical reality in clinical practice. The penalized-optimal solutions in the feasibility maps rely on negative low-frequency insertion gain to free up loudness capacity. However, digital gain reduction cannot bring the ear canal level below the direct sound path in an open fitting. To achieve true negative low-frequency insertion gain, a clinician must use a highly occluding earmold to physically attenuate the incoming low frequencies. Because precipitous profiles possess near-normal low-frequency hearing, occluding the ear canal will induce a severe, often intolerable occlusion effect (e.g., autophony and boomy own-voice). 
 
