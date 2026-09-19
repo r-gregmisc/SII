@@ -97,6 +97,8 @@ To mitigate local minima, multi-start initialization was employed across a bound
 
 Additionally, the number of random restarts (`open_nl_starts`) is a fixed setting (set to 3) whose value alters the prescribed gains due to the non-convex parameter space. (Note that because the random number generator seed is deterministic based on the audiogram and level, repeated runs are bit-identical and cannot be used to estimate variability.)
 
+A defect in the `open_nl()` routine caused the original minimum-gain floor contrast to report a rectified difference rather than a true effect. When called with a negative insertion floor, the function executed a dual-run branch that evaluated the optimization at both the requested floor and a strict 0 dB floor, automatically returning whichever yielded the higher raw speech intelligibility index (e.g., `R/open_nl.R` lines 381–395). Consequently, the published difference between the -10 dB and 0 dB floors was mathematically bounded to `max(0, SII(-10) - SII(0))`, explaining why 63 of the 192 paired cells in the original audiogram family analysis appeared as exactly zero; these cells—whose frequency rose from 31% at a 1000 Hz audible edge to 61% at 3000 Hz—were simply 0 dB solutions differenced against themselves rather than legitimate null results. Because this defect was isolated to branch selection and did not compromise the underlying loudness engine or the optimizer itself, we resolved it by disabling the dual-run branch so that each floor is optimized exactly once. The affected results have been recomputed under this corrected methodology and are reported below as side-by-side solutions with their achieved loudness.
+
 ## Results
 
 ### Loudness Budget Decomposition
