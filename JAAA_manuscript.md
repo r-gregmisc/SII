@@ -98,7 +98,7 @@ Additionally, the number of random restarts (`open_nl_starts`) is a fixed settin
 ## Results
 
 ### Loudness Budget Decomposition
-To establish the model-predicted loudness constraints operating on high-frequency amplification, the unamplified loudness ($L_0$) produced by speech across three conversational input levels (50, 65, and 80 dB SPL) was first computed the unamplified loudness ($L_0$) produced by speech across three conversational input levels (50, 65, and 80 dB SPL). This baseline was then compared against a normative broadband loudness ceiling ($L_{cap}$) for each level. 
+To establish the model-predicted loudness constraints operating on high-frequency amplification, the unamplified loudness ($L_0$) produced by speech across three conversational input levels (50, 65, and 80 dB SPL) was first computed. This baseline was then compared against a normative broadband loudness ceiling ($L_{cap}$) for each level. 
 
 To avoid arbitrary definitions of tolerance, the normative target ceilings ($L_{cap}$) are strictly defined as the normal-hearing loudness of unaided speech at the evaluation level. When the 50, 65, and 80 dB SPL long-term average speech spectra are processed through the specific-loudness engine for a 0 dB HL profile, the model predicts overall loudnesses of 1.21, 6.81, and 20.52 sones, respectively. For the purposes of baseline comparison, the normative target ceilings $L_{cap}$ are defined as 1.21, 7.00, and 20.52 sones. These ceilings are identical for all listeners and are not listener-specific. The difference ($L_{cap} - L_0$) therefore represents the remaining model-predicted loudness budget available to "purchase" high-frequency audibility via prescriptive gain before exceeding normal-hearing loudness limits.
 
