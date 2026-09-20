@@ -71,7 +71,7 @@ build_target <- function(freq, speech_spec, threshold, loss, gain_vec, eval_leve
   return(temp_tgt)
 }
 
-report_sii <- function(target, desensitization, nal_ldf = TRUE, desensitization_scale = 1.0) {
+report_sii <- function(target, desensitization, nal_ldf = FALSE, desensitization_scale = 1.0) {
   SII::sii(speech = target$orig_speech, noise = rep(-50, length(target$orig_freq)),
       threshold = target$orig_threshold, loss = target$orig_loss, freq = target$orig_freq,
       prescription = target, interpolate = TRUE,

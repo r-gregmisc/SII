@@ -22,12 +22,14 @@ several findings below rest on them.
 | 6 | `starts_sensitivity.R` | 19th 07:15–08:30 | `output/isoloudness/starts_sensitivity_2026-09-19.csv` + log | Does the `d_SII` noise band shrink with more restarts? |
 | 7 | `audit_tone_anchor.R` | 19th 08:55 | `output/audit_tone_anchor_2026-09-19.log` | Is the 1-sone anchor failure spectral resampling loss? |
 | 8 | `audit_cap_basis.R` | 19th 09:38 | `output/audit_cap_basis_2026-09-19.log` | Which engine produced the manuscript's sone values; what NAL-NL2 targets |
+| 9 | `audit_nal_ldf.R` | 19th 11:04 | `output/audit_nal_ldf_2026-09-19.log` | How much the `nal_ldf` flag changes the reported SII |
 
 Running / not yet run:
 
 | Script | Status | Notes |
 |---|---|---|
-| `rebuild_isoloudness_20.R` | running 19th, ~6h | Full sweep at 20 starts; checkpoints to `isoloudness_starts20.csv` and resumes |
+| `rebuild_isoloudness_20_naldf_off.R` | started 19th 12:46, ~19h | Full sweep: 20 starts, all three desensitization scales, `nal_ldf` off. Checkpoints to `isoloudness_starts20_naldf_off.csv` and resumes. |
+| `rebuild_isoloudness_20.R` | abandoned at 78 rows | Superseded by the above once `nal_ldf` was switched off. Its partial output is kept as `isoloudness_starts20_naldf_on_partial.csv` — 39 complete pairs at 20 starts with the flag ON, the sensitivity arm. |
 | `confirm_vent_floor.R` | not run | Reproducible example for the GitHub issue |
 
 Scripts 2–6 and the 20-start rebuild operate on an in-memory copy of
@@ -103,6 +105,72 @@ given level draw identical starting points.
 **`options()` leakage.** `cap_rule_comparison.R` set `open_nl_maxit = 150` and
 `open_nl_starts = 1` globally without restoring, so any script sourced after it
 in the same session inherited both. Patched (§5).
+
+**The `nal_ldf` flag modified the SII against the evidence it cites.**
+(Script 9.) `R/sii.R` lines 506–515: with `nal_ldf = TRUE` the speech level
+distortion factor becomes
+
+    Li = 1 - (E'i - Ui - 10 - Ji - 0.5*T'i) / 160
+
+instead of the ANSI S3.5 form without the `0.5*T'i` term, shifting the penalty
+onset up by half the hearing threshold. `Li` is clamped to [0,1] and multiplies
+band audibility, so impaired ears are credited with tolerating higher
+presentation levels before intelligibility is penalised. `report_sii()`
+defaulted it TRUE and `compute_sii()` inside `open_nl()` passed TRUE, so the
+optimizer and three of the four reported SII variants used the modified form;
+only the `ansi` column used the standard one.
+
+No source exists for the `0.5` coefficient — not in the code, `man/sii.Rd`, or
+NEWS. Gemini, asked twice, first described it as an implementation choice made
+so the optimizer would not be "overly conservative", then produced two
+citations it could not quote from. Both were checked:
+
+- **Keidser et al. (2011), the NAL-NL2 paper.** Describes NAL-NL2's SII change
+  as an *effective audibility factor* — the Ching et al. desensitization term
+  already implemented separately. The level distortion factor is not mentioned
+  anywhere, and no `0.5` coefficient appears.
+- **Ching, Dillon & Byrne (1998).** Eq. (7) gives the level distortion factor
+  as `Li = 1 - (Ei - Ui - 10)/160` — exactly the `nal_ldf = FALSE` branch. They
+  then derived a *new* level-dependent distortion factor from their own data
+  (Eq. 10) and report it "did not fit the data any better than did the standard
+  level distortion factor", concluding that impaired listeners "are
+  disadvantaged to the same degree as are normal-hearing people" by high
+  presentation levels. Their data run the opposite way: for severe sloping
+  losses the standard factor *overestimated* performance at high sensation
+  levels.
+
+So the premise behind the modification is the hypothesis Ching et al. tested
+and rejected, and its direction contradicts that paper's central conclusion —
+that audibility at 4 kHz contributes nothing once thresholds exceed 80 dB HL,
+and that hearing aids for severe high-frequency losses "should not amplify
+high-frequency components of speech".
+
+Magnitude (Script 9, Part A). Unaided: no effect at any profile, since 65 dB
+speech does not reach the penalty onset. NAL-NL2-aided: 0.007–0.017 across
+A1–A5. With +30 dB at 2–8 kHz — the regime the floor analysis pushes into —
+**0.017 to 0.051**, the same size as the floor effects being reported.
+
+Effect on the floor contrast specifically, from rescoring all 384 stored family
+cells with the flag off (mean `d_SII`, rectified, so both columns understate):
+
+| Edge (Hz) | budget 0.5, ldf ON | ldf OFF |
+|---|---|---|
+| 1000 | 0.0853 | 0.0619 |
+| 1500 | 0.0351 | 0.0213 |
+| 2000 | 0.0176 | 0.0091 |
+| 3000 | 0.0030 | 0.0003 |
+
+The effect survives with its structure intact — monotone in edge frequency and
+in budget — at roughly two thirds its former size. Edge 2000 becomes marginal
+against the ~0.005 resolution limit; edge 3000 stays null either way.
+
+Resolved by hardcoding `nal_ldf = FALSE` at `R/open_nl.R` lines 193 and 373 and
+flipping `report_sii()`'s default to FALSE. Verified by rescoring a stored cell:
+0.9210 with the flag on, 0.8961 as the new default, and `forced_on` still
+reproducing 0.9210 so the sensitivity arm remains available. The flag is
+retained rather than deleted, because the sensitivity comparison needs it and
+because removing an argument from an exported function's signature is a
+deprecation cycle, not an edit. See §5 for the package-level follow-up.
 
 ### 2.3 Findings that change the manuscript
 
@@ -253,6 +321,20 @@ before any binaural claim.
 7. Address budget non-monotonicity explicitly.
 8. Correct line 75: the floor does not act exclusively on low frequencies.
 9. Strengthen the limitation on AUDMOD's unverified absolute loudness scale.
+10. **State that the SII uses the standard ANSI S3.5 level distortion factor.**
+    The reported analyses now do. Whether to report the `nal_ldf` sensitivity
+    arm at all is a judgement call: it demonstrates robustness, but introducing
+    a modification the paper does not use invites a question it need not raise.
+    If reported, describe it accurately and say plainly that no published source
+    supports the `0.5*T'i` shift and that Ching et al. (1998) tested and
+    rejected a modified level factor.
+11. **Resolve the 9.03 / 7.00 mismatch.** The NAL-NL2 fractions now in the
+    L_cap paragraph (0.46, 0.39, 0.40, 0.73, 0.61) are computed against the
+    AUDMOD ceiling of 9.03, while the preceding paragraph defines the 65 dB
+    ceiling as 7.00 from the superseded engine. Against 7.00 they would be
+    0.59, 0.50, 0.52, 0.94, 0.79. The scatter argument holds either way, but the
+    figures must match whichever ceiling the text defines — unresolved until
+    Table 1 is regenerated (item 1).
 
 ### Done on `manuscript-audit-edits`
 
@@ -265,27 +347,53 @@ before any binaural claim.
 - Validation section rewritten around port fidelity / input path /
   reference-free behaviour; orphaned Bland-Altman figure removed and figures
   renumbered (`3740568`, `6bd7db1`, `83c8d78`).
+- Rectification disclosed in Methods: the dual-run branch, the absence of any
+  negative difference across 192 paired cells, the 63 cells that returned the
+  0 dB solution, and their rise from 31% at a 1000 Hz edge to 61% at 3000 Hz
+  (`6af2d06`, `7ec0953`, plus manual tightening).
+- L_cap rejustified as a modelling choice with the NAL-NL2 scatter as evidence
+  and the continuous cap axis as its sensitivity analysis (`eb85b94`,
+  `3e73016`, plus a manual fix to the Feasibility Maps lead-in).
 
 ---
 
 ## 4. Analyses still to run
 
-1. `rebuild_isoloudness_20.R` — running. Full family at 20 starts.
+1. `rebuild_isoloudness_20_naldf_off.R` — running, started 19th 12:46, about
+   19 hours. Full family, 20 starts, all three desensitization scales,
+   `nal_ldf` off. This is the main result.
 2. The other three SII variants. `gen_audiogram_family.R` computes
    `diff_complete_s`, `diff_complete_full` and `diff_ansi` alongside
-   `diff_smoothed_s`; all four are rectified and need the same rebuild.
-3. Desensitization scales 0 and 0.5 — the figures have three panels; the
-   rebuild covers only ds = 1.
-4. Table 1 regenerated on AUDMOD.
-5. Feasibility maps at 20 starts — the 21.3 vs 29.9 dB figures quoted in the
+   `diff_smoothed_s`; all four are rectified and need the same rebuild. Note
+   `complete_full` is hardcoded to `desensitization_scale = 1.0` (line 111), so
+   it coincides with `complete_s` at scale 1 and differs at 0 and 0.5.
+3. Table 1 regenerated on AUDMOD.
+4. Feasibility maps at 20 starts — the 21.3 vs 29.9 dB figures quoted in the
    Discussion sit on a floor-0 contour that 3 starts demonstrably
    under-converges. Largest job (357 grid points per profile); decide after the
-   sweep lands.
+   sweep lands. Check first whether that script passes `vent_floor` explicitly
+   or inherits the −10 default, since the maps would then carry the
+   rectification too.
+
+**Machine note.** The host suspended at 13:21 on the 19th, freezing the run for
+73 minutes mid-sweep (visible as cell 12 taking 106 minutes). `sleep.target`,
+`suspend.target`, `hibernate.target` and `hybrid-sleep.target` are now masked.
+Unmask them when the long runs are finished.
 
 ---
 
 ## 5. Repository actions outstanding
 
+- [ ] **File a `nal_ldf` issue and fix `man/sii.Rd`.** The documentation calls
+      it "NAL-NL2 loudness discomfort factors"; the code modifies the speech
+      level distortion factor, a different quantity (LDLs are a separate `ldl`
+      argument). The issue should record what the flag does, that Ching et al.
+      (1998) Eq. (7) is the standard form the `FALSE` branch implements, that
+      they tested a modified level factor and found it no better, and that
+      removal should follow a deprecation cycle rather than a straight delete —
+      it is an argument in an exported signature, and callers may pass it.
+      Alongside the `vent_floor` issue, this gives JOSS reviewers two openly
+      logged defects, which reads better than a clean tracker.
 - [ ] **Revert `helpers_jaaa.R`.** Gemini wrapped its `options(open_nl_maxit =
       800)` in `.old <-` / `on.exit(options(.old))`. Verified: the restore fires
       when `source()` returns, so the setting is undone before any caller uses
