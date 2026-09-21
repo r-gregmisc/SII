@@ -3,6 +3,7 @@ title: "Loudness budget constraints on high-frequency amplification in precipito
   hearing loss"
 author:
   - name: Mark Shaver
+    email: mark.shaver@wichita.edu
     affiliation: |
       Wichita State University \
       Department of Communication Sciences and Disorders \

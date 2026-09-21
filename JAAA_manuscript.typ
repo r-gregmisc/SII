@@ -125,7 +125,7 @@ Department of Communication Sciences and Disorders \
 Wichita, KS, USA
 
 ],
-      email: [] ),
+      email: [mark.shaver\@wichita.edu] ),
     ),
   font: ("Linux Libertine",),
   fontsize: 12pt,
