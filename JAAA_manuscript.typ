@@ -812,12 +812,12 @@ references.
 <data-availability>
 The code used to execute the computational simulations, reproduce the
 dataset, and generate the figure for this study is fully open-source and
-available on GitHub (https:\/\/github.com/r-gregmisc/SII).
+available on GitHub (https://github.com/r-gregmisc/SII).
 
 == References
 <references>
 
 
-#set bibliography(style: "https:\/\/raw.githubusercontent.com/citation-style-language/styles/master/chicago-author-date.csl")
+#set bibliography(style: "chicago-author-date")
 
 #bibliography("paper.bib")
