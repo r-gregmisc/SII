@@ -120,8 +120,11 @@
 precipitous hearing loss],
   authors: (
     ( name: [Mark Shaver],
-      affiliation: [Wichita State University, Department of
-Communication Sciences and Disorders, Wichita, KS, USA],
+      affiliation: [Wichita State University \
+Department of Communication Sciences and Disorders \
+Wichita, KS, USA
+
+],
       email: [] ),
     ),
   font: ("Linux Libertine",),
