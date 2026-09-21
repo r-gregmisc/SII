@@ -2,7 +2,8 @@
 title: "Loudness budget constraints on high-frequency amplification in precipitous
   hearing loss"
 author:
-  - Mark Shaver^[Wichita State University, Department of Communication Sciences and Disorders, Wichita, KS, USA]
+  - name: Mark Shaver
+    affiliation: Wichita State University, Department of Communication Sciences and Disorders, Wichita, KS, USA
 output:
   pdf_document: default
   word_document:
