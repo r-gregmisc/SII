@@ -184,8 +184,9 @@ boundary for profiles combining robust low-frequency hearing with
 impaired high frequencies, but its measurable benefit is confined to
 losses with a relatively low audible edge and is progressively
 discounted by physiological desensitization. Realizing it requires
-negative low-frequency insertion gain, and therefore occlusion that
-these listeners are unlikely to tolerate --- which is an argument for
+negative low-frequency insertion gain (attenuation below the unaided
+ear-canal level), achievable only with an occluding earmold that these
+listeners are unlikely to tolerate --- which is an argument for
 frequency-lowering signal processing @simpson2009 rather than for more
 high-frequency gain.
 
@@ -296,29 +297,35 @@ capabilities of Open-NL were bypassed, reducing the optimizer to a
 single-level linear insertion gain solver at 65 dB SPL.
 
 The optimizer was subjected to a global minimum insertion gain
-constraint across all frequency bands (the `vent_floor` parameter).
-While mathematically enforced as a global floor, for sensorineural
-profiles with sloping configurations the floor binds only at the low
-frequencies, with A2, a reverse-slope profile, the exception. Baseline
-clinical targets were generated using NAL-NL2 Version 2 software
-@keidser2011 at 65 dB SPL for a symmetrical, bilateral fitting for an
-experienced user of unknown gender. To isolate the rationale's
-fundamental prescription for the audiogram from the secondary acoustic
-effects of venting, the targets were intentionally generated using a
-fully occluded (\#13 tubing) coupling rather than an open fitting. While
-an open fitting is the clinical standard of care for these profiles,
-generating NAL-NL2 targets with an open coupling instructs the software
-to automatically cut low-frequency prescribed gain. Utilizing an
-occluded setting ensures the baseline targets reflect the rationale's
-true theoretical intent. However, it must be noted that because NAL-NL2
-was parameterized for a bilateral fitting, the rationale automatically
-applied a binaural loudness correction that systematically lowers
-prescribed gain. Because the computational instruments utilized in this
-analysis are strictly monaural, this introduces a methodological
-mismatch. While this binaural correction contributes slightly to
-NAL-NL2's lower overall predicted loudness, the magnitude of the
-discrepancy is small relative to the structural boundaries of the
-$L_(c a p) - L_0$ budget.
+constraint across all frequency bands (the `vent_floor` parameter). A
+negative insertion gain floor represents the passive insertion loss of
+an occluding earmold (the Real-Ear Occluded Response minus the Real-Ear
+Unaided Response). Measured insertion loss is inherently
+frequency-dependent and is typically smallest at the lowest frequencies,
+even for completely unvented molds @kuk2009. The flat -10 dB floor used
+here is therefore an idealized upper bound on achievable low-frequency
+attenuation rather than a model of any specific earmold. While
+mathematically enforced as a global floor, for sensorineural profiles
+with sloping configurations the floor binds only at the low frequencies,
+with A2, a reverse-slope profile, the exception. Baseline clinical
+targets were generated using NAL-NL2 Version 2 software @keidser2011 at
+65 dB SPL for a symmetrical, bilateral fitting for an experienced user
+of unknown gender. To isolate the rationale's fundamental prescription
+for the audiogram from the secondary acoustic effects of venting, the
+targets were intentionally generated using a fully occluded (\#13
+tubing) coupling rather than an open fitting. While an open fitting is
+the clinical standard of care for these profiles, generating NAL-NL2
+targets with an open coupling instructs the software to automatically
+cut low-frequency prescribed gain. Utilizing an occluded setting ensures
+the baseline targets reflect the rationale's true theoretical intent.
+However, it must be noted that because NAL-NL2 was parameterized for a
+bilateral fitting, the rationale automatically applied a binaural
+loudness correction that systematically lowers prescribed gain. Because
+the computational instruments utilized in this analysis are strictly
+monaural, this introduces a methodological mismatch. While this binaural
+correction contributes slightly to NAL-NL2's lower overall predicted
+loudness, the magnitude of the discrepancy is small relative to the
+structural boundaries of the $L_(c a p) - L_0$ budget.
 
 === C++ Instrument Validation
 <c-instrument-validation>
@@ -714,12 +721,18 @@ This constraint forces a harsh physical reality in clinical practice.
 The penalized-optimal solutions in the audiogram family sweep rely on
 negative low-frequency insertion gain to free up loudness capacity.
 However, digital gain reduction cannot bring the ear canal level below
-the direct sound path in an open fitting. To achieve true negative
-low-frequency insertion gain, a clinician must use a highly occluding
-earmold to physically attenuate the incoming low frequencies. Because
-precipitous profiles possess near-normal low-frequency hearing,
-occluding the ear canal will induce a severe, often intolerable
-occlusion effect (e.g., autophony and boomy own-voice) @kiessling2005.
+the direct sound path in an open fitting, because open earsets provide
+no insertion loss @kuk2009 and hearing aid venting drains amplified
+low-frequency sound without attenuating the direct unamplified path
+@stuart1999. To achieve true negative low-frequency insertion gain, a
+clinician must use an unvented earmold, which is the only configuration
+providing appreciable passive attenuation @kuk2009. Even with an
+unvented mold, this attenuation is modest at the lowest frequencies
+(// TODO: digitize Kuk et al.~(2009) Fig. 7). Furthermore, because
+precipitous profiles possess near-normal low-frequency hearing, the
+unvented molds required for attenuation simultaneously induce the
+largest, most severe occlusion effects (e.g., autophony and boomy
+own-voice) @kuk2009@kiessling2005.
 
 Conversely, if the clinician opts for an open or vented fitting to avoid
 occlusion (the standard of care for precipitous losses), the direct
@@ -777,6 +790,15 @@ thresholds and a single standard speech spectrum. A broader corpus of
 real-world audiometric profiles and variable speech inputs would still
 be required to generalize these constraints across the diverse clinical
 population.
+
+Additionally, the flat -10 dB minimum insertion gain floor utilized in
+these simulations likely overstates achievable attenuation in the lowest
+frequency bands. The reported floor effects are therefore best read as
+idealized upper bounds on the benefit of passive attenuation. A
+frequency-shaped floor based on measured insertion loss would be more
+realistic for future modeling, though measured attenuation values are
+highly sensitive to clinical factors such as earmold seal, insertion
+depth, and slit leak.
 
 Additionally, the loudness budget framework is limited in its
 application to the mixed (A6, 30 dB conductive component) and conductive
