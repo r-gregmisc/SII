@@ -303,8 +303,7 @@ an occluding earmold (the Real-Ear Occluded Response minus the Real-Ear
 Unaided Response). Measured insertion loss is inherently
 frequency-dependent and is typically smallest at the lowest frequencies,
 even for completely unvented molds @kuk2009. The flat -10 dB floor used
-here is therefore an idealized upper bound on achievable low-frequency
-attenuation rather than a model of any specific earmold. While
+here is therefore an idealization that is likely optimistic in the lowest frequency bands, rather than a model of any specific earmold. While
 mathematically enforced as a global floor, for sensorineural profiles
 with sloping configurations the floor binds only at the low frequencies,
 with A2, a reverse-slope profile, the exception. Baseline clinical
@@ -384,9 +383,7 @@ scale is either correct or incorrect.
 
 === Optimization Procedure
 <optimization-procedure>
-The underlying optimization routine utilized a Nelder-Mead simplex
-algorithm to fit a 3-parameter non-stationary gain curve (anchor gain,
-slope trigger, and bypass slope).
+The underlying optimization routine utilized a multi-start Nelder-Mead simplex algorithm over six free parameters: a gain shift at each audiometric octave frequency from 250 to 8000 Hz, applied on top of the Open-NL heuristic prescription and interpolated logarithmically across the 21 analysis bands.
 
 The solutions generated are penalized-optimal rather than strictly
 SII-optimal. Specifically, the optimizer maximizes a nine-term penalized
@@ -581,10 +578,7 @@ the resolution limit at 2000 Hz, and indistinguishable from zero at 3000
 Hz. At the tightest budget and a 1000 Hz audible edge, averaged across
 desensitization scales, prescribed gain falls by 6.8 dB at 500 Hz, 3.3
 dB at 1000 Hz, and 7.9 dB at 8 kHz, and rises by 10.0 dB at 2000 Hz and
-6.4 dB at 4000 Hz. Because the paired solutions are at matched loudness,
-these changes trade off against one another: capacity is drawn from the
-near-normal low frequencies and from 8 kHz, and spent in the 2-4 kHz
-region.
+6.4 dB at 4000 Hz. Because the paired solutions are at matched loudness, these changes trade off against one another: capacity is drawn from the near-normal low frequencies and from 8 kHz, and spent in the 2-4 kHz region. The reduction at 8 kHz reflects two features of the implementation. The SII assigns little importance to that region, and the loudness model extrapolates the aided spectrum above 8 kHz at -24 dB per octave from the 8 kHz value, so gain there incurs loudness from a spectral region the SII does not score.
 
 #figure(image("figures/Figure2_Mechanism_Spectral.pdf"),
   caption: [
@@ -611,10 +605,7 @@ smoothed implementation of the Johnson and Dillon (2011) @johnson2011
 desensitization penalty, aligning its internal objective function
 closely with the physiological assumptions of NAL-NL2. To ensure
 rigorous evaluation, both formulas were scored in Table 3 using the
-smoothed Johnson and Dillon (2011) desensitized SII metric. By perfectly
-aligning the reported index with the metric the optimizer actually
-maximizes, any measured changes can be conclusively attributed to the
-mathematical boundaries rather than objective function mismatch. The
+smoothed Johnson and Dillon (2011) desensitized SII metric. This aligns the reported index with the intelligibility term of the optimizer's objective, though not with the penalized objective it actually maximizes, so that measured changes reflect the mathematical boundaries rather than a mismatch in the intelligibility metric itself. The
 primary goal is not to claim algorithmic superiority over the clinical
 rationale, but to isolate the exact efficiency cost of the 0 dB
 insertion floor within a rigidly controlled mathematical space.
@@ -721,19 +712,16 @@ This constraint forces a harsh physical reality in clinical practice.
 The penalized-optimal solutions in the audiogram family sweep rely on
 negative low-frequency insertion gain to free up loudness capacity.
 However, digital gain reduction cannot bring the ear canal level below
-the direct sound path in an open fitting, because open earsets provide
-no insertion loss @kuk2009 and hearing aid venting drains amplified
-low-frequency sound without attenuating the direct unamplified path
+the direct sound path in an open fitting: an open earset provides no
+measurable insertion loss @kuk2009, and venting reduces amplified
+low-frequency output rather than the unamplified direct sound
 @stuart1999. To achieve true negative low-frequency insertion gain, a
-clinician must use an unvented earmold, which is the only configuration
-providing appreciable passive attenuation @kuk2009. Even with an
-unvented mold, this attenuation is modest at the lowest frequencies
-(// TODO: digitize Kuk et al.~(2009) Fig. 7). Furthermore, because
-precipitous profiles possess near-normal low-frequency hearing, the
-unvented molds required for attenuation simultaneously induce the
-largest, most severe occlusion effects (e.g., autophony and boomy
-own-voice) @kuk2009@kiessling2005.
-
+clinician must use an unvented earmold, since venting largely removes
+passive low-frequency attenuation @kuk2009. Even unvented molds
+attenuate only modestly at the lowest frequencies, and they produce the
+largest occlusion effects of any configuration @kuk2009@kiessling2005,
+a particular burden for precipitous profiles with near-normal
+low-frequency hearing.
 Conversely, if the clinician opts for an open or vented fitting to avoid
 occlusion (the standard of care for precipitous losses), the direct
 sound path locks the low-frequency insertion gain floor at $gt.eq 0$ dB.
@@ -791,14 +779,25 @@ real-world audiometric profiles and variable speech inputs would still
 be required to generalize these constraints across the diverse clinical
 population.
 
-Additionally, the flat -10 dB minimum insertion gain floor utilized in
+Similarly, the flat -10 dB minimum insertion gain floor utilized in
 these simulations likely overstates achievable attenuation in the lowest
-frequency bands. The reported floor effects are therefore best read as
-idealized upper bounds on the benefit of passive attenuation. A
+frequency bands. The reported floor effects should therefore be read as
+likely optimistic estimates of the benefit of passive attenuation. A
 frequency-shaped floor based on measured insertion loss would be more
 realistic for future modeling, though measured attenuation values are
 highly sensitive to clinical factors such as earmold seal, insertion
 depth, and slit leak.
+
+The penalized objective introduces a bias in the opposite direction. The
+anchor penalty charges 0.1 objective points per dB of shift away from the
+Open-NL heuristic prescription, so driving two low-frequency bands to the
+-10 dB floor costs at least 0.02 in SII-equivalent units. For the profiles
+with the smallest floor effects (A4, +0.020; A5, +0.009) this cost is of the
+same order as the effect itself, and the reported values may therefore
+understate what an unpenalized SII maximizer would achieve. The flat floor
+and the anchor penalty thus bias the reported floor effects in opposite
+directions, and the reported values should not be read as a one-sided
+overestimate.
 
 Additionally, the loudness budget framework is limited in its
 application to the mixed (A6, 30 dB conductive component) and conductive
