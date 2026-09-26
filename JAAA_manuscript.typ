@@ -1,5 +1,6 @@
 #let horizontalrule = line(start: (25%,0%), end: (75%,0%))
-
+#set par.line(numbering: "1")
+#set par(first-line-indent: 0.5in, leading: 1em, spacing: 1em)
 #show terms: it => {
   it.children
     .map(child => [
@@ -149,9 +150,8 @@ energy in the residual normal-hearing low frequencies consumes much of
 the acceptable loudness budget before any gain is prescribed, reducing
 the capacity available to restore high-frequency audibility.
 
-#strong[Research Design:] A computational modeling study using the
-AUDMOD specific-loudness model @bramslow1993@bramslow2004 alongside the
-Speech Intelligibility Index (SII) @ansi1997.
+#strong[Research Design:] A computational modeling study using the AUDMOD specific-loudness
+model alongside the Speech Intelligibility Index (SII).
 
 #strong[Study Sample:] N/A (computational modeling of seven canonical
 audiometric profiles and sixteen synthetic audiograms).
@@ -187,9 +187,19 @@ discounted by physiological desensitization. Realizing it requires
 negative low-frequency insertion gain (attenuation below the unaided
 ear-canal level), achievable only with an occluding earmold that these
 listeners are unlikely to tolerate --- which is an argument for
-frequency-lowering signal processing @simpson2009 rather than for more
+frequency-lowering signal processing rather than for more
 high-frequency gain.
 
+#strong[Clinical Relevance Statement:] Clinicians who cannot fully
+restore high-frequency audibility in sloping or precipitous losses
+should recognize that a structural loudness ceiling, not necessarily an
+inadequate fitting, may be limiting the achievable gain, particularly
+when low-frequency hearing is largely spared. Because realizing more of
+this budget requires occluding the ear canal, which produces an
+occlusion effect these patients are unlikely to tolerate, approaches
+that deliver high-frequency cues where hearing is better, such as
+frequency lowering, may warrant consideration over further
+high-frequency gain.
 == Introduction
 <introduction>
 In the fitting of precipitous or profound high-frequency hearing loss,
@@ -383,7 +393,10 @@ scale is either correct or incorrect.
 
 === Optimization Procedure
 <optimization-procedure>
-The underlying optimization routine utilized a multi-start Nelder-Mead simplex algorithm over six free parameters: a gain shift at each audiometric octave frequency from 250 to 8000 Hz, applied on top of the Open-NL heuristic prescription and interpolated logarithmically across the 21 analysis bands.
+The underlying optimization routine utilized a multi-start Nelder-Mead simplex algorithm over six free parameters: a gain shift at each audiometric octave frequency from 250 to 8000 Hz, applied on top of the Open-NL heuristic prescription and interpolated logarithmically across the 21 analysis bands. All Open-NL runs used the package defaults for
+the heuristic prescription: a fully occluded coupling with no vent
+correction, the severe-loss booster disabled, and no demographic
+adjustments.
 
 The solutions generated are penalized-optimal rather than strictly
 SII-optimal. Specifically, the optimizer maximizes a nine-term penalized
@@ -483,7 +496,7 @@ Audiometric Profiles at 50, 65, and 80 dB SPL]
   , kind: table
   )
 
-#figure(image("figures/Figure1_Loudness_Budget.pdf"),
+#figure(image("figures/Figure1_Loudness_Budget.png"),
   caption: [
     Fraction of the normative loudness ceiling consumed by unamplified
     speech, for the seven canonical profiles (defined in Table 1) at
@@ -580,7 +593,7 @@ desensitization scales, prescribed gain falls by 6.8 dB at 500 Hz, 3.3
 dB at 1000 Hz, and 7.9 dB at 8 kHz, and rises by 10.0 dB at 2000 Hz and
 6.4 dB at 4000 Hz. Because the paired solutions are at matched loudness, these changes trade off against one another: capacity is drawn from the near-normal low frequencies and from 8 kHz, and spent in the 2-4 kHz region. The reduction at 8 kHz reflects two features of the implementation. The SII assigns little importance to that region, and the loudness model extrapolates the aided spectrum above 8 kHz at -24 dB per octave from the 8 kHz value, so gain there incurs loudness from a spectral region the SII does not score.
 
-#figure(image("figures/Figure2_Mechanism_Spectral.pdf"),
+#figure(image("figures/Figure2_Mechanism_Spectral.png"),
   caption: [
     Change in prescribed insertion gain when the minimum-gain floor is
     relaxed from 0 dB to -10 dB, at a 0.5-sone loudness budget, by
@@ -722,6 +735,7 @@ attenuate only modestly at the lowest frequencies, and they produce the
 largest occlusion effects of any configuration @kuk2009@kiessling2005,
 a particular burden for precipitous profiles with near-normal
 low-frequency hearing.
+
 Conversely, if the clinician opts for an open or vented fitting to avoid
 occlusion (the standard of care for precipitous losses), the direct
 sound path locks the low-frequency insertion gain floor at $gt.eq 0$ dB.
@@ -788,10 +802,7 @@ realistic for future modeling, though measured attenuation values are
 highly sensitive to clinical factors such as earmold seal, insertion
 depth, and slit leak.
 
-The penalized objective introduces a bias in the opposite direction. The
-anchor penalty charges 0.1 objective points per dB of shift away from the
-Open-NL heuristic prescription, so driving two low-frequency bands to the
--10 dB floor costs at least 0.02 in SII-equivalent units. For the profiles
+The penalized objective introduces a bias in the opposite direction. The anchor penalty charges 0.1 objective points per dB of shift away from the Open-NL heuristic prescription, which the optimizer floors at 0 dB before shifts are applied, so driving two low-frequency bands to the -10 dB floor costs at least 0.02 in SII-equivalent units. For the profiles
 with the smallest floor effects (A4, +0.020; A5, +0.009) this cost is of the
 same order as the effect itself, and the reported values may therefore
 understate what an unpenalized SII maximizer would achieve. The flat floor
