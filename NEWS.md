@@ -1,5 +1,9 @@
+# SII 1.3.0
 
-# SII (development version)
+* Loudness is now computed by `calculate_loudness_audmod()`, a C++ port of the
+  AUDMOD model (Bramslow, 2004) that matches the Auditory Modeling Toolbox
+  (AMT 1.6.0) `bramslow2004` implementation at every stage. Tests compare it
+  against AMT reference output for 23 cases.
 
 * `open_nl()` gains `objective_sii`, which selects the SII the optimizer maximizes.
   The default is `"johnson2011_complete"`, the Johnson & Dillon (2011)
