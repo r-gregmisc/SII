@@ -26,3 +26,16 @@ SII_*.tar.gz
 SII.Rcheck/
 /doc/
 /Meta/
+
+# Compiled code
+*.so
+*.dll
+
+# Local tools and scratch output
+typst-*/
+*.tar.xz
+test*.typ
+test*.pdf
+user_pasted.*
+scratch*
+*.bak

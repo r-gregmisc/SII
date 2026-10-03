@@ -37,3 +37,15 @@
 ^.*\.html$
 ^doc$
 ^Meta$
+^audit_register\.md$
+^issue_vent_floor\.md$
+^.*\.bib$
+^.*\.csl$
+^.*\.Rproj$
+^data_output$
+^scratch.*$
+^octave-workspace$
+^typst-.*$
+^.*\.tar\.xz$
+^JAAA_.*$
+^.*\.bak$
