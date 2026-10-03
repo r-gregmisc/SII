@@ -82,7 +82,7 @@ find1 <- function(pattern) {
 i_cap <- find1("if (!is.null(cap_override)) dynamic_cap <- cap_override")
 i_fin <- find1("clamped_shifts <- pmax(-60, pmin(30, best_shifts))")
 i_anc <- find1("anchor_penalty <- sum(abs(shifts)) * 0.1")
-i_obj <- find1("desensitization = objective_sii,")
+i_obj <- find1("desensitization = objective_sii)")
 
 instrument <- function(anchor_on) {
   s2 <- src
@@ -125,7 +125,7 @@ run_one <- function(set, anchor, profile, htl, loss, cap, budget, fl, starts) {
     sones_opt   = if (is.null(ll)) NA_real_ else ll[["sones"]],
     sones_model = loudness_of(EVAL_LVL, g, htl, loss)$total,
     objective   = -.open_nl_dbg$final_obj,
-    sii_complete = report_sii(tgt, "johnson2011_complete"),
+    sii_complete = report_sii(tgt, "johnson2011_desensitized"),
     sii_ansi     = report_sii(tgt, "none"),
     g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
     stringsAsFactors = FALSE)

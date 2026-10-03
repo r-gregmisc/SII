@@ -123,7 +123,7 @@ score_row <- function(part, profile, fl, g, tgt, cap, sones_opt, sones_model) {
   data.frame(part = part, profile = profile, floor = fl, starts = STARTS,
              cap = cap, sones_opt = sones_opt, sones_model = sones_model,
              sii_smooth   = report_sii(tgt, "johnson2011_smoothed"),
-             sii_complete = report_sii(tgt, "johnson2011_complete"),
+             sii_complete = report_sii(tgt, "johnson2011_desensitized"),
              sii_ansi     = report_sii(tgt, "none"),
              g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
              stringsAsFactors = FALSE)

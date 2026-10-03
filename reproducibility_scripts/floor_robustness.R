@@ -47,8 +47,8 @@ csv_path <- file.path(out_dir, "solutions.csv")
 log_path <- file.path(out_dir, sprintf("floor_robustness_%s.log", Sys.Date()))
 
 ## ---- preconditions -------------------------------------------------------------
-if (!identical(eval(formals(open_nl)$objective_sii)[1], "johnson2011_complete"))
-  stop("open_nl()'s objective_sii default is not johnson2011_complete.")
+if (!identical(eval(formals(open_nl)$objective_sii)[1], "johnson2011_desensitized"))
+  stop("open_nl()'s objective_sii default is not johnson2011_desensitized.")
 if (!bisgaard_nal_ready()) stop("NAL-NL2 gains missing from bisgaard_profiles.R.")
 
 ## ---- instrumented open_nl(): loudness logged, anchor on/off, seed overridable ----
@@ -93,7 +93,7 @@ nal <- lapply(setNames(PROFS4, PROFS4), function(p) {
   t  <- build_target(hl_freqs, sp, th, LOSS, g6, EVAL_LVL)
   list(th = th, gain = g6, loud = loudness_of(EVAL_LVL, g6, th, LOSS)$total,
        L0 = loudness_of(EVAL_LVL, rep(0, 6), th, LOSS)$total,
-       complete = report_sii(t, "johnson2011_complete"), ansi = report_sii(t, "none"))
+       complete = report_sii(t, "johnson2011_desensitized"), ansi = report_sii(t, "none"))
 })
 L0e <- sapply(rownames(EDGE1000), function(nm)
   loudness_of(EVAL_LVL, rep(0, 6), EDGE1000[nm, ], LOSS)$total)
@@ -125,7 +125,7 @@ run_one <- function(part, cond, anchor, profile, cap, seed_id, fl) {
                     sones_opt   = if (is.null(ll)) NA_real_ else ll[["sones"]],
                     sones_model = loudness_of(EVAL_LVL, g, th, LOSS)$total,
                     objective   = -.open_nl_dbg$final_obj,
-                    sii_complete = report_sii(tgt, "johnson2011_complete"),
+                    sii_complete = report_sii(tgt, "johnson2011_desensitized"),
                     sii_ansi     = report_sii(tgt, "none"),
                     g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
                     stringsAsFactors = FALSE)

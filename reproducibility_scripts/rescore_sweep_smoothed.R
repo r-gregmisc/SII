@@ -52,7 +52,7 @@ for (i in seq_len(nrow(d))) {
   g    <- as.numeric(d[i, gcols])
   tgt  <- build_target(hl_freqs, sp, htl6, rep(0, 6), g, EVAL_LVL)
   d$sii_smooth[i]   <- report_sii(tgt, "johnson2011_smoothed")
-  d$sii_complete[i] <- report_sii(tgt, "johnson2011_complete")
+  d$sii_complete[i] <- report_sii(tgt, "johnson2011_desensitized")
   d$sii_ansi[i]     <- report_sii(tgt, "none")
 }
 

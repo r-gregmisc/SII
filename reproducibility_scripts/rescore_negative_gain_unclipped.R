@@ -50,7 +50,7 @@ score3 <- function(tgt, fun) {
                            threshold = tgt$orig_threshold, loss = tgt$orig_loss,
                            freq = tgt$orig_freq, prescription = tgt, interpolate = TRUE,
                            nal_ldf = FALSE, desensitization = des)$sii
-  c(smooth = one("johnson2011_smoothed"), complete = one("johnson2011_complete"),
+  c(smooth = one("johnson2011_smoothed"), complete = one("johnson2011_desensitized"),
     ansi = one("none"))
 }
 

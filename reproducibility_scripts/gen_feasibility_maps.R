@@ -55,7 +55,7 @@ run_cell <- function(p, c_val, f_val) {
     hf_gain <- mean(res$gain[4:5])
     
     tgt <- build_target(hl_freqs, input_speech, htl, loss, res$gain)
-    sii_complete <- report_sii(tgt, "johnson2011_complete")
+    sii_complete <- report_sii(tgt, "johnson2011_desensitized")
     sii_smoothed <- report_sii(tgt, "johnson2011_smoothed")
     sii_raw <- report_sii(tgt, "none")
     

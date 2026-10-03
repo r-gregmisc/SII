@@ -40,7 +40,7 @@ log_path <- file.path(out_dir, sprintf("rerun_bisgaard_profiles_%s.log", Sys.Dat
 s <- readLines("R/sii.R")
 if (!any(grepl("^\\s*gain <- final_output - speech\\s*$", s)))
   stop("R/sii.R does not carry the negative-gain fix.")
-if (!all(c("johnson2011_complete", "none") %in% eval(formals(open_nl)$objective_sii)))
+if (!all(c("johnson2011_desensitized", "none") %in% eval(formals(open_nl)$objective_sii)))
   stop("open_nl() lacks the objective_sii options needed; update R/open_nl.R first.")
 
 con <- file(log_path, open = "at"); sink(con, split = TRUE)
@@ -113,7 +113,7 @@ nal <- lapply(setNames(PROFS, PROFS), function(p) {
   th <- bisgaard_profiles[[p]]$threshold
   t  <- build_target(hl_freqs, sp, th, LOSS, g6, EVAL_LVL)
   list(th = th, gain = g6, loud = loudness_of(EVAL_LVL, g6, th, LOSS)$total,
-       complete = report_sii(t, "johnson2011_complete"), ansi = report_sii(t, "none"))
+       complete = report_sii(t, "johnson2011_desensitized"), ansi = report_sii(t, "none"))
 })
 
 done <- if (file.exists(csv_path)) read.csv(csv_path, stringsAsFactors = FALSE) else NULL
@@ -124,7 +124,7 @@ n_todo <- 2 * 2 * length(PROFS) * 2 - length(key_done)
 options(open_nl_starts = STARTS)
 
 cat(sprintf("\n\n==== PART 2: iso-loudness control, %d optimizations to do ====\n", n_todo))
-for (anc in c("on", "off")) for (obj in c("johnson2011_complete", "none")) for (p in PROFS) for (fl in c(0, -10)) {
+for (anc in c("on", "off")) for (obj in c("johnson2011_desensitized", "none")) for (p in PROFS) for (fl in c(0, -10)) {
   k <- key(obj, anc, p, fl); if (k %in% key_done) next
   .open_nl_dbg$last_loud <- NULL; .open_nl_dbg$final_loud <- NULL; .open_nl_dbg$final_obj <- NA_real_
   g <- onl[[anc]](speech = EVAL_LVL, threshold = nal[[p]]$th, freq = hl_freqs, loss = LOSS,
@@ -136,7 +136,7 @@ for (anc in c("on", "off")) for (obj in c("johnson2011_complete", "none")) for (
                     sones_opt   = if (is.null(ll)) NA_real_ else ll[["sones"]],
                     sones_model = loudness_of(EVAL_LVL, g, nal[[p]]$th, LOSS)$total,
                     objective   = -.open_nl_dbg$final_obj,
-                    sii_complete = report_sii(tgt, "johnson2011_complete"),
+                    sii_complete = report_sii(tgt, "johnson2011_desensitized"),
                     sii_ansi     = report_sii(tgt, "none"),
                     g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
                     stringsAsFactors = FALSE)
@@ -169,22 +169,22 @@ for (p in PROFS) cat(sprintf("  %-4s   %6.2f    %5.1f     %+5.2f      %.3f      
 cat("\n==== TABLE 4 (complete objective, anchor on): complete SII ====\n")
 cat("  prof  NAL SII  ONL 0 dB  ONL -10 dB  optimizer  floor    d_sones  neg bands (-10)\n")
 for (p in PROFS) {
-  c0 <- get("johnson2011_complete", "on", p, 0, "sii_complete")
-  c10 <- get("johnson2011_complete", "on", p, -10, "sii_complete")
-  g <- as.numeric(d[d$objective_sii == "johnson2011_complete" & d$anchor == "on" & d$profile == p & d$floor == -10, gcols])
+  c0 <- get("johnson2011_desensitized", "on", p, 0, "sii_complete")
+  c10 <- get("johnson2011_desensitized", "on", p, -10, "sii_complete")
+  g <- as.numeric(d[d$objective_sii == "johnson2011_desensitized" & d$anchor == "on" & d$profile == p & d$floor == -10, gcols])
   cat(sprintf("  %-4s  %.3f    %.3f     %.3f      %s    %s   %+.4f  %s\n", p, nal[[p]]$complete, c0, c10,
-              r3(c0 - nal[[p]]$complete), r3(c10 - c0), fe("johnson2011_complete", "on", p, "sones_model"),
+              r3(c0 - nal[[p]]$complete), r3(c10 - c0), fe("johnson2011_desensitized", "on", p, "sones_model"),
               if (length(g) == 6 && any(g < -0.001)) paste(hl_freqs[g < -0.001], collapse = "/") else "none"))
 }
 cat("\n  optimizer effect under ANSI (complete objective, anchor on):\n")
-for (p in PROFS) cat(sprintf("  %-4s  %s\n", p, r3(get("johnson2011_complete", "on", p, 0, "sii_ansi") - nal[[p]]$ansi)))
+for (p in PROFS) cat(sprintf("  %-4s  %s\n", p, r3(get("johnson2011_desensitized", "on", p, 0, "sii_ansi") - nal[[p]]$ansi)))
 
 cat("\n==== TABLE 5: floor effect, complete-objective fittings ====\n")
 cat("  prof  complete on  complete off  ANSI on   ANSI off   d_sones on / off\n")
 for (p in PROFS) cat(sprintf("  %-4s  %s       %s        %s    %s     %+.4f / %+.4f\n", p,
-  r3(fe("johnson2011_complete", "on", p, "sii_complete")), r3(fe("johnson2011_complete", "off", p, "sii_complete")),
-  r3(fe("johnson2011_complete", "on", p, "sii_ansi")), r3(fe("johnson2011_complete", "off", p, "sii_ansi")),
-  fe("johnson2011_complete", "on", p, "sones_model"), fe("johnson2011_complete", "off", p, "sones_model")))
+  r3(fe("johnson2011_desensitized", "on", p, "sii_complete")), r3(fe("johnson2011_desensitized", "off", p, "sii_complete")),
+  r3(fe("johnson2011_desensitized", "on", p, "sii_ansi")), r3(fe("johnson2011_desensitized", "off", p, "sii_ansi")),
+  fe("johnson2011_desensitized", "on", p, "sones_model"), fe("johnson2011_desensitized", "off", p, "sones_model")))
 
 cat("\n==== ANSI-tuned fittings: floor effect on the display vs after desensitization ====\n")
 cat("  prof  ANSI on  complete on  |  ANSI off  complete off  |  d_sones on / off\n")
@@ -195,11 +195,11 @@ for (p in PROFS) cat(sprintf("  %-4s  %s   %s       |  %s    %s        |  %+.4f 
 
 cat("\n==== Complete SII reached: ANSI-tuned vs complete-tuned (anchor on) ====\n")
 for (p in PROFS) for (fl in c(0, -10)) cat(sprintf("  %-4s fl%+3d  %.4f vs %.4f  (%+.4f)\n", p, fl,
-  get("none", "on", p, fl, "sii_complete"), get("johnson2011_complete", "on", p, fl, "sii_complete"),
-  get("none", "on", p, fl, "sii_complete") - get("johnson2011_complete", "on", p, fl, "sii_complete")))
+  get("none", "on", p, fl, "sii_complete"), get("johnson2011_desensitized", "on", p, fl, "sii_complete"),
+  get("none", "on", p, fl, "sii_complete") - get("johnson2011_desensitized", "on", p, fl, "sii_complete")))
 
 cat("\n==== Search check: matched pairs with lower objective at -10 dB ====\n")
-for (obj in c("johnson2011_complete", "none")) for (anc in c("on", "off")) {
+for (obj in c("johnson2011_desensitized", "none")) for (anc in c("on", "off")) {
   x <- sapply(PROFS, function(p) c(ds = fe(obj, anc, p, "sones_model"), dobj = fe(obj, anc, p, "objective")))
   m <- !is.na(x["ds", ]) & abs(x["ds", ]) <= ISO_TOL
   bad <- m & x["dobj", ] < -1e-6

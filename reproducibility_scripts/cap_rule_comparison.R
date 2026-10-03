@@ -76,12 +76,12 @@ for (p in profiles) {
       
       presc_leg <- open_nl(speech = lvl, threshold = threshold, freq = hl_freqs, loss = loss, cap_rule = "legacy")
       ldn_leg <- calculate_loudness(presc_leg)$total
-      sii_leg <- sii(speech = input_speech, threshold = threshold, loss = loss, freq = hl_freqs, method = "octave", transducer = "none", custom_gain = presc_leg$gain, desensitization = "johnson2011_complete")$sii
+      sii_leg <- sii(speech = input_speech, threshold = threshold, loss = loss, freq = hl_freqs, method = "octave", transducer = "none", custom_gain = presc_leg$gain, desensitization = "johnson2011_desensitized")$sii
       gain24_leg <- mean(presc_leg$gain[4:5])
       
       presc_norm <- open_nl(speech = lvl, threshold = threshold, freq = hl_freqs, loss = loss, cap_rule = "normal")
       ldn_norm <- calculate_loudness(presc_norm)$total
-      sii_norm <- sii(speech = input_speech, threshold = threshold, loss = loss, freq = hl_freqs, method = "octave", transducer = "none", custom_gain = presc_norm$gain, desensitization = "johnson2011_complete")$sii
+      sii_norm <- sii(speech = input_speech, threshold = threshold, loss = loss, freq = hl_freqs, method = "octave", transducer = "none", custom_gain = presc_norm$gain, desensitization = "johnson2011_desensitized")$sii
       gain24_norm <- mean(presc_norm$gain[4:5])
       
       cap_leg <- get_legacy_cap(lvl, threshold, loss)

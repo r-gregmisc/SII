@@ -94,7 +94,7 @@ for (p in profiles) {
 
   tgt_nal <- build_target(hl_freqs, input_speech, htl, loss, nal_gain_6,
                           eval_level = lvl)
-  sii_nal_desens <- report_sii(tgt_nal, "johnson2011_complete")
+  sii_nal_desens <- report_sii(tgt_nal, "johnson2011_desensitized")
   sii_nal_raw    <- report_sii(tgt_nal, "none", nal_ldf = FALSE)
   sii_nal_smooth <- report_sii(tgt_nal, "johnson2011_smoothed")
 
@@ -107,7 +107,7 @@ for (p in profiles) {
                           vent_floor = 0)
   tgt_0 <- build_target(hl_freqs, input_speech, htl, loss, res_0$gain,
                         eval_level = lvl)
-  sii_onl_0_desens <- report_sii(tgt_0, "johnson2011_complete")
+  sii_onl_0_desens <- report_sii(tgt_0, "johnson2011_desensitized")
   sii_onl_0_raw    <- report_sii(tgt_0, "none", nal_ldf = FALSE)
   sii_onl_0_smooth <- report_sii(tgt_0, "johnson2011_smoothed")
   onl_0_loudness   <- loudness_of(lvl, res_0$gain, htl, loss)$total
@@ -124,7 +124,7 @@ for (p in profiles) {
                            vent_floor = -10)
   tgt_10 <- build_target(hl_freqs, input_speech, htl, loss, res_10$gain,
                          eval_level = lvl)
-  sii_onl_10_desens <- report_sii(tgt_10, "johnson2011_complete")
+  sii_onl_10_desens <- report_sii(tgt_10, "johnson2011_desensitized")
   sii_onl_10_raw    <- report_sii(tgt_10, "none", nal_ldf = FALSE)
   sii_onl_10_smooth <- report_sii(tgt_10, "johnson2011_smoothed")
   onl_10_loudness   <- loudness_of(lvl, res_10$gain, htl, loss)$total

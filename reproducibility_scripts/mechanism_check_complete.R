@@ -82,15 +82,15 @@ for (p in P1) {
   L0 <- loud_of(cs, cs$g0)
   cat(sprintf("\n  %s %s   gains 0 dB: %s\n              -10 dB: %s\n", p[[1]], p[[2]],
               paste(sprintf("%6.1f", cs$g0), collapse = ""), paste(sprintf("%6.1f", cs$g10), collapse = "")))
-  base <- c(sii_of(cs, cs$g0, "johnson2011_complete")$sii, sii_of(cs, cs$g0, "none")$sii)
+  base <- c(sii_of(cs, cs$g0, "johnson2011_desensitized")$sii, sii_of(cs, cs$g0, "none")$sii)
   for (lab in c("floor -10", "LF cut only", "HF change only")) {
     g <- switch(lab, "floor -10" = cs$g10, "LF cut only" = lf, "HF change only" = hf)
-    s <- c(sii_of(cs, g, "johnson2011_complete")$sii, sii_of(cs, g, "none")$sii)
+    s <- c(sii_of(cs, g, "johnson2011_desensitized")$sii, sii_of(cs, g, "none")$sii)
     cat(sprintf("    %-15s d complete %+.4f  d ANSI %+.4f   loudness vs 0 dB solution %+.3f sones\n",
                 lab, s[1] - base[1], s[2] - base[2], loud_of(cs, g) - L0))
   }
-  t0  <- as.data.frame(sii_of(cs, cs$g0,  "johnson2011_complete")$table, check.names = FALSE)
-  t10 <- as.data.frame(sii_of(cs, cs$g10, "johnson2011_complete")$table, check.names = FALSE)
+  t0  <- as.data.frame(sii_of(cs, cs$g0,  "johnson2011_desensitized")$table, check.names = FALSE)
+  t10 <- as.data.frame(sii_of(cs, cs$g10, "johnson2011_desensitized")$table, check.names = FALSE)
   dI  <- t10[["IiAi"]] - t0[["IiAi"]]
   mask <- t10[["Zi"]] > t10[["X'i"]]
   sel <- abs(dI) >= 0.001
@@ -108,14 +108,14 @@ cat("\n\n==== Part 2: unspent budget, anchor off, 0.5 sone ====\n")
 for (nm in c("e1500_s20", "e2000_s20", "e2000_s30", "e3000_s40")) {
   cs <- case("sweep", "off", nm, 0.5)
   left <- cs$r10$cap - cs$r10$sones_opt
-  b_c <- sii_of(cs, cs$g10, "johnson2011_complete")$sii; b_a <- sii_of(cs, cs$g10, "none")$sii
+  b_c <- sii_of(cs, cs$g10, "johnson2011_desensitized")$sii; b_a <- sii_of(cs, cs$g10, "none")$sii
   b_L <- loud_of(cs, cs$g10)
   cat(sprintf("\n  %s   floor effect: complete %+.4f  ANSI %+.4f   budget left at -10 dB: %.3f sones\n",
               nm, cs$r10$sii_complete - cs$r0$sii_complete, cs$r10$sii_ansi - cs$r0$sii_ansi, left))
   for (k in 4:6) {
     g <- cs$g10; g[k] <- g[k] + 3
     cat(sprintf("    +3 dB at %4d Hz: d complete %+.4f  d ANSI %+.4f  d loudness %+.3f\n", hl[k],
-                sii_of(cs, g, "johnson2011_complete")$sii - b_c,
+                sii_of(cs, g, "johnson2011_desensitized")$sii - b_c,
                 sii_of(cs, g, "none")$sii - b_a, loud_of(cs, g) - b_L))
   }
 }

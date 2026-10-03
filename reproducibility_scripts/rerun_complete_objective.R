@@ -1,7 +1,7 @@
 ## rerun_complete_objective.R ---------------------------------------------------
 ## Reruns every optimization behind Tables 3-5 and Figure 2 with Open-NL's
 ## objective set to the complete Johnson & Dillon (2011) desensitized SII, the
-## new default in R/open_nl.R (objective_sii = "johnson2011_complete").
+## new default in R/open_nl.R (objective_sii = "johnson2011_desensitized").
 ##
 ## Steps, in order of importance (so an interrupted run still has the key parts):
 ##   1. Iso-loudness control, anchor on, A1-A7            14 optimizations
@@ -61,8 +61,8 @@ loss_of <- function(p) if (p == "a6") rep(30, 6) else if (p == "a7") rep(50, 6) 
 
 ## ---- preconditions -------------------------------------------------------------
 obj_default <- eval(formals(open_nl)$objective_sii)[1]
-if (!identical(obj_default, "johnson2011_complete"))
-  stop("open_nl()'s objective_sii default is not johnson2011_complete; update R/open_nl.R first.")
+if (!identical(obj_default, "johnson2011_desensitized"))
+  stop("open_nl()'s objective_sii default is not johnson2011_desensitized; update R/open_nl.R first.")
 s <- readLines("R/sii.R")
 if (!any(grepl("^\\s*gain <- final_output - speech\\s*$", s)))
   stop("R/sii.R does not carry the negative-gain fix.")
@@ -79,7 +79,7 @@ find1 <- function(pattern) {
 i_cap <- find1("if (!is.null(cap_override)) dynamic_cap <- cap_override")
 i_fin <- find1("clamped_shifts <- pmax(-60, pmin(30, best_shifts))")
 i_anc <- find1("anchor_penalty <- sum(abs(shifts)) * 0.1")
-i_obj <- find1("desensitization = objective_sii,")
+i_obj <- find1("desensitization = objective_sii)")
 
 instrument <- function(anchor_on) {
   s2 <- src
@@ -122,7 +122,7 @@ run_one <- function(set, anchor, profile, htl, loss, cap, budget, fl, starts) {
     sones_opt   = if (is.null(ll)) NA_real_ else ll[["sones"]],
     sones_model = loudness_of(EVAL_LVL, g, htl, loss)$total,
     objective   = -.open_nl_dbg$final_obj,
-    sii_complete = report_sii(tgt, "johnson2011_complete"),
+    sii_complete = report_sii(tgt, "johnson2011_desensitized"),
     sii_ansi     = report_sii(tgt, "none"),
     g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
     stringsAsFactors = FALSE)
@@ -262,7 +262,7 @@ iso <- d[d$set == "iso", ]
 get_iso <- function(anc, p, fl, col) iso[iso$anchor == anc & iso$profile == p & iso$floor == fl, col]
 nal_sii <- sapply(names(nal), function(p) {
   t <- build_target(hl_freqs, sp, nal[[p]]$htl, nal[[p]]$loss, nal[[p]]$gain, EVAL_LVL)
-  c(complete = report_sii(t, "johnson2011_complete"), ansi = report_sii(t, "none"))
+  c(complete = report_sii(t, "johnson2011_desensitized"), ansi = report_sii(t, "none"))
 })
 
 cat("\n\n==== TABLE 4: iso-loudness control, complete SII, anchor on ====\n")

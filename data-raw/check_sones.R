@@ -31,13 +31,13 @@ for (p in profiles) {
   # ANSI SII (no desensitization)
   sii_open_ansi <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = open_nl_tgt, desensitization = "none", interpolate = TRUE)
   # Effective SII (complete)
-  sii_open_eff <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = open_nl_tgt, desensitization = "johnson2011_complete", interpolate = TRUE)
+  sii_open_eff <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = open_nl_tgt, desensitization = "johnson2011_desensitized", interpolate = TRUE)
   # C++ Sones
   l_open <- SII:::calculate_loudness(sii_open_eff)$total
   
   # 2. Evaluate NAL-NL2
   sii_nal_ansi <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = temp_nal, desensitization = "none", interpolate = TRUE)
-  sii_nal_eff <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = temp_nal, desensitization = "johnson2011_complete", interpolate = TRUE)
+  sii_nal_eff <- sii(speech = open_nl_tgt$speech, threshold = loss, freq = freqs, loss = cond, prescription = temp_nal, desensitization = "johnson2011_desensitized", interpolate = TRUE)
   l_nal <- SII:::calculate_loudness(sii_nal_eff)$total
   
   cat(sprintf("%s\tNAL-NL2\t%.3f\t%.3f\t%.2f\n", toupper(p), sii_nal_ansi$sii, sii_nal_eff$sii, l_nal))

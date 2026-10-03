@@ -41,8 +41,8 @@ for (i in if(is_smoke) 1:2 else 1:7) {
       tgt_nal <- build_target(hl_freqs, speech_spec, threshold_6, loss_6, nal_gain_6, eval_level=lvl)
       ansi_sii_nal <- report_sii(tgt_nal, "none", nal_ldf=FALSE)
       
-      eff_sii_onl <- report_sii(tgt_onl, "johnson2011_complete")
-      eff_sii_nal <- report_sii(tgt_nal, "johnson2011_complete")
+      eff_sii_onl <- report_sii(tgt_onl, "johnson2011_desensitized")
+      eff_sii_nal <- report_sii(tgt_nal, "johnson2011_desensitized")
       
       sones_onl <- loudness_of(lvl, onl_gain_6, threshold_6, loss_6)$total
       sones_nal <- loudness_of(lvl, nal_gain_6, threshold_6, loss_6)$total

@@ -107,8 +107,8 @@ run_cell <- function(job_idx, prof_list) {
   if (is.null(res$error)) {
     tgt <- build_target(hl_freqs, input_speech, htl, loss, res$gain, eval_level = lvl)
     sii_smoothed_s <- report_sii(tgt, "johnson2011_smoothed", desensitization_scale = s)
-    sii_complete_s <- report_sii(tgt, "johnson2011_complete", desensitization_scale = s)
-    sii_complete_full <- report_sii(tgt, "johnson2011_complete")
+    sii_complete_s <- report_sii(tgt, "johnson2011_desensitized", desensitization_scale = s)
+    sii_complete_full <- report_sii(tgt, "johnson2011_desensitized")
     sii_ansi <- report_sii(tgt, "none", nal_ldf = FALSE)
     ldn_val <- loudness_of(lvl, res$gain, htl, loss)$total
     

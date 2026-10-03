@@ -26,7 +26,7 @@ for (i in 1:n_samples) {
                     prescription=list(gain=gain, freq=freqs), desensitization="johnson2011_smoothed")
                     
   sii_comp <- sii(speech=ltass_65, noise=rep(-50,6), threshold=t_scaled, freq=freqs,
-                  prescription=list(gain=gain, freq=freqs), desensitization="johnson2011_complete")
+                  prescription=list(gain=gain, freq=freqs), desensitization="johnson2011_desensitized")
                   
   diffs[i] <- sii_comp$sii - sii_smooth$sii
 }

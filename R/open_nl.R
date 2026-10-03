@@ -35,7 +35,7 @@
 #' @param booster_onset Threshold for the severe-loss booster (default: 70).
 #' @param disable_sdlfp Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).
 #' @param cap_rule Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.
-#' @param objective_sii SII version maximized by the optimizer: "johnson2011_complete" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).
+#' @param objective_sii SII version maximized by the optimizer: "johnson2011_desensitized" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).
 #'
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
@@ -50,10 +50,15 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
                     abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
-                    cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_complete", "none")) {
+                    cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_desensitized", "none")) {
   if ("desensitization_scale" %in% names(list(...)))
     stop("'desensitization_scale' has been removed; use objective_sii = \"none\" ",
-         "or \"johnson2011_complete\".", call. = FALSE)
+         "or \"johnson2011_desensitized\".", call. = FALSE)
+  if (identical(objective_sii, "johnson2011_complete")) {
+    warning('objective_sii = "johnson2011_complete" is deprecated; ',
+            'use "johnson2011_desensitized".', call. = FALSE)
+    objective_sii <- "johnson2011_desensitized"
+  }
   cap_rule <- match.arg(cap_rule); objective_sii <- match.arg(objective_sii)
   
   if (length(speech) == 1) {

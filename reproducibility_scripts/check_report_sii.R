@@ -43,12 +43,12 @@ check_case <- function(prof, lvl, use_nal = FALSE, d_scale = 1.0) {
   c_int <- sii(speech = speech_spec_base, noise = rep(-50, 6), 
                threshold = t_val, loss = loss, freq = freqs, 
                prescription = temp_target, interpolate = TRUE, 
-               nal_ldf = TRUE, desensitization = "johnson2011_complete",
+               nal_ldf = TRUE, desensitization = "johnson2011_desensitized",
                desensitization_scale = d_scale)$sii
                
   tgt <- build_target(freqs, speech_spec_base, t_val, loss, gain_vec, eval_level = lvl)
   s_rep <- report_sii(tgt, "johnson2011_smoothed", desensitization_scale = d_scale)
-  c_rep <- report_sii(tgt, "johnson2011_complete", desensitization_scale = d_scale)
+  c_rep <- report_sii(tgt, "johnson2011_desensitized", desensitization_scale = d_scale)
   
   d_s <- abs(s_int - s_rep)
   d_c <- abs(c_int - c_rep)

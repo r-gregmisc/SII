@@ -44,19 +44,24 @@ sii <- function(
 {
   if ("desensitization_scale" %in% names(list(...)))
     stop("'desensitization_scale' has been removed; use desensitization = \"none\" ",
-         "or \"johnson2011_complete\".", call. = FALSE)
+         "or \"johnson2011_desensitized\".", call. = FALSE)
 
   # Map backwards-compatible boolean to new string identifier
   if (is.logical(desensitization)) {
     if (desensitization) {
-      desensitization <- "johnson2011_complete"
+      desensitization <- "johnson2011_desensitized"
     } else {
       desensitization <- "none"
     }
   }
+  if (identical(desensitization, "johnson2011_complete")) {
+    warning('desensitization = "johnson2011_complete" is deprecated; ',
+            'use "johnson2011_desensitized".', call. = FALSE)
+    desensitization <- "johnson2011_desensitized"
+  }
   if (!is.character(desensitization) || length(desensitization) != 1 ||
-      !desensitization %in% c("none", "johnson2011_complete"))
-    stop('`desensitization` must be TRUE, FALSE, "johnson2011_complete" or "none".')
+      !desensitization %in% c("none", "johnson2011_desensitized"))
+    stop('`desensitization` must be TRUE, FALSE, "johnson2011_desensitized" or "none".')
 
   ## Assumptions:
   ##
@@ -527,7 +532,7 @@ sii <- function(
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
   sii.tab$"Ki" <- enforce.range( sii.tab$"Ki" )
   
-  if (desensitization == "johnson2011_complete") {
+  if (desensitization == "johnson2011_desensitized") {
     # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
     # Use sensorineural threshold only (subtract conductive component)
     T_sn <- pmax(sii.tab$"T'i" - sii.tab$"Ji", 0)

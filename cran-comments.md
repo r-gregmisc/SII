@@ -11,7 +11,9 @@ This is an update from the previous CRAN release to version 1.3.0. Main changes
   as `cap_rule = "legacy"`).
 * The `"johnson2011_smoothed"` desensitization option and the
   `desensitization_scale` argument were removed; desensitization is now
-  either the ANSI SII or the full Johnson & Dillon (2011) correction.
+  either the ANSI SII or the full Johnson & Dillon (2011) correction,
+  now named `"johnson2011_desensitized"` (the old name `"johnson2011_complete"`
+  is accepted with a deprecation warning).
 
 ## Test environments
 

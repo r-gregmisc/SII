@@ -11,7 +11,7 @@
 ##
 ## This script re-optimizes profiles A1-A5 at NAL-NL2's own loudness (the
 ## iso-loudness control), both floors, anchor penalty on and off, with the
-## objective's SII switched to "johnson2011_complete" in an in-memory copy of
+## objective's SII switched to "johnson2011_desensitized" in an in-memory copy of
 ## R/open_nl.R. Nothing else changes. Scores every solution on all three SII
 ## versions and prints the complete-SII floor effect beside the reported one.
 ##
@@ -61,7 +61,7 @@ i_anc <- grep("anchor_penalty <- sum(abs(shifts)) * 0.1", src, fixed = TRUE)
 if (length(i_obj) != 1 || length(i_anc) != 1) {
   sink(); stop("Could not find the objective's SII call or the anchor line in R/open_nl.R.")
 }
-src[i_obj] <- sub("johnson2011_smoothed", "johnson2011_complete", src[i_obj], fixed = TRUE)
+src[i_obj] <- sub("johnson2011_smoothed", "johnson2011_desensitized", src[i_obj], fixed = TRUE)
 build <- function(s) {
   tmp <- tempfile(fileext = ".R"); writeLines(s, tmp)
   e <- new.env(parent = ns); sys.source(tmp, envir = e)
@@ -95,7 +95,7 @@ for (p in paste0("a", 1:5)) {
     tgt <- build_target(hl_freqs, sp, htl, loss, g, EVAL_LVL)
     row <- data.frame(profile = p, anchor = anc, floor = fl, starts = STARTS,
                       cap = nal_loud, sones = loudness_of(EVAL_LVL, g, htl, loss)$total,
-                      sii_complete = report_sii(tgt, "johnson2011_complete"),
+                      sii_complete = report_sii(tgt, "johnson2011_desensitized"),
                       sii_smooth   = report_sii(tgt, "johnson2011_smoothed"),
                       sii_ansi     = report_sii(tgt, "none"),
                       g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],

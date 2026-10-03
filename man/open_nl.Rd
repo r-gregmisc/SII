@@ -31,7 +31,7 @@ open_nl(
   booster_onset = 70,
   disable_sdlfp = FALSE,
   cap_rule = c("normal", "legacy"),
-  objective_sii = c("johnson2011_complete", "none")
+  objective_sii = c("johnson2011_desensitized", "none")
 )
 
 \method{print}{prescription_target}(x, ...)
@@ -87,7 +87,7 @@ open_nl(
 
 \item{cap_rule}{Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.}
 
-\item{objective_sii}{SII version maximized by the optimizer: "johnson2011_complete" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).}
+\item{objective_sii}{SII version maximized by the optimizer: "johnson2011_desensitized" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).}
 
 \item{x}{Object for S3 method.}
 
