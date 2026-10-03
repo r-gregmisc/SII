@@ -1,6 +1,6 @@
 #let horizontalrule = line(start: (25%,0%), end: (75%,0%))
 #set par.line(numbering: "1")
-#set par(first-line-indent: 0.5in, leading: 1em, spacing: 1em)
+#set par(first-line-indent: (amount: 0.5in, all: true), leading: 2em, spacing: 2em)
 #show terms: it => {
   it.children
     .map(child => [
@@ -117,17 +117,8 @@
 
 
 #show: doc => conf(
-  title: [Loudness budget constraints on high-frequency amplification in
-precipitous hearing loss],
-  authors: (
-    ( name: [Mark Shaver],
-      affiliation: [Wichita State University \
-Department of Communication Sciences and Disorders \
-Wichita, KS, USA
-
-],
-      email: [mark.shaver\@wichita.edu] ),
-    ),
+  title: none,
+  authors: (),
   font: ("Linux Libertine",),
   fontsize: 12pt,
   pagenumbering: "1",
@@ -135,71 +126,103 @@ Wichita, KS, USA
   doc,
 )
 
+// ---- JAAA title page --------------------------------------------------
+// Per JAAA Author Instructions (audiology.org, updated 2024): page one
+// carries the submission date, full title, author names with academic
+// degrees, institutional affiliations, corresponding-author contact
+// details, prior-presentation information (if any), and acknowledgments
+// or grant numbers. Fill in the bracketed placeholders and delete this
+// comment block and the page break below if the submission portal
+// collects this information separately instead.
+
+#block[
+#set par.line(numbering: none)
+#align(center)[
+  #text(size: 1.3em, weight: "bold")[
+    Loudness budget constraints on high-frequency amplification in
+    precipitous hearing loss
+  ]
+
+  #v(1.5em)
+  Mark Shaver, Ph.D.
+
+  Department of Communication Sciences and Disorders \
+  Wichita State University \
+  Wichita, KS, USA
+
+  #v(1.5em)
+  #par(justify: false)[
+    #strong[Corresponding author:] Mark Shaver, Ph.D. \
+    517 Oakwood St. \
+    Rose Hill, KS 67133 \
+    Phone: 1-316-208-9588 \
+    Email: mark.shaver\@wichita.edu
+  ]
+
+  #v(1.5em)
+  #strong[Date of submission:] #text(style: "italic")[\[date\]]
+
+  #v(1em)
+  #strong[Prior presentation:] None
+
+  #v(1em)
+  #strong[Acknowledgments / funding:] No grant support was received for
+  this work; see Acknowledgments section.
+]
+]
+
+#pagebreak()
+
 
 == Abstract
 <abstract>
 #strong[Background:] In precipitous high-frequency hearing loss,
-achieving sufficient audibility in the high frequencies is notoriously
-difficult. Historically, this limitation has been attributed to the
-choice of prescriptive fitting rationale or to inherent physiological
-damage.
+restoring high-frequency audibility is difficult, usually attributed to
+the fitting rationale or to physiological damage.
 
-#strong[Purpose:] This study examines an additional, structural
-explanation based on loudness budget arithmetic: unamplified speech
-energy in the residual normal-hearing low frequencies consumes much of
-the acceptable loudness budget before any gain is prescribed, reducing
-the capacity available to restore high-frequency audibility.
+#strong[Purpose:] To test a structural explanation: unamplified speech
+in the residual low frequencies consumes much of the loudness budget before any gain is prescribed.
 
-#strong[Research Design:] A computational modeling study using the AUDMOD specific-loudness
-model alongside the Speech Intelligibility Index (SII).
+#strong[Research Design:] Computational modeling with the AUDMOD
+specific-loudness model and the Speech Intelligibility Index (SII).
 
-#strong[Study Sample:] N/A (computational modeling of seven canonical
-audiometric profiles and sixteen synthetic audiograms).
+#strong[Study Sample:] Seven canonical audiometric profiles and sixteen
+synthetic audiograms.
 
 #strong[Data Collection and Analysis:] The loudness budget was
-decomposed for seven canonical profiles at 50, 65, and 80 dB SPL. A
-systematic sweep then crossed four audible edge frequencies with four
-high-frequency slopes, evaluated at four loudness budgets, three
-desensitization scales, and two minimum-gain floors (0 and -10 dB),
-optimizing each floor separately and comparing solutions at matched
-loudness. Finally, an iso-loudness control constrained a speech
-intelligibility maximizer to NAL-NL2's own achieved loudness for each
-profile, isolating the cost of the 0 dB insertion floor.
+decomposed at 50, 65, and 80 dB SPL. At 65 dB SPL, gains were optimized
+with minimum insertion-gain floors of 0 and -10 dB, in a sweep of
+audible edge, slope, and loudness budget and in an iso-loudness control
+matched to NAL-NL2. Solutions optimized
+on a smoothed desensitized SII were scored with it, the published
+Johnson and Dillon correction, and the ANSI SII, with and without the
+optimizer's anchor penalty.
 
 #strong[Results:] For profile A4 at 65 dB SPL, unamplified speech
-consumes 64% of the normative loudness ceiling before any prescriptive
-gain is applied. Relaxing the minimum-gain floor from 0 to -10 dB
-improved the desensitized SII by 0.038 to 0.079 where the audible edge
-lay at 1000 Hz and by 0.009 to 0.023 at 1500 Hz, against an optimizer
-resolution limit of 0.007; at 2000 and 3000 Hz the benefit was not
-distinguishable from solver noise. At matched loudness, the freed
-capacity was drawn from the low frequencies and from 8 kHz and spent in
-the 2--4 kHz region. In the iso-loudness control the floor effect was
-largest for the moderate sloping profile A3 (+0.073) and smaller for the
-precipitous profiles A4 (+0.020) and A5 (+0.009), shrinking further as
-the desensitization penalty strengthened.
+consumed 64% of the normative ceiling. At the tightest budget
+and a 1000 Hz audible edge, relaxing the floor improved the SII by 0.017
+to 0.050 across metrics (resolution limit 0.006); at higher
+edges the benefit was at most 0.012. Under the published correction,
+the iso-loudness floor effect was +0.045 for moderate sloping profile A3
+and negligible for precipitous profiles A4 and A5. Without the anchor penalty, A4 and A5 gained 0.037 to 0.086 under
+the smoothed and ANSI SII but at most 0.006 under the published
+correction. The benefit came from high-frequency gain funded by a
+low-frequency cut.
 
-#strong[Conclusions:] Loudness crowding-out is a general structural
-boundary for profiles combining robust low-frequency hearing with
-impaired high frequencies, but its measurable benefit is confined to
-losses with a relatively low audible edge and is progressively
-discounted by physiological desensitization. Realizing it requires
-negative low-frequency insertion gain (attenuation below the unaided
-ear-canal level), achievable only with an occluding earmold that these
-listeners are unlikely to tolerate --- which is an argument for
-frequency-lowering signal processing rather than for more
-high-frequency gain.
+#strong[Conclusions:] Residual low-frequency hearing consumes most of
+the loudness budget before gain is applied. Whether relaxing the floor
+helps depends on how strongly desensitization discounts high-frequency
+audibility. Because negative low-frequency
+insertion gain requires an unvented fitting, the modeled benefit does
+not justify sacrificing venting unless desensitization is mild.
 
-#strong[Clinical Relevance Statement:] Clinicians who cannot fully
-restore high-frequency audibility in sloping or precipitous losses
-should recognize that a structural loudness ceiling, not necessarily an
-inadequate fitting, may be limiting the achievable gain, particularly
-when low-frequency hearing is largely spared. Because realizing more of
-this budget requires occluding the ear canal, which produces an
-occlusion effect these patients are unlikely to tolerate, approaches
-that deliver high-frequency cues where hearing is better, such as
-frequency lowering, may warrant consideration over further
-high-frequency gain.
+#strong[Clinical Relevance Statement:] In precipitous loss, freeing the
+loudness budget consumed by residual low-frequency hearing requires an
+unvented fitting and, under current desensitization models, adds little
+intelligibility. Open fittings remain an appropriate default, and
+frequency lowering may warrant consideration when more high-frequency
+information is needed.
+
 == Introduction
 <introduction>
 In the fitting of precipitous or profound high-frequency hearing loss,
@@ -208,16 +231,16 @@ loudness targets is a central clinical challenge. Historically, the
 failure to restore high-frequency audibility has been attributed to the
 inherent physiological damage of the auditory periphery---specifically,
 hearing-loss desensitization and dead regions @moore2001, which render
-severe high-frequency amplification effectively useless for speech
-recognition @ching1998@hogan1998. Consequently, modern prescriptive
-rationales like NAL-NL2 @keidser2011 deliberately limit high-frequency
-gain for profound thresholds to avoid prescribing "wasted"
+high-frequency amplification for a severe loss or greater effectively
+useless for speech recognition @ching1998@hogan1998. Consequently, modern
+prescriptive rationales like NAL-NL2 @keidser2011 deliberately limit
+high-frequency gain for profound thresholds to avoid prescribing "wasted"
 amplification.
 
-While desensitization dictates the #emph[utility] of high-frequency
+While desensitization dictates the utility of high-frequency
 gain, it is proposed that the fundamental arithmetic of broadband
 loudness summation acts as a parallel, independent structural constraint
-on the #emph[capacity] to provide that gain. For a given audiogram and
+on the capacity to provide that gain. For a given audiogram and
 input level, unamplified speech inherently produces a baseline quantity
 of loudness ($L_0$) through residual hearing. If a patient's overall
 target loudness is constrained by a normative ceiling ($L_(c a p)$), the
@@ -225,7 +248,7 @@ model-predicted loudness budget available to "purchase" high-frequency
 audibility via prescriptive gain is defined as $L_(c a p) - L_0$.
 Because this relationship is governed entirely by the auditory periphery
 and the acoustic speech spectrum, it acts as a fundamental boundary
-condition that profoundly constrains loudness-based rationales (e.g.,
+condition that heavily constrains loudness-based rationales (e.g.,
 NAL-NL2) and any theoretical attempt at intelligibility maximization.
 
 While patient preference and some audiological paradigms often favor
@@ -235,32 +258,34 @@ standard ANSI S3.5-1997 Speech Intelligibility Index (SII) @ansi1997
 assigns the bulk of its importance weighting to the 1-4 kHz speech
 bands, with relatively little weight applied below 500 Hz. Consequently,
 an unconstrained intelligibility-maximizing algorithm operating under a
-strict loudness budget will systematically attenuate low-frequency
-audibility, as well as audibility at 8 kHz where the importance
-weighting is likewise low, to fund high-frequency gain. While it is a
-mathematical axiom that relaxing a constraint in an optimization
-algorithm yields a higher theoretical optimum, the clinical relevance
-lies in quantifying the sheer magnitude of this trade-off for realistic
-audiometric profiles. By framing this behavior as an efficiency
-statement relative to an absolute budget, this analysis quantifies the
-exact degree to which "broadband loudness crowding-out" limits
-high-frequency restoration, investigating whether it is uniquely tied to
-precipitous losses or represents a general property of near-normal
-low-frequency hearing.
+strict loudness budget will tend to attenuate low-frequency audibility
+to fund high-frequency gain. While it is a mathematical axiom that
+relaxing a constraint in an optimization algorithm yields a higher
+theoretical optimum, the clinical relevance lies in quantifying the
+magnitude of this trade-off for realistic audiometric profiles, and in
+whether it survives when the index is corrected for desensitization. By
+framing this behavior as an efficiency statement relative to an
+absolute budget, this analysis quantifies the degree to which
+"broadband loudness crowding-out" limits high-frequency restoration,
+investigating whether it is uniquely tied to precipitous losses or
+represents a general property of near-normal low-frequency hearing.
 
 == Methods
 <methods>
 === The AUDMOD Specific-Loudness Model
 <the-audmod-specific-loudness-model>
 To isolate the model-predicted loudness constraints operating on the
-speech spectrum, the canonical AUDMOD specific-loudness model was
+speech spectrum, the AUDMOD specific-loudness model @bramslow1993@bramslow2004 was
 utilized. This model converts acoustic excitation patterns into specific
 loudness (sones/ERB) and integrates them across the frequency spectrum
 to predict overall broadband loudness. By benchmarking the raw,
-unamplified long-term average speech spectrum (LTASS) @byrne1994 through
-this model using the seven standard hypothetical audiometric profiles
-established by Johnson and Dillon @johnson2011, the baseline loudness
-($L_0$) natively generated by residual hearing was established.
+unamplified long-term average speech spectrum (LTASS) through this model
+using the seven standard hypothetical audiometric profiles established
+by #cite(<johnson2011>, form: "prose"), the baseline loudness ($L_0$)
+natively generated by residual hearing was established. Throughout this
+work the LTASS is the ANSI S3.5-1997 standard speech spectrum for normal
+vocal effort @ansi1997, scaled to the evaluation level; the same
+spectrum feeds both the loudness model and the SII calculation.
 
 === Study Sample and Audiometric Profiles
 <study-sample-and-audiometric-profiles>
@@ -391,6 +416,26 @@ at 9.0333 sones across every input grid spacing tested, ensuring the
 analyses reported here are unaffected. We do not claim the absolute
 scale is either correct or incorrect.
 
+=== Intelligibility Metrics
+<intelligibility-metrics>
+Three versions of the SII were used. The #emph[ANSI SII] is the index
+as standardized @ansi1997, with no correction for desensitization. The
+#emph[complete] desensitized SII applies the published
+#cite(<johnson2011>, form: "prose") correction, which combines each
+band's audibility with a level-dependent desensitization factor through
+a power mean. The #emph[smoothed] desensitized SII is Open-NL's
+approximation to that correction: it multiplies each band's audibility
+by the same desensitization factor instead. The complete formulation is
+discontinuous where the exponent of its power mean passes through zero,
+which impedes simplex search, so the smoothed version serves as the
+optimizer's objective.
+
+Every solution reported here was optimized once, on the smoothed SII,
+and then scored with all three metrics. Because the optimizer never
+targets the complete or ANSI SII, nothing guarantees that relaxing the
+floor improves either of them; a negative floor effect under those
+metrics is therefore a genuine result rather than solver noise.
+
 === Optimization Procedure
 <optimization-procedure>
 The underlying optimization routine utilized a multi-start Nelder-Mead simplex algorithm over six free parameters: a gain shift at each audiometric octave frequency from 250 to 8000 Hz, applied on top of the Open-NL heuristic prescription and interpolated logarithmically across the 21 analysis bands. All Open-NL runs used the package defaults for
@@ -417,11 +462,25 @@ prescription) and the roughness penalty, additional restarts improve the
 objective and can return solutions with lower SII.
 
 Additionally, the number of random restarts (`open_nl_starts`) is a
-fixed setting (set to 20) whose value alters the prescribed gains due to
-the non-convex parameter space. (Note that because the random number
-generator seed is deterministic based on the audiogram and level,
-repeated runs are bit-identical and cannot be used to estimate
-variability.)
+fixed setting (set to 20 unless stated otherwise) whose value alters
+the prescribed gains due to the non-convex parameter space. (Note that
+because the random number generator seed is deterministic based on the
+audiogram and level, repeated runs are bit-identical and cannot be used
+to estimate variability. For the same reason, a run with 40 restarts
+repeats the first 20 exactly and adds 20 more, so its penalized
+objective can only equal or improve on the 20-restart result.)
+
+The anchor penalty charges 0.1 objective points per dB of shift away
+from the heuristic prescription, which the optimizer floors at 0 dB
+before shifts are applied, so driving two low-frequency bands to the
+-10 dB floor costs at least 0.02 in SII-equivalent units. Because this
+is the same order as the floor effects of interest, the tightest-budget
+sweep and the iso-loudness control were repeated with the anchor weight
+set to zero (20 restarts). Without the anchor, the only remaining
+regularization is the weak roughness penalty, so these solutions
+indicate what is attainable in principle rather than realistic
+prescriptions; anchor-on and anchor-off results are reported together
+as a bracket.
 
 == Results
 <results>
@@ -513,20 +572,19 @@ A5) across the entire dynamic range. As illustrated in Figure 1, the
 fraction of the loudness budget consumed by unamplified speech rises
 with input level for every profile, so the constraint tightens as speech
 gets louder. Profile A4 consumes 58.5%, 63.9%, and 68.1% of the ceiling
-at 50, 65, and 80 dB SPL respectively---roughly twice the fraction
-consumed by the mild (A1: 12.7%, 29.3%, 41.2%) and moderate sloping (A3:
-13.7%, 25.3%, 35.8%) profiles, and substantially more than the reverse
-slope profile (A2: 0.7%, 14.7%, 30.0%). Profile A5 consumes a smaller
+at 50, 65, and 80 dB SPL respectively---4.6, 2.2, and 1.7 times the
+fraction consumed by the mild profile (A1: 12.7%, 29.3%, 41.2%), and
+well above the moderate sloping (A3: 13.7%, 25.3%, 35.8%) and reverse
+slope (A2: 0.7%, 14.7%, 30.0%) profiles. Profile A5 consumes a smaller
 fraction than A4 (36.6%, 48.1%, 54.0%) despite being the more profound
 loss; this is because A5's high-frequency thresholds are so elevated
 that unamplified speech is largely inaudible there and contributes
 little loudness. Crucially, if a prescriptive formula enforces a rigid
 low-frequency insertion gain floor of 0 dB (preventing attenuation),
 these $L_0$ values cannot be reduced. What remains is thus far short of
-the immense high-frequency gain required to cross the profound
-high-frequency thresholds, and high-frequency audibility is
-systematically crowded out by residual low-frequency hearing at all
-input levels.
+the high-frequency gain required to cross the profound high-frequency
+thresholds, so high-frequency audibility is crowded out by residual
+low-frequency hearing at all input levels.
 
 === The Audiogram Family Sweep
 <the-audiogram-family-sweep>
@@ -557,50 +615,130 @@ paper disables the dual-run branch so that each floor is optimized
 exactly once at the floor requested (the original package behavior is
 documented in a separate issue). The affected results have been
 recomputed under this corrected methodology and are reported below as
-side-by-side solutions with their achieved loudness.
+side-by-side solutions with their achieved loudness. The original
+analysis also varied the strength of the desensitization penalty; those
+conditions changed the optimizer's objective rather than only the
+scoring, and are not reported.
 
 Sixteen synthetic audiograms crossing four audible edge frequencies
 (1000, 1500, 2000, 3000 Hz) with four high-frequency slopes (20, 30, 40,
 50 dB/octave) were evaluated at four loudness budgets (0.5, 1, 2, and 3
-sones above each listener's own unaided loudness), three desensitization
-scales (0, 0.5, 1), and two minimum-gain floors (0 and -10 dB). Each
-floor was optimized once at the floor requested with 20 random restarts,
-and solutions at the two floors are reported side by side with their
-achieved loudness rather than as a difference.
+sones above each listener's own unaided loudness) and two minimum-gain
+floors (0 and -10 dB), giving 64 paired cells. Each floor was optimized
+once, on the smoothed SII, at the floor requested with 20 random
+restarts, and each solution was scored with the smoothed, complete, and
+ANSI SII.
 
-In 133 of the 192 paired cells, the two solutions differ in achieved
-loudness by no more than 0.001 sones, so the comparison is like-for-like
-at matched loudness; the cells that fail this test are concentrated at
-the loosest budget, where the loudness cap stops binding and the
-optimizer no longer spends the capacity available to it.
+At the tightest budget the loudness cap should bind at both floors, yet
+six of the 16 pairs initially differed in achieved loudness by more
+than 0.001 sones. These six were re-optimized at both floors with 40
+restarts. Two became matched, and a third (0.001 sones) was matched in
+all but name; the other three still stopped short of the cap at the
+-10 dB floor, by 0.004 to 0.028 sones. With the anchor penalty removed,
+two of those three reached the cap to within 0.0002 sones, indicating
+that the shortfall was an optimum of the penalized objective, in which
+spending the last of the budget cost more in anchor penalty than it
+gained in SII, rather than a failure to converge. The 40-restart
+solutions replace the originals in what follows.
 
-A negative difference between floors is impossible in a genuine
-comparison, since the 0 dB feasible set is contained within the -10 dB
-set. Across the 133 paired cells at matched loudness, 46 such excursions
-occur; their median magnitude is 0.0009 and the largest is 0.0074. We
-take the maximum as the optimizer's resolution limit, so differences
-below roughly 0.007 are not distinguishable from solver noise.
+After this rerun, 41 of the 64 paired cells match in achieved loudness
+to within 0.001 sones (12, 12, 9, and 8 of 16 at budgets of 0.5, 1, 2,
+and 3 sones). Where a pair is unmatched it is usually the -10 dB
+solution that leaves budget unspent, and this becomes more common as
+the budget loosens and the cap binds less tightly.
 
-At the tightest budget, the mean SII change from relaxing the floor is
-0.079, 0.054, and 0.038 at a 1000 Hz audible edge for desensitization
-scales 0, 0.5, and 1 respectively; 0.023, 0.016, and 0.009 at 1500 Hz;
-0.010, 0.008, and 0.005 at 2000 Hz; and approximately zero at 3000 Hz.
-The effect declines monotonically with desensitization scale and with
-loudness budget. It is unambiguous at 1000 and 1500 Hz, comparable to
-the resolution limit at 2000 Hz, and indistinguishable from zero at 3000
-Hz. At the tightest budget and a 1000 Hz audible edge, averaged across
-desensitization scales, prescribed gain falls by 6.8 dB at 500 Hz, 3.3
-dB at 1000 Hz, and 7.9 dB at 8 kHz, and rises by 10.0 dB at 2000 Hz and
-6.4 dB at 4000 Hz. Because the paired solutions are at matched loudness, these changes trade off against one another: capacity is drawn from the near-normal low frequencies and from 8 kHz, and spent in the 2-4 kHz region. The reduction at 8 kHz reflects two features of the implementation. The SII assigns little importance to that region, and the loudness model extrapolates the aided spectrum above 8 kHz at -24 dB per octave from the 8 kHz value, so gain there incurs loudness from a spectral region the SII does not score.
+A negative difference between floors is impossible for a genuine
+optimum of the optimized metric, since the 0 dB feasible set is
+contained within the -10 dB set. Across the 41 matched pairs, 15
+smoothed-SII differences are negative; their median magnitude is 0.0008
+and the largest is 0.0056. We take the maximum, rounded to 0.006, as the
+optimizer's resolution limit, so smoothed-SII differences below that
+value are not distinguishable from solver noise. The limit applies only
+to the smoothed SII; as noted in the Methods, negative differences under
+the complete and ANSI SII are genuine.
+
+#strong[Table 3. Audiogram Family Sweep: Mean Floor Effect (SII at -10 dB
+minus SII at 0 dB) at the 0.5-Sone Budget, by Audible Edge, with the
+Anchor Penalty On and Off]
+
+#figure(
+  align(center)[#table(
+    columns: 7,
+    align: (left,left,left,left,left,left,left,),
+    table.header([Audible edge], [Smoothed (on)], [Smoothed (off)],
+      [Complete (on)], [Complete (off)], [ANSI (on)], [ANSI (off)],),
+    table.hline(),
+    [1000 Hz], [+0.036], [+0.053], [+0.017], [+0.022], [+0.050], [+0.094],
+    [1500 Hz], [+0.009], [+0.023], [+0.001], [+0.005], [+0.012], [+0.040],
+    [2000 Hz], [+0.005], [+0.012], [+0.003], [+0.006], [+0.007], [+0.019],
+    [3000 Hz], [+0.000], [+0.001], [+0.000], [-0.000], [+0.001], [+0.002],
+  )]
+  , kind: table
+  )
+
+Table 3 gives the floor effect at the tightest budget, averaged over the
+four slopes at each audible edge. With the anchor penalty on, the effect
+at the 1000 Hz edge is 0.036 under the smoothed SII, 0.017 under the
+complete SII, and 0.050 under the ANSI SII, exceeding the resolution
+limit under all three. At the 1500 Hz edge it exceeds the limit under
+the smoothed and ANSI SII (0.009 and 0.012) but not under the complete
+SII (0.001). At the 2000 and 3000 Hz edges it is comparable to or below
+the limit under every metric. The effect falls quickly as the budget loosens: at
+1 sone only the 1000 Hz edge shows a benefit (0.011 smoothed, 0.001
+complete, 0.017 ANSI), and at 2 and 3 sones none of the edges do.
+
+Removing the anchor penalty increases the tightest-budget floor effect
+at the 1000, 1500, and 2000 Hz edges, most under the ANSI SII (0.094 at
+the 1000 Hz edge) and least under the complete SII (0.022). The ordering
+across edges and metrics is largely unchanged, and at the 3000 Hz edge
+the effect remains negligible. Only 7 of the 16 anchor-off pairs match
+in loudness. In three pairs (edges of 1500 and 2000 Hz, slopes of 20
+and 30 dB/octave) the -10 dB solution improves the smoothed SII by 0.011
+to 0.014 while leaving 0.89 to 1.37 sones of the budget unspent. To
+locate the source of this benefit, each -10 dB solution was rescored
+with only its low-frequency gains (250--1000 Hz) or only its
+high-frequency gains (2000--8000 Hz) applied to the 0 dB solution. The
+low-frequency cut alone left the SII unchanged, whereas the
+high-frequency gains alone reproduced the entire improvement, which
+arose in the 4000--5800 Hz bands where audibility is limited by
+threshold rather than by masking. The low-frequency cut therefore cost
+no SII, because those near-normal bands remained fully audible, while
+reducing loudness. That reduction was necessary: applied without the
+low-frequency cut, the high-frequency gains would have exceeded the
+loudness cap by 0.50 to 0.66 sones, so the 0 dB solution could not have
+reached them. The same pattern held for A4 in the iso-loudness control,
+where the high-frequency changes accounted for 0.0496 of the 0.0500
+improvement and, applied alone, would have exceeded the cap by 1.87
+sones. The floor effect is thus a loudness-budget effect: low-frequency
+audibility that the SII does not need is traded for high-frequency gain
+it does.
+
+The budget left unspent in the three pairs has two sources. Adding 3 dB
+at 2000 or 4000 Hz to the -10 dB solutions lowered the SII slightly
+(by 0.0004 to 0.0022): those bands were already close to full
+audibility, so further gain mainly increased the index's
+level-distortion penalty. Adding 3 dB at 8000 Hz instead raised the SII
+by 0.002 to 0.003 at a cost of 0.07 to 0.10 sones, so the unpenalized
+optimizer stopped slightly short of the available benefit there, and
+the floor effects for these pairs are slight underestimates.
+
+In the anchor-on solutions, the reallocation of gain at matched
+loudness can be read directly from the paired solutions. At the tightest
+budget and the 1000 Hz edge, averaged over the two matched audiograms,
+relaxing the floor lowers gain by 5.4 dB at 500 Hz and 2.1 dB at 1000
+Hz and raises it by 8.1 dB at 2000 Hz and 5.0 dB at 4000 Hz; the change
+at 8 kHz is small (-1.5 dB). Because these pairs are at matched
+loudness, capacity drawn from the near-normal low frequencies is spent
+in the 2--4 kHz region (Figure 2).
 
 #figure(image("figures/Figure2_Mechanism_Spectral.png"),
   caption: [
     Change in prescribed insertion gain when the minimum-gain floor is
     relaxed from 0 dB to -10 dB, at a 0.5-sone loudness budget, by
-    audible edge frequency. Grey lines show individual audiograms (four
-    slopes by three desensitization scales); the black line is their
-    mean. Because the paired solutions are at matched loudness, gain
-    given up at one frequency is gain gained at another.
+    audible edge frequency, for the pairs matched in loudness (anchor
+    penalty on). Grey lines show individual audiograms; the black line
+    is their mean. Because the paired solutions are at matched loudness,
+    loudness given up at one frequency is spent at another.
   ]
 )
 
@@ -613,25 +751,24 @@ mathematical loudness output generated by NAL-NL2 for each profile at 65
 dB SPL. It was then optimized twice: once with a strict 0 dB
 low-frequency insertion gain floor, and once with a -10 dB floor.
 
-During optimization, Open-NL maximizes a modified SII incorporating a
-smoothed implementation of the Johnson and Dillon (2011) @johnson2011
-desensitization penalty, aligning its internal objective function
-closely with the physiological assumptions of NAL-NL2. To ensure
-rigorous evaluation, both formulas were scored in Table 3 using the
-smoothed Johnson and Dillon (2011) desensitized SII metric. This aligns the reported index with the intelligibility term of the optimizer's objective, though not with the penalized objective it actually maximizes, so that measured changes reflect the mathematical boundaries rather than a mismatch in the intelligibility metric itself. The
-primary goal is not to claim algorithmic superiority over the clinical
-rationale, but to isolate the exact efficiency cost of the 0 dB
-insertion floor within a rigidly controlled mathematical space.
+As in the sweep, Open-NL optimized the smoothed SII, which approximates
+the desensitization assumptions built into NAL-NL2, and each solution,
+together with the NAL-NL2 prescription itself, was then scored with the
+smoothed, complete, and ANSI SII. The primary goal is not to claim
+algorithmic superiority over the clinical rationale, but to isolate the
+efficiency cost of the 0 dB insertion floor within a controlled
+mathematical space.
 
-Table 3 details the difference in achieved desensitized SII when both
-the formula and the optimizer are constrained to the same total sones.
-By separating the #emph[optimizer effect] (the difference between
-Open-NL at 0 dB and NAL-NL2) from the #emph[floor effect] (the
-difference between Open-NL at -10 dB and 0 dB), the precise mechanism of
-loudness crowding-out becomes clear.
+Table 4 details the difference in achieved smoothed SII when both the
+formula and the optimizer are constrained to the same total sones. By
+separating the #emph[optimizer effect] (the difference between Open-NL
+at 0 dB and NAL-NL2) from the #emph[floor effect] (the difference
+between Open-NL at -10 dB and 0 dB), the mechanism of loudness
+crowding-out can be examined. Table 5 then gives the floor effect under
+all three metrics, with the anchor penalty on and off.
 
-#strong[Table 3. Iso-Loudness Control: Smoothed Desensitized SII
-(Constrained to NAL-NL2 Loudness at 65 dB SPL)]
+#strong[Table 4. Iso-Loudness Control: Smoothed Desensitized SII
+(Constrained to NAL-NL2 Loudness at 65 dB SPL; Anchor Penalty On)]
 
 #figure(
   align(center)[#table(
@@ -647,7 +784,7 @@ loudness crowding-out becomes clear.
     [A3 (Moderate Sloping)], [3.63
     sones], [0.608], [0.605], [0.678], [-0.003], [+0.073],
     [A4 (Mod-Severe Precipitous)], [6.56
-    sones], [0.670], [0.699], [0.719], [+0.029], [+0.020],
+    sones], [0.670], [0.699], [0.719], [+0.028], [+0.020],
     [A5 (Profound Precipitous)], [5.50
     sones], [0.539], [0.586], [0.595], [+0.047], [+0.009],
     [A6 (Mixed)], [2.10
@@ -658,49 +795,66 @@ loudness crowding-out becomes clear.
   , kind: table
   )
 
-Scoring with the desensitized SII reveals a strikingly different
-decomposition than raw ANSI SII would suggest, and one that is far more
-clinically realistic. The floor effect is highly variable, with the
-moderate sloping profile A3 showing the largest benefit (+0.073) from
-relaxing the low-frequency floor, followed by the mild profile A1
-(+0.033). For the precipitous profiles, the floor effect is modest for
-A4 (+0.020) and smaller though still measurable for A5 (+0.009). The
-desensitized SII improvement over NAL-NL2 for these profound losses
-instead comes substantially from the optimizer effect: +0.029 for A4 and
-\+0.047 for A5. Because the desensitization penalty heavily discounts
-audibility in the profoundly impaired high frequencies, freeing up
-additional loudness capacity via low-frequency attenuation yields
-limited marginal desensitized SII benefit for the steepest
-high-frequency losses --- much of the extra gain is prescribed into
-frequency regions where the Johnson and Dillon (2011) penalty renders it
-less valuable.
+#strong[Table 5. Iso-Loudness Control: Floor Effect under Three SII
+Metrics, with the Anchor Penalty On and Off]
 
-This result has two important implications. First, it confirms that
-NAL-NL2's conservative high-frequency gain limits are well-aligned with
-desensitized intelligibility: the gap between NAL-NL2 and the 0 dB
-optimizer is modest, while relaxing the floor adds a further benefit
-that varies substantially across profiles and is largest where
-high-frequency loss is least severe. Second, the structural loudness
-crowding-out documented in the audiogram family sweep remains a genuine
-acoustic boundary, but its #emph[clinical] impact as measured by
-desensitized SII is substantially attenuated by the very physiological
-limits that motivated the desensitization correction. The crowding-out
-constraint is most consequential for profiles where high-frequency loss
-is moderate enough that the desensitization penalty is small ---
-precisely the profiles (like A3) where the floor effect is largest.
-Supporting this, the benefit of relaxing the floor shrinks as the
-desensitization penalty strengthens: for A3 the floor effect is +0.094
-with no desensitization, +0.073 smoothed, and +0.045 complete, while for
-A5 it is +0.006, +0.009, and -0.002 across the three treatments.
+#figure(
+  align(center)[#table(
+    columns: 7,
+    align: (left,left,left,left,left,left,left,),
+    table.header([Profile], [Smoothed (on)], [Smoothed (off)],
+      [Complete (on)], [Complete (off)], [ANSI (on)], [ANSI (off)],),
+    table.hline(),
+    [A1], [+0.033], [+0.053], [+0.008], [+0.014], [+0.037], [+0.064],
+    [A2], [+0.011], [+0.012], [+0.005], [-0.000], [+0.015], [+0.017],
+    [A3], [+0.073], [+0.066], [+0.045], [+0.035], [+0.094], [+0.085],
+    [A4], [+0.020], [+0.050], [+0.002], [+0.006], [+0.024], [+0.085],
+    [A5], [+0.009], [+0.037], [-0.002], [-0.003], [+0.006], [+0.086],
+    [A6], [0.000], [---], [0.000], [---], [0.000], [---],
+    [A7], [0.000], [---], [0.000], [---], [0.000], [---],
+  )]
+  , kind: table
+  )
+
+Under the smoothed SII with the anchor penalty on (Table 4), the floor
+effect is largest for the moderate sloping profile A3 (+0.073),
+followed by the mild profile A1 (+0.033), and is modest for the
+precipitous profiles A4 (+0.020) and A5 (+0.009). For these profound
+losses the improvement over NAL-NL2 instead comes mainly from the
+optimizer effect: +0.028 for A4 and +0.047 for A5. Under the complete
+SII the optimizer effect is +0.037 for A4 and +0.049 for A5, and under
+the ANSI SII +0.055 and +0.105; the larger ANSI values partly reflect
+that index crediting high-frequency gain NAL-NL2 withholds on purpose.
+
+The floor effect depends strongly on how desensitization is scored
+(Table 5). Under the complete SII, which the optimizer never targeted,
+it remains clearly positive only for A3 (+0.045), is marginal for A1
+(+0.008) and A2 (+0.005), and is negligible for the precipitous
+profiles A4 (+0.002) and A5 (-0.002). Under the ANSI SII it is larger
+for every sensorineural profile except A5.
+
+Removing the anchor penalty sharpens this contrast. For A3 the floor
+effect barely changes (0.066 smoothed, 0.035 complete, 0.085 ANSI), so
+its benefit was never a penalty artifact. For the precipitous profiles
+it grows substantially under the smoothed SII (A4 0.020 to 0.050; A5
+0.009 to 0.037) and the ANSI SII (A4 0.024 to 0.085; A5 0.006 to
+0.086), but stays at or below 0.006 under the complete SII. All five
+anchor-off pairs match in loudness to within 0.001 sones, so these are
+like-for-like comparisons. For the precipitous profiles, then, the
+freed loudness is spent in exactly the frequency region the complete
+correction treats as largely unusable: whether relaxing the floor helps
+them depends on the desensitization assumption rather than on the
+optimizer's regularization.
 
 For the mixed and conductive profiles (A6, A7) the floor effect is
 exactly zero and no frequency band receives negative gain, so the floor
-never engages. For A2, the reverse-slope profile, the band receiving
-negative gain is 4000 Hz rather than the low frequencies---the only such
-case---which naturally follows from the reverse-slope configuration. As
-a caveat, for A1 the two solutions differ in achieved loudness by 0.016
+never engages; these profiles were not rerun without the anchor. For
+A2, the reverse-slope profile, the band receiving negative gain is 4000
+Hz rather than the low frequencies---the only such case---which
+naturally follows from the reverse-slope configuration. As a caveat,
+for A1 the two anchor-on solutions differ in achieved loudness by 0.016
 sones, so that profile alone is not exactly iso-loudness; every other
-profile matches to within 0.002 sones.
+anchor-on profile matches to within 0.002 sones.
 
 == Discussion
 <discussion>
@@ -721,11 +875,11 @@ insertion gain floor, that residual third of the budget must cover the
 entire high-frequency prescription, and it is nowhere near sufficient
 for thresholds of 70 to 100 dB HL.
 
-This constraint forces a harsh physical reality in clinical practice.
-The penalized-optimal solutions in the audiogram family sweep rely on
-negative low-frequency insertion gain to free up loudness capacity.
-However, digital gain reduction cannot bring the ear canal level below
-the direct sound path in an open fitting: an open earset provides no
+This constraint has a practical consequence. The penalized-optimal
+solutions that benefit from relaxing the floor rely on negative
+low-frequency insertion gain to free up loudness capacity. However,
+digital gain reduction cannot bring the ear canal level below the
+direct sound path in an open fitting: an open earset provides no
 measurable insertion loss @kuk2009, and venting reduces amplified
 low-frequency output rather than the unamplified direct sound
 @stuart1999. To achieve true negative low-frequency insertion gain, a
@@ -739,13 +893,12 @@ low-frequency hearing.
 Conversely, if the clinician opts for an open or vented fitting to avoid
 occlusion (the standard of care for precipitous losses), the direct
 sound path locks the low-frequency insertion gain floor at $gt.eq 0$ dB.
-As demonstrated by the audiogram family sweep, this instantly traps the
-fitting at the 0 dB floor, drastically reducing the achievable
-high-frequency gain before the loudness cap is breached. This
-theoretical limitation is compounded by practical electroacoustic
-constraints: open fittings suffer from severe acoustic feedback, which
-independently limits the maximum stable high-frequency gain a device can
-deliver.
+In the model, this forgoes whatever benefit relaxing the floor would
+provide, reducing the achievable high-frequency gain before the
+loudness cap is reached. This limitation is compounded by practical
+electroacoustic constraints: larger vents also reduce the maximum gain
+available before feedback @kuk2009, which independently limits the
+high-frequency gain a device can deliver.
 
 Crucially, this analysis does not suggest that clinicians should
 actively pursue these theoretical SII maximums by occluding patients and
@@ -755,22 +908,34 @@ standard ANSI SII is known to overpredict actual behavioral speech
 recognition in profound high-frequency losses. Applying massive
 high-frequency gain often yields diminishing or even negative behavioral
 returns for these patients. Rather, this index-level analysis serves to
-map the absolute boundaries of the acoustic parameter space. It
-demonstrates that even if a clinician #emph[wished] to pursue higher
-high-frequency gain---perhaps for a patient with exceptionally robust
-high-frequency neural survival---they are structurally blocked by the
-loudness budget arithmetic of the open fitting.
+map the boundaries of the acoustic parameter space. It demonstrates that
+even if a clinician #emph[wished] to pursue higher high-frequency
+gain---perhaps for a patient with exceptionally robust high-frequency
+neural survival---they are constrained by the loudness budget
+arithmetic of the open fitting.
 
-Ultimately, maximizing the theoretical Speech Intelligibility Index
-through raw high-frequency gain in precipitous losses is fundamentally a
-direct trade-off against residual low-frequency hearing, and achieving
-it physically requires intolerable occlusion. This structural bottleneck
-perfectly illustrates why alternative signal processing strategies, such
-as nonlinear frequency compression or transposition, are so critical
-@simpson2009. By shifting high-frequency speech cues into
-lower-frequency regions, these algorithms bypass the need for massive
-high-frequency gain, circumventing both the broadband loudness budget
-and the limits of high-frequency physiological desensitization entirely.
+Taken together, these analyses separate two explanations for the
+difficulty of restoring high-frequency audibility in precipitous loss.
+The loudness budget is a genuine constraint: unamplified speech in the
+residual low frequencies consumes most of it before any gain is
+prescribed. Relaxing the minimum-gain floor recovers part of that
+budget, but whether the recovered capacity improves intelligibility
+depends on desensitization. With the anchor penalty removed, the floor
+effect for the precipitous profiles reached 0.037 to 0.086 when scored
+with the smoothed or unmodified SII, yet was at most 0.006 under the
+published Johnson and Dillon correction, because the freed capacity is
+spent at frequencies that correction discounts. For the moderate
+sloping profile the effect was positive under every metric and both
+optimizer settings (0.035 to 0.094). In the four cases examined, the
+benefit came from high-frequency gain funded by a low-frequency cut that
+itself cost no intelligibility, confirming that the floor effect is a
+loudness-budget effect. Because negative low-frequency insertion gain requires an
+unvented fitting, the benefit does not justify sacrificing venting in
+precipitous loss unless desensitization is mild. Strategies that
+deliver high-frequency cues to regions of better hearing, such as
+frequency lowering @simpson2009, remain the more plausible route; the
+present analysis does not model them, and their benefit under a
+loudness budget remains to be tested.
 
 === Limitations
 <limitations>
@@ -782,16 +947,25 @@ the framework applies stationary loudness integration to a static
 long-term average speech spectrum (LTASS). Real-world speech is highly
 time-varying, and dynamic compression systems (WDRC) acting on
 fluctuating speech may yield different instantaneous loudness profiles
-@souza2002. Furthermore, the analysis is fundamentally a theoretical,
+@souza2002. Third, the analysis is fundamentally a theoretical,
 index-level optimization; it lacks behavioral validation and does not
-directly measure patient speech recognition outcomes. Finally, although
-the analysis evaluated the seven canonical profiles defined by Johnson
-and Dillon (2011) alongside a systematic sweep of sixteen synthetic
-audiograms, the simulations were deliberately constrained to synthetic
-thresholds and a single standard speech spectrum. A broader corpus of
-real-world audiometric profiles and variable speech inputs would still
-be required to generalize these constraints across the diverse clinical
-population.
+directly measure patient speech recognition outcomes. Fourth, although
+the analysis evaluated the seven canonical profiles defined by
+#cite(<johnson2011>, form: "prose") alongside a systematic sweep of
+sixteen synthetic audiograms, the simulations were deliberately
+constrained to synthetic thresholds and a single standard speech
+spectrum. A broader corpus of real-world audiometric profiles and
+variable speech inputs would still be required to generalize these
+constraints across the diverse clinical population.
+
+The floor analyses were also conducted only at 65 dB SPL with linear
+gain. Figure 1 shows the budget tightening as input level rises, which
+would favor a larger floor effect for loud speech; however, the SII's
+level-distortion factor, which already offset additional 2--4 kHz gain
+at 65 dB SPL, penalizes high presentation levels more strongly. The
+direction of the effect at 50 and 80 dB SPL therefore cannot be inferred
+from these results and would require a level-specific (compression)
+analysis.
 
 Similarly, the flat -10 dB minimum insertion gain floor utilized in
 these simulations likely overstates achievable attenuation in the lowest
@@ -802,13 +976,17 @@ realistic for future modeling, though measured attenuation values are
 highly sensitive to clinical factors such as earmold seal, insertion
 depth, and slit leak.
 
-The penalized objective introduces a bias in the opposite direction. The anchor penalty charges 0.1 objective points per dB of shift away from the Open-NL heuristic prescription, which the optimizer floors at 0 dB before shifts are applied, so driving two low-frequency bands to the -10 dB floor costs at least 0.02 in SII-equivalent units. For the profiles
-with the smallest floor effects (A4, +0.020; A5, +0.009) this cost is of the
-same order as the effect itself, and the reported values may therefore
-understate what an unpenalized SII maximizer would achieve. The flat floor
-and the anchor penalty thus bias the reported floor effects in opposite
-directions, and the reported values should not be read as a one-sided
-overestimate.
+The optimizer's anchor penalty biases the reported floor effects in the
+opposite direction, and its size was tested directly rather than
+assumed. The anchor-off solutions bound what an essentially unpenalized
+SII maximizer could achieve, but they are only weakly regularized and
+should not be read as realistic prescriptions. The anchor-on and
+anchor-off values together bracket the floor effect; the flat floor and
+the anchor penalty push in opposite directions, so neither end of the
+bracket is a one-sided overestimate. The anchor-off solutions are also
+not exact optima: in the three sweep pairs that left budget unspent,
+additional 8 kHz gain would still have raised the SII by a few
+thousandths, so their floor effects are slightly understated.
 
 Additionally, the loudness budget framework is limited in its
 application to the mixed (A6, 30 dB conductive component) and conductive
@@ -816,10 +994,11 @@ application to the mixed (A6, 30 dB conductive component) and conductive
 inaudible at conversational levels---only becoming audible at 80 dB SPL
 with 0.17 and 0.28 sones---"budget above unaided" degenerates to an
 absolute ceiling for these profiles. Evaluated against the 9.03-sone
-ceiling at 65 dB SPL, both NAL-NL2-aided (2.10 and 3.10 sones; fractions
-of 0.23 and 0.34) and Open-NL-aided prescriptions (3.46 and 3.84 sones;
-fractions of 0.38 and 0.42) use a smaller fraction of the budget than
-for any sensorineural profile (A1--A5 range 0.39 to 0.73). This is
+ceiling at 65 dB SPL, the NAL-NL2-aided loudness for A6 and A7 (2.10 and
+3.10 sones) uses a smaller fraction of the budget (0.23 and 0.34) than
+for any sensorineural profile (A1--A5 range 0.39 to 0.73). Because the
+iso-loudness control constrains Open-NL to that same loudness by
+construction, its prescriptions use the identical fraction. This is
 consistent with attenuation without recruitment, and the binding
 constraint for mixed and conductive losses is therefore the air-bone-gap
 anchoring rather than the loudness cap.
@@ -829,27 +1008,27 @@ anchoring rather than the loudness cap.
 Generative AI tools were used in preparing this work. Gemini 3.1 Pro
 (Google DeepMind) served as a programming and copyediting assistant,
 refactoring R and C++ code and applying revisions to the manuscript
-text. Claude Opus 5 (Anthropic) was used to audit the analysis code and
-its outputs, to write diagnostic and analysis scripts in R, to draft
-portions of the revised text including the abstract, and to locate and
-verify references against publisher records. That audit identified the
-optimizer and scoring defects described in the Methods and Results; the
-corrected analyses reported here were run by the author. The author
-verified all AI-assisted code through numerical checks against
-independent outputs, reviewed and edited all AI-assisted text, and takes
-full responsibility for the content, including the accuracy of all
-references.
+text. Claude (Anthropic; Opus 5.5 and Sonnet 5 models) was used to
+audit the analysis code and its outputs, to write diagnostic and
+analysis scripts in R, to draft portions of the revised text including
+the abstract, and to locate and verify references against publisher
+records. That audit identified the optimizer and scoring defects
+described in the Methods and Results; the corrected analyses reported
+here were run by the author. The author verified all AI-assisted code
+through numerical checks against independent outputs, reviewed and
+edited all AI-assisted text, and takes full responsibility for the
+content, including the accuracy of all references.
 
 == Data Availability
 <data-availability>
 The code used to execute the computational simulations, reproduce the
-dataset, and generate the figure for this study is fully open-source and
-available on GitHub (https://github.com/r-gregmisc/SII).
+dataset, and generate the figures for this study is fully open-source
+and available on GitHub (https://github.com/r-gregmisc/SII).
 
 == References
 <references>
 
 
-#set bibliography(style: "chicago-author-date")
+#set bibliography(style: "jaaa.csl")
 
-#bibliography("paper.bib")
+#bibliography("jaaa_refs.bib")

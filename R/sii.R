@@ -51,6 +51,9 @@ sii <- function(
       desensitization <- "none"
     }
   }
+  if (!is.character(desensitization) || length(desensitization) != 1 ||
+      !desensitization %in% c("none", "johnson2011_complete"))
+    stop('`desensitization` must be TRUE, FALSE, "johnson2011_complete" or "none".')
 
   ## Assumptions:
   ##
@@ -372,7 +375,10 @@ sii <- function(
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     final_output <- pmin(raw_output, mpo) + (overshoot / 10.0)
-    gain <- pmax(final_output - speech, 0)
+    # Negative insertion gain (e.g. the passive loss of an occluding earmold)
+    # lowers the speech level in the ear canal, so it is passed through rather
+    # than floored at 0 dB.
+    gain <- final_output - speech
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "Open-NL") {
@@ -518,7 +524,7 @@ sii <- function(
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
   sii.tab$"Ki" <- enforce.range( sii.tab$"Ki" )
   
-  if (desensitization == "johnson2011_smoothed" || desensitization == "johnson2011_complete") {
+  if (desensitization == "johnson2011_complete") {
     # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
     # Use sensorineural threshold only (subtract conductive component)
     T_sn <- pmax(sii.tab$"T'i" - sii.tab$"Ji", 0)
@@ -533,14 +539,10 @@ sii <- function(
     # Save raw Ki before desensitization
     Ki_raw <- sii.tab$"Ki"
     
-    if (desensitization == "johnson2011_smoothed") {
-      Ki_desens <- Ki_raw * m
-    } else if (desensitization == "johnson2011_complete") {
-      # Apply the full asymptotic formula: k' = [(k/30)^p + m^p]^(1/p)
-      # Bounding Ki prevents 0^negative = Inf errors.
-      Ki_safe <- pmax(Ki_raw, 1e-10)
-      Ki_desens <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
-    }
+    # Complete correction: k' = [(k/30)^p + m^p]^(1/p), with Ki = k/30.
+    # Bounding Ki prevents 0^negative = Inf errors.
+    Ki_safe <- pmax(Ki_raw, 1e-10)
+    Ki_desens <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
     Ki_desens <- enforce.range(Ki_desens)
     
     # Scale: 0.0 = raw ANSI SII (no penalty), 1.0 = full Johnson 2011

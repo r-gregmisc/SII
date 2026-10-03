@@ -36,7 +36,7 @@
 #' @param booster_onset Threshold for the severe-loss booster (default: 70).
 #' @param disable_sdlfp Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).
 #' @param cap_rule Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.
-#' @param ... Additional graphical or printing parameters.
+#' @param objective_sii SII version maximized by the optimizer: "johnson2011_complete" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).
 #'
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
@@ -51,8 +51,8 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
                     abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
-                    desensitization_scale = 1.0, cap_rule = c("normal", "legacy")) {
-  cap_rule <- match.arg(cap_rule)
+                    desensitization_scale = 1.0, cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_complete", "none")) {
+  cap_rule <- match.arg(cap_rule); objective_sii <- match.arg(objective_sii)
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -190,7 +190,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           sii(speech = speech_spec_base, noise = rep(-50, length(freq)), 
               threshold = threshold, loss = loss, freq = freq, 
               prescription = temp_target, interpolate = TRUE, 
-              nal_ldf = FALSE, desensitization = "johnson2011_smoothed",
+              nal_ldf = FALSE, desensitization = objective_sii,
               desensitization_scale = desensitization_scale)
         }, error = function(e) NULL)
         
@@ -352,73 +352,14 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
       return(list(gain = final_gain_out, mpo = mpo_base))
     }
     
-    # Helper: compute raw SII for a gain vector (no penalties)
-    compute_sii <- function(gain_vec) {
-      temp_tgt <- list(
-        freq = critical$fi,
-        gain = approx(log10(freq), gain_vec, log10(critical$fi), rule=2)$y,
-        mpo = approx(log10(freq), calculate_nal_sspl90(threshold, gain_vec, ldl, loss, freq),
-                     log10(critical$fi), rule=2)$y,
-        speech = approx(log10(freq), speech_spec, log10(critical$fi), rule=2)$y,
-        threshold = approx(log10(freq), threshold, log10(critical$fi), rule=2)$y,
-        loss = approx(log10(freq), if(is.null(loss)) rep(0, length(freq)) else loss,
-                      log10(critical$fi), rule=2)$y,
-        module = module
-      )
-      class(temp_tgt) <- "prescription_target"
-      res <- tryCatch(
-        sii(speech = speech_spec, noise = rep(-50, length(freq)),
-            threshold = threshold, loss = loss, freq = freq,
-            prescription = temp_tgt, interpolate = TRUE,
-            nal_ldf = FALSE, desensitization = "johnson2011_smoothed",
-            desensitization_scale = desensitization_scale),
-        error = function(e) list(sii = 0)
-      )
-      res$sii
-    }
-    
-    # 1. Optimize 65 dB anchor always
-    if (vent_floor < 0) {
-      original_floor <- vent_floor
-      vent_floor <- 0
-      res_65_constrained <- optimize_level(65, constraint_gain = NULL)
-      vent_floor <- original_floor
-      res_65_relaxed <- optimize_level(65, constraint_gain = NULL)
-      
-      sii_c <- compute_sii(res_65_constrained$gain)
-      sii_r <- compute_sii(res_65_relaxed$gain)
-      
-      if (sii_c >= sii_r) {
-        res_65 <- res_65_constrained
-      } else {
-        res_65 <- res_65_relaxed
-      }
-    } else {
-      res_65 <- optimize_level(65, constraint_gain = NULL)
-    }
+    # 1. Optimize the 65 dB anchor at the requested floor
+    res_65 <- optimize_level(65, constraint_gain = NULL)
     
     if (abs(overall_level - 65) < 0.1) {
       final_gain <- res_65$gain
     } else {
       # 2. Optimize requested level constrained by 65 dB anchor
-      if (vent_floor < 0) {
-        original_floor <- vent_floor
-        vent_floor <- 0
-        res_req_c <- optimize_level(overall_level, constraint_gain = res_65$gain)
-        vent_floor <- original_floor
-        res_req_r <- optimize_level(overall_level, constraint_gain = res_65$gain)
-        
-        sii_c <- compute_sii(res_req_c$gain)
-        sii_r <- compute_sii(res_req_r$gain)
-        
-        if (sii_c >= sii_r) {
-          res_requested <- res_req_c
-        } else {
-          res_requested <- res_req_r
-        }
-      } else {
-        res_requested <- optimize_level(overall_level, constraint_gain = res_65$gain)
-      }
+      res_requested <- optimize_level(overall_level, constraint_gain = res_65$gain)
       final_gain <- res_requested$gain
     }
     

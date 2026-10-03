@@ -66,20 +66,18 @@ FAMILY <- rbind(
 
 ## ---- in-memory copy: double-run disabled, loudness logged ----------------
 
+## The vent_floor dual-run branch has been removed from R/open_nl.R, so each
+## floor is optimized once at the floor requested without patching.
 src <- readLines("R/open_nl.R")
-ok <- grepl("if \\(vent_floor < 0\\)", src[381]) &&
-      grepl("if \\(vent_floor < 0\\)", src[404]) &&
-      grepl("loudness_sones > dynamic_cap", src[256]) &&
+ok <- grepl("loudness_sones > dynamic_cap", src[256]) &&
       grepl("^\\s*\\}\\s*$", src[259]) &&
       grepl("^\\s*\\}\\s*$", src[325])
 if (!ok) {
-  cat("ANCHOR CHECK FAILED at 256/259/325/381/404:\n")
-  for (i in c(256, 259, 325, 381, 404)) cat(sprintf("%5d | %s\n", i, src[i]))
+  cat("ANCHOR CHECK FAILED at 256/259/325:\n")
+  for (i in c(256, 259, 325)) cat(sprintf("%5d | %s\n", i, src[i]))
   sink(); stop("Aborting: re-anchor against the current R/open_nl.R.")
 }
-cat("anchor check passed (256, 259, 325, 381, 404)\n")
-src[381] <- sub("if \\(vent_floor < 0\\)", "if (FALSE)", src[381])
-src[404] <- sub("if \\(vent_floor < 0\\)", "if (FALSE)", src[404])
+cat("anchor check passed (256, 259, 325)\n")
 
 .open_nl_dbg <- new.env(parent = emptyenv())
 src <- append(src, paste(
@@ -93,7 +91,7 @@ src <- append(src,
 tmp <- tempfile(fileext = ".R"); writeLines(src, tmp)
 e <- new.env(parent = ns); sys.source(tmp, envir = e)
 open_nl_single <- e$open_nl; environment(open_nl_single) <- ns
-cat("double-run disabled: each floor optimized once at the floor requested\n")
+cat("each floor optimized once at the floor requested\n")
 
 ## ---- resume from any existing CSV ----------------------------------------
 

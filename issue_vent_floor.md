@@ -1,5 +1,7 @@
 # vent_floor does not prescribe at the requested floor
 
+**Status: resolved.** The dual-run branch has been removed from `open_nl()`; each floor is now optimized once, at the floor requested.
+
 When `vent_floor < 0`, `open_nl()` runs `optimize_level` twice — once with the requested floor and once with the floor forced to 0 (lines 381-395 for 65 dB, and 404-418 for non-65 dB levels). It then returns whichever branch has the higher raw SII from `compute_sii()`.
 
 **Consequences:**

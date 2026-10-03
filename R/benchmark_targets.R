@@ -1,10 +1,15 @@
-# Extrapolated target insertion gains for a 65 dB SPL input 
-# from Johnson & Dillon (2011) "A comparison of NAL-NL2 and DSL m[i/o] v5.0a for adults"
-# These match the exact A-1 to A-7 audiograms.
+# Audiometric profiles A1-A7 from Johnson & Dillon (2011) "A comparison of
+# NAL-NL2 and DSL m[i/o] v5.0a for adults", with NAL-NL2 target insertion gains.
+#
+# The multi-level fields nalnl2_50 / nalnl2_65 / nalnl2_80 (19-point
+# third-octave grid in `freq`) were generated with the NAL-NL2 software
+# (version 2) for each audiogram: bilateral fitting, experienced user, unknown
+# gender, fully occluded (#13 tubing) coupling. They replaced earlier values
+# extracted from the plots in Johnson & Dillon (2011).
 
 jd2011_targets <- list(
   "a1" = list(
-    # Fine-frequency grid from Johnson & Dillon (2011) Table/Figure data
+    # Third-octave grid for the NAL-NL2 software targets below
     freq = c(125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000),
     threshold = c(15, 20, 30, 40, 50, 60),   # at standard audiometric freqs
     # NAL-NL2 insertion gains at each input level
