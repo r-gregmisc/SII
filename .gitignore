@@ -38,3 +38,7 @@ test*.pdf
 user_pasted.*
 scratch*
 *.bak
+
+# Keep the Octave/AMT validation harness and its log
+!reproducibility_scripts/**/*.m
+!reproducibility_scripts/**/*.txt

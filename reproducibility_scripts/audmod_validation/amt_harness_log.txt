@@ -1,0 +1,101 @@
+ 
+****************************************************************************
+ 
+The Auditory Modeling Toolbox (AMT) version 1.6.0.
+Brought to you by the AMT Team. See http://amtoolbox.org for more information.
+ 
+****************************************************************************
+Starting packages and toolboxes:
+* Signal package: loaded.
+* Statistics package: loaded.
+* Nan package: loaded.
+* Neural Network package: NOT loaded. Install this package and then re-run amt_start.
+* Netcdf package: loaded.
+* Optimization package: loaded.
+* Python Environment: Python 3.14.4.
+* LTFAT: LTFAT version 2.6.0 (for AMT). Copyright 2005-2023 Peter L. Søndergaard. For help, please type "ltfathelp". LTFAT is using the script language backend.
+* SOFA: LTFAT version 2.6.0 (for AMT). Copyright 2005-2023 Peter L. Søndergaard. For help, please type "ltfathelp". LTFAT is using the script language backend.
+* SFS: Toolbox version 2.5.0 loaded
+* CIRCSTAT: Circular statistics toolbox found.
+* BINAURALSH: BinauralSH toolbox loaded.
+* BADS: Bayesian Adaptive Direct Search toolbox found.
+ 
+****************************************************************************
+ 
+Internal configuration:
+  
+  Auxiliary data (local): /home/mark/Desktop/amtoolbox-full-1.6.0/amtoolbox-1.6.0/auxdata
+  Auxiliary data (web): http://amtoolbox.org/amt-1.6.0/auxdata
+  Cache mode: Download precalculated results. Examples:
+              exp_model(...)        shows precalculated results
+              exp_model(...,'redo') enforces recalculation
+ 
+  Check your configuration via [flags, keyvalues] = amt_configuration().
+ 
+The AMT is released under multiple licenses, with the GPL v3 being the primary one.
+  For models NOT licensed under the GPL3, the corresponding license 
+  is displayed on the first run.
+ 
+Type "help amt_start" for more details...
+Case 1 done in 112.3 s, total loudness = 1.967975 sones
+Case 2 done in 112.4 s, total loudness = 0.236686 sones
+Case 3 done in 112.2 s, total loudness = 1.842623 sones
+Case 4 done in 113.0 s, total loudness = 7.157688 sones
+Case 5 done in 113.2 s, total loudness = 0.196670 sones
+ 
+****************************************************************************
+ 
+The Auditory Modeling Toolbox (AMT) version 1.6.0.
+Brought to you by the AMT Team. See http://amtoolbox.org for more information.
+ 
+****************************************************************************
+Starting packages and toolboxes:
+* Signal package: loaded.
+* Statistics package: loaded.
+* Nan package: loaded.
+* Neural Network package: NOT loaded. Install this package and then re-run amt_start.
+* Netcdf package: loaded.
+* Optimization package: loaded.
+* Python Environment: Python 3.14.4.
+* LTFAT: LTFAT version 2.6.0 (for AMT). Copyright 2005-2023 Peter L. Søndergaard. For help, please type "ltfathelp". LTFAT is using the script language backend.
+* SOFA: LTFAT version 2.6.0 (for AMT). Copyright 2005-2023 Peter L. Søndergaard. For help, please type "ltfathelp". LTFAT is using the script language backend.
+* SFS: Toolbox version 2.5.0 loaded
+* CIRCSTAT: Circular statistics toolbox found.
+* BINAURALSH: BinauralSH toolbox loaded.
+* BADS: Bayesian Adaptive Direct Search toolbox found.
+ 
+****************************************************************************
+ 
+Internal configuration:
+  
+  Auxiliary data (local): /home/mark/Desktop/amtoolbox-full-1.6.0/amtoolbox-1.6.0/auxdata
+  Auxiliary data (web): http://amtoolbox.org/amt-1.6.0/auxdata
+  Cache mode: Download precalculated results. Examples:
+              exp_model(...)        shows precalculated results
+              exp_model(...,'redo') enforces recalculation
+ 
+  Check your configuration via [flags, keyvalues] = amt_configuration().
+ 
+The AMT is released under multiple licenses, with the GPL v3 being the primary one.
+  For models NOT licensed under the GPL3, the corresponding license 
+  is displayed on the first run.
+ 
+Type "help amt_start" for more details...
+Case 6 done in 116.6 s, total loudness = 3.157700 sones
+Case 7 done in 116.2 s, total loudness = 0.401774 sones
+Case 8 done in 116.6 s, total loudness = 0.023593 sones
+Case 9 done in 116.6 s, total loudness = 0.434033 sones
+Case 10 done in 116.0 s, total loudness = 1.848201 sones
+Case 11 done in 116.2 s, total loudness = 1.155355 sones
+Case 12 done in 116.0 s, total loudness = 9.033267 sones
+Case 13 done in 116.8 s, total loudness = 2.646304 sones
+Case 14 done in 117.2 s, total loudness = 1.328576 sones
+Case 15 done in 116.6 s, total loudness = 2.286681 sones
+Case 16 done in 116.4 s, total loudness = 5.772669 sones
+Case 17 done in 116.6 s, total loudness = 4.342541 sones
+Case 18 done in 116.1 s, total loudness = 22.388712 sones
+Case 19 done in 116.5 s, total loudness = 9.219438 sones
+Case 20 done in 116.2 s, total loudness = 6.720481 sones
+Case 21 done in 116.2 s, total loudness = 8.011660 sones
+Case 22 done in 116.4 s, total loudness = 15.254389 sones
+Case 23 done in 116.0 s, total loudness = 12.095966 sones
