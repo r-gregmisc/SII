@@ -74,8 +74,8 @@ sii(speech = c("normal", "raised", "loud", "shout"),
     required by the specified method via linear interpolation on the log
     scale.}
   \item{prescription}{A character string (e.g. \code{"NAL-R"}, \code{"Open-NL"}). If provided, the function will automatically calculate hearing aid insertion gain based on the specified prescriptive fitting rationale and add it to the speech and noise spectrum, calculating an Aided SII.}
-  \item{desensitization}{Logical flag. If \code{TRUE}, applies the hearing loss desensitization factor (Ching et al., 2011; Johnson, 2013) to the calculation to account for suprathreshold distortion in impaired ears. Defaults to \code{FALSE} (Traditional ANSI S3.5 calculation).}
-  \item{desensitization_scale}{Scaling factor for high-frequency desensitization (default: 1.0).}
+  \item{desensitization}{Hearing loss desensitization applied to band audibility. One of \code{"none"} (standard ANSI S3.5 calculation) or \code{"johnson2011_complete"} (the complete Johnson and Dillon (2011) correction, computed from the sensorineural component of the threshold). For backward compatibility \code{FALSE} is treated as \code{"none"} and \code{TRUE} as \code{"johnson2011_complete"}. Defaults to \code{FALSE}. Any other value is an error.}
+  \item{desensitization_scale}{Number between 0 and 1. When desensitization is applied, band audibility is a linear blend of the unadjusted ANSI value (weight \code{1 - desensitization_scale}) and the desensitized value (weight \code{desensitization_scale}); 0 gives the ANSI SII and 1 (default) the full correction. Ignored when \code{desensitization = "none"}.}
   \item{ldl}{Numeric vector specifying Loudness Discomfort Levels (LDL) in dB HL for each frequency. If \code{NULL}, limits are estimated based on hearing thresholds.}
   \item{gender}{Character string specifying patient gender ("male" or "female"). Used for prescriptive algorithms. Defaults to "male".}
   \item{experience}{Character string specifying user hearing aid experience ("experienced", "new"). Defaults to "experienced".}
