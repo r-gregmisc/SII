@@ -93,11 +93,45 @@ earlier `"legacy"` rule), `cap_override`, `vent_floor`, and switches for
 individual prescription rules (`enable_severe_booster`, `disable_sdlfp`,
 `abg_fraction`). See `?open_nl`.
 
-### Loudness
+### Aided SII and loudness for an Open-NL target
 
-`calculate_loudness()` gives the loudness in sones of the speech in an `sii()`
-result; `calculate_loudness_audmod()` gives direct access to the AUDMOD model.
-See `?calculate_loudness` and `?calculate_loudness_audmod`.
+Pass the target to `sii()` through `prescription`, with the speech spectrum,
+thresholds and frequencies stored in the target:
+
+```r
+aided <- sii(
+  speech       = target$speech,
+  threshold    = target$threshold,
+  freq         = target$freq,
+  prescription = target,
+  interpolate  = TRUE,
+  desensitization = "johnson2011_desensitized"
+)
+aided$sii          # aided SII
+aided$unaided_sii  # unaided SII, same settings
+
+calculate_loudness(aided)$total   # loudness of the aided speech, sones
+```
+
+`calculate_loudness_audmod()` gives direct access to the AUDMOD model; see
+`?calculate_loudness_audmod`.
+
+### Testing a prescription rule
+
+Each rule in Open-NL can be switched on or off to measure its effect, for
+example:
+
+```r
+target_booster <- open_nl(
+  speech    = 65,
+  threshold = c(0, 0, 10, 40, 70, 80),
+  freq      = c(250, 500, 1000, 2000, 4000, 8000),
+  enable_severe_booster = TRUE,  # extra gain for severe losses
+  booster_onset = 60,            # dB HL at which the booster starts
+  disable_sdlfp = TRUE           # turn off the slope-dependent low-frequency penalty
+)
+target_booster$gain - target$gain
+```
 
 ## Reproducing published results
 
