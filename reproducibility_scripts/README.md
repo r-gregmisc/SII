@@ -1,61 +1,161 @@
-# Open-NL Reproducibility Scripts & Peer-Review Toolkit
+# Reproducibility scripts
 
-This directory contains the complete suite of standalone R and Octave/MATLAB scripts required to reproduce all figures, tables, and computational validation benchmarks reported in the manuscript:
+Scripts behind the results reported for Open-NL and the loudness-budget study
+submitted to the *Journal of the American Academy of Audiology* (JAAA), plus
+the checks used to verify the package's loudness model and SII calculation.
 
-**"Open-NL: An Open-Source Intelligibility-Maximizing Prescriptive Testbed with Embedded Physiological Loudness Constraints"**
+All scripts are run **from the repository root** with the development version
+of the package loaded (`devtools::load_all(".")` or an installed build of this
+commit). They read and write under `reproducibility_scripts/output/` and
+`figures/`.
+
+The scripts fall into four groups:
+
+| Group | Runs on this version (SII 1.3.0)? |
+|:---|:---|
+| [1. JAAA manuscript](#1-jaaa-manuscript) | Yes |
+| [2. Package verification](#2-package-verification) | Yes |
+| [3. Earlier JAAA analyses and audits](#3-earlier-jaaa-analyses-and-audits) | No: check out the commit given |
+| [4. Earlier Open-NL (JASA) manuscript](#4-earlier-open-nl-jasa-manuscript) | No: check out the commit given |
+
+Groups 3 and 4 are kept as a record of how the current analysis was reached.
+They use options that 1.3.0 removed (the `"johnson2011_smoothed"` SII, the
+`desensitization_scale` argument, the earlier loudness engine and loudness cap)
+and stop with an error if run on this version.
 
 ---
 
-## 1. Directory & File Manifest
+## Setup
 
-| Manuscript Item | Description | Script to Run | Output Artifact |
+* R (>= 3.5) with a C++ compiler (the package compiles C++ via Rcpp)
+* R packages: `devtools` (or `pkgload`), `dplyr`, `tidyr`, `ggplot2`, `callr`
+* For regenerating the AMT reference output only: GNU Octave with the
+  [Auditory Modeling Toolbox](https://amtoolbox.org/) 1.6.0
+
+The long runs save every solution to a CSV as they go and **resume** from it
+if interrupted: source the script again. If a script stopped with an error,
+run `sink()` once at the prompt first.
+
+---
+
+## 1. JAAA manuscript
+
+These reproduce every result in the JAAA manuscript and supplement
+(Supplement Table S5). Times are the estimates given in each script's header,
+at 20 Nelder-Mead starts per optimization.
+
+| Result | Script (in order) | Output | Time |
 |:---|:---|:---|:---|
-| **JAAA Fig 1** | Loudness Budget Decomposition ($L_{cap} - L_0$) | `Rscript reproducibility_scripts/gen_budget_decomposition.R` | Console / `data_output/budget_decomposition.md` |
-| **JAAA Fig 2** | 2D Feasibility Maps for Steeply Sloping Profiles | `Rscript reproducibility_scripts/gen_feasibility_maps.R` | `figures/feasibility_a4.png`, `figures/feasibility_a5.png` |
-| **JAAA Table 2** | Iso-Loudness Control (NAL-NL2 vs Open-NL SII) | `Rscript reproducibility_scripts/gen_iso_loudness_control.R` | Console |
-| **JAAA Sens.** | Variance Decomposition (L_cap & vent_floor) | `Rscript reproducibility_scripts/gen_variance_decomposition.R` | Console |
-| **Figure 1** | ANSI SII vs Effective SII (50, 65, 80 dB SPL) | `Rscript reproducibility_scripts/plot_fig1_sii_grouped.R` | `manuscript_figures/OpenNL_vs_NALNL2_SII_Grouped.png` |
-| **Figure 4** | Monte Carlo Stability & Hyperparameter Sensitivity Sweep | `Rscript reproducibility_scripts/generate_sensitivity_fig.R` | `manuscript_figures/Figure4_Sensitivity.png` |
-| **Table III** | Effective Compression Ratios (Gain50 / Gain80) | `Rscript reproducibility_scripts/generate_table3_cr.R` | Markdown table to console |
-| **Table IV** | 256-Parameter Sensitivity Sweep Variance | `Rscript reproducibility_scripts/generate_sensitivity_fig.R` | `manuscript_figures/sensitivity_progress.csv` |
-| **Table VI** | Monaural Loudness (Sones) & SII across A1–A7 | `Rscript reproducibility_scripts/generate_tables.R` | Markdown table to console |
-| **Table VII** | Insertion Gain Targets (dB) across A1–A7 at 65 dB SPL | `Rscript reproducibility_scripts/generate_tables.R` | Markdown table to console |
-| **Section II.P** | Slope-Dependent Low-Frequency Penalty (SD-LFP) Ablation | `Rscript reproducibility_scripts/run_sdlfp_ablation.R` | Ablation delta report to console |
-| **Section II.Q** | Multi-level (50/65/80 dB) Loudness & Gain Matrix | `Rscript reproducibility_scripts/gen_multi_level_tables.R` | Markdown table to console |
-| **Section III** | C++ Loudness Engine vs. Canonical AMT Validation | `Rscript reproducibility_scripts/validate_amt_loudness.R` | `evaluate_amt_speech.m` (Octave) |
+| Table 1 audiograms; NAL-NL2 gains | `bisgaard_profiles.R` (data, sourced by the scripts below; NAL-NL2 gains exported from NAL-NL2 v2.0, dll v2.15) | – | – |
+| Table 2; Figure 1; NAL-NL2 loudness; Tables 4 and 5; Table S2 | `rerun_bisgaard_profiles.R` | `output/bisgaard/` | ~4 h |
+| Table 3; resolution limit | `rerun_complete_objective.R` | `output/complete_objective/` | ~10–11 h |
+| Figures 1 and 2 | `fig_jaaa.R` (after the two scripts above) | `figures/` (PDF, EPS, TIFF, PNG) | < 1 min |
+| Low- vs high-frequency rescoring; unspent budget | `mechanism_check_complete.R` (after `rerun_complete_objective.R`) | console | < 1 min |
+| Table S1 (optimizing the ANSI SII) | `rerun_ansi_objective.R` | `output/ansi_objective/` | ~4–5 h |
+| Tables S3 and S4; search variability; floor at the normative ceiling | `floor_robustness.R` | `output/floor_robustness/` | ~5–6 h |
 
----
+`helpers_jaaa.R` holds shared functions (target construction, `report_sii()`)
+and is sourced by the scripts above.
 
-## 2. Requirements & Setup
+Each script states at the top what it reruns and checks its preconditions
+before starting (for example, that `open_nl()` optimizes the
+`"johnson2011_desensitized"` SII by default).
 
-All scripts rely on the compiled `SII` package and standard data analysis packages:
-* **R Packages:** `SII` (v1.2.4), `ggplot2`, `dplyr`, `tidyr`, `stringr`, `reshape2`, `parallel`
-* **C++ Compiler:** GCC/Clang with C++17 support (automatically invoked via `Rcpp`)
-* **Optional (AMT Validation):** GNU Octave or MATLAB with the [Auditory Modeling Toolbox (AMT)](http://amtoolbox.org/) installed (`bramslow2004` model)
-
-To ensure the local development version of `SII` is active:
-```R
-devtools::load_all(".")
+```r
+source("reproducibility_scripts/rerun_bisgaard_profiles.R")
+source("reproducibility_scripts/rerun_complete_objective.R")
+source("reproducibility_scripts/fig_jaaa.R")
+source("reproducibility_scripts/mechanism_check_complete.R")
+source("reproducibility_scripts/rerun_ansi_objective.R")
+source("reproducibility_scripts/floor_robustness.R")
 ```
 
 ---
 
-## 3. Quickstart Replication Commands
+## 2. Package verification
 
-To regenerate all primary figures and print all core tables:
+| Check | Script | Notes |
+|:---|:---|:---|
+| AUDMOD loudness port matches AMT 1.6.0 `bramslow2004` at every stage (23 cases) | `audmod_validation/make_cases.R` → `audmod_validation/run_amt_harness.m` (Octave) → `audmod_validation/compare_stages.R` | AMT reference output is in `audmod_validation/out/` and is also used by the package tests (`tests/testthat/test-audmod.R`), so Octave is only needed to regenerate it. Edit the AMT path in the first lines of `run_amt_harness.m`. `amt_harness_log.txt` is the log of the reference run. |
+| Standard SII unchanged from the original CRAN release (Warnes) when no new options are used | `regression_vs_cran.R` | Installs the CRAN release into a temporary library; your main library is not touched. |
 
-```bash
-# 1. Regenerate Figures 1 and 2
-Rscript reproducibility_scripts/plot_fig1_sii_grouped.R
-Rscript reproducibility_scripts/plot_final_gains.R
+---
 
-# 2. Print Tables III, VI, and VII to console
-Rscript reproducibility_scripts/generate_table3_cr.R
-Rscript reproducibility_scripts/generate_tables.R
+## 3. Earlier JAAA analyses and audits
 
-# 3. Run SD-LFP heuristic ablation
-Rscript reproducibility_scripts/run_sdlfp_ablation.R
+Development of the JAAA analysis between 15 September and 2 October 2026:
+earlier scoring with the smoothed desensitized SII, the audiogram-family and
+iso-loudness sweeps, the feasibility maps later removed from the manuscript,
+and audits of the loudness cap, the multi-start search, the vent-floor
+"dual-run" branch and negative insertion gain. Their outputs are kept in
+`output/` (`jaaa_audmod/`, `jaaa_audmod_smoke/`, `isoloudness/`,
+`archive_run1_old_scoring/`, `archive_run2_rectified_bramslow/`).
 
-# 4. (Optional) Run full 768-permutation Monte Carlo analysis & Figure 4
-Rscript reproducibility_scripts/generate_sensitivity_fig.R
+**3a. Run at commit `bc8a08e`** (26 Sep 2026; AUDMOD loudness, smoothed SII
+available, `desensitization_scale` available):
+
 ```
+git checkout bc8a08e
+```
+
+`gen_audiogram_family.R`, `gen_budget_decomposition.R`,
+`gen_desens_sensitivity.R`, `gen_feasibility_maps.R`,
+`gen_iso_loudness_control.R`, `gen_iso_loudness_control_v2.R`,
+`rebuild_isoloudness_20.R`, `rebuild_isoloudness_20_naldf_off.R`,
+`check_report_sii.R`, `check_outlier_and_noise.R`, `audit_cap_basis.R`,
+`audit_nal_ldf.R`, `cap_knots_diagnostic.R`, `cap_rule_comparison.R`,
+`baseline_loudness.R`, `fig_budget.R`, `fig_mechanism.R`,
+`plot_jaaa_figures.R`, `plot_hf_maps.R`, `plot_sii_maps.R`,
+`plot_smoothed_maps.R`, `validate_amt_loudness_45.R`, `run_all.R`,
+and everything in `audit/`.
+
+**3b. Ran on uncommitted working states** between `bc8a08e` and `97e2200`
+(the smoothed SII still present, with the negative-gain fix to `sii()` and/or
+the removal of the vent-floor dual-run branch applied). No commit reproduces
+these states exactly, so these scripts will not run unmodified on any commit.
+They document the checks that led to those two changes, and their results are
+in `output/`.
+
+`anchor_off_check.R`, `budget_check.R`, `masking_check.R`,
+`complete_objective_check.R`, `rerun_iso_after_sii_fix.R`,
+`rerun_unmatched_tight_budget.R`, `rescore_negative_gain_unclipped.R`,
+`rescore_sweep_smoothed.R`, `compare_prefix_postfix_tightbudget.R`,
+`verify_dualrun_removal.R`.
+
+The last two compare against `open_nl()` as it was before the dual-run branch
+was removed. To recreate that copy:
+
+```
+mkdir -p scratch
+git show bc8a08e:R/open_nl.R > scratch/open_nl_pre_dualrun_removal.R
+```
+
+---
+
+## 4. Earlier Open-NL (JASA) manuscript
+
+Scripts for the earlier Open-NL methods manuscript (`OpenNL_manuscript.*`),
+written for the previous loudness engine (a C++ port of `bramslow2004` later
+replaced by the validated AUDMOD port), the PTA-based loudness cap (now
+`cap_rule = "legacy"`) and the smoothed SII objective. Run at commit
+`cee2f06` (13 Sep 2026, the last state before the AUDMOD port):
+
+```
+git checkout cee2f06
+```
+
+| Manuscript item | Script |
+|:---|:---|
+| Figure 1: ANSI vs desensitized SII at 50, 65 and 80 dB SPL | `plot_fig1_sii_grouped.R` |
+| Insertion gain figure | `plot_final_gains.R` |
+| Sensitivity figure and sweep variance | `generate_sensitivity_fig.R`, `generate_lhs_sensitivity.R`, `generate_lhs_sensitivity_safe.R` |
+| Effective compression ratios | `generate_table3_cr.R` |
+| Loudness, SII and insertion gain tables | `generate_tables.R`, `generate_remaining_tables.R` |
+| Multi-level (50/65/80 dB) loudness and gain | `gen_multi_level_tables.R` |
+| SD-LFP ablation | `run_sdlfp_ablation.R` |
+| Severe-loss booster ablation | `validate_booster_ablation.R` |
+| Smoothed vs complete desensitization | `compare_smoothed_complete.R`, `evaluate_smoothed_desensitization_error.R` |
+| C++ loudness engine vs AMT (Bland-Altman) | `validate_amt_loudness.R`, `validate_amt_loudness_bland_altman.R`, `validate_amt_loudness_random.R`, `validate_amt_bland_altman_intense.R`, `plot_bland_altman.R`, `plot_bland_altman_intense.R`, `plot_random_bland_altman.R` |
+
+The AMT comparisons in this group also need the Octave `evaluate_amt_*.m`
+scripts from that period, which are not included in the repository.
