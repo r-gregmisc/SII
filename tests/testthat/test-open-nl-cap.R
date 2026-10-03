@@ -22,3 +22,18 @@ test_that("cap_override overrides cap_rule", {
   
   expect_equal(res_legacy$gain, res_normal$gain)
 })
+
+test_that("open_nl() optimizes when loss is not supplied, and the cap binds", {
+  op <- options(open_nl_starts = 1, open_nl_maxit = 200)
+  on.exit(options(op))
+  thr <- c(0, 0, 10, 40, 70, 80)
+  frq <- c(250, 500, 1000, 2000, 4000, 8000)
+  loose <- open_nl(speech = 65, threshold = thr, freq = frq, cap_override = 100)
+  tight <- open_nl(speech = 65, threshold = thr, freq = frq, cap_override = 0.5)
+  # A binding cap must lower the prescribed gain
+  expect_lt(sum(tight$gain), sum(loose$gain))
+  # Omitting loss must give the same result as loss = 0
+  zero <- open_nl(speech = 65, threshold = thr, freq = frq, cap_override = 0.5,
+                  loss = rep(0, 6))
+  expect_equal(tight$gain, zero$gain)
+})

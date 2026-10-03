@@ -60,6 +60,10 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
     objective_sii <- "johnson2011_desensitized"
   }
   cap_rule <- match.arg(cap_rule); objective_sii <- match.arg(objective_sii)
+  # No conductive component unless given. Passing NULL on to sii() inside the
+  # objective made every evaluation fail, so the optimizer silently returned
+  # the starting (rule-based) gains.
+  if (is.null(loss)) loss <- rep(0, length(threshold))
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {

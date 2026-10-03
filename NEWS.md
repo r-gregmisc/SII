@@ -1,5 +1,11 @@
 # SII 1.3.0
 
+* Fixed: `open_nl()` called without `loss` returned its starting rule-based
+  gains without optimizing. The missing `loss` was passed to `sii()` inside the
+  objective function, where it caused an error that was caught and scored as
+  a constant, so Nelder-Mead never moved. A missing `loss` is now treated as
+  no conductive loss. Calls that supplied `loss` were not affected.
+
 * The Johnson & Dillon (2011) desensitization option is now named
   `"johnson2011_desensitized"` in `sii()` and `open_nl()`. The old name
   `"johnson2011_complete"` still works but gives a deprecation warning.
