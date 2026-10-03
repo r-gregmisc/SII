@@ -10,28 +10,64 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// audmod_reference_cpp
+Rcpp::List audmod_reference_cpp(double fs, int N, Rcpp::NumericVector AGLoss_HL, Rcpp::NumericVector AG_UCL_HL, int NoChan, double E_Beg, double E_End, std::string TransFact);
+RcppExport SEXP _SII_audmod_reference_cpp(SEXP fsSEXP, SEXP NSEXP, SEXP AGLoss_HLSEXP, SEXP AG_UCL_HLSEXP, SEXP NoChanSEXP, SEXP E_BegSEXP, SEXP E_EndSEXP, SEXP TransFactSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type fs(fsSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type AGLoss_HL(AGLoss_HLSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type AG_UCL_HL(AG_UCL_HLSEXP);
+    Rcpp::traits::input_parameter< int >::type NoChan(NoChanSEXP);
+    Rcpp::traits::input_parameter< double >::type E_Beg(E_BegSEXP);
+    Rcpp::traits::input_parameter< double >::type E_End(E_EndSEXP);
+    Rcpp::traits::input_parameter< std::string >::type TransFact(TransFactSEXP);
+    rcpp_result_gen = Rcpp::wrap(audmod_reference_cpp(fs, N, AGLoss_HL, AG_UCL_HL, NoChan, E_Beg, E_End, TransFact));
+    return rcpp_result_gen;
+END_RCPP
+}
+// audmod_loudness_cpp
+Rcpp::List audmod_loudness_cpp(Rcpp::NumericVector PowSpect_in, double fs, int N, Rcpp::List ref, std::string Coupler, std::string TransFact, int Binaural);
+RcppExport SEXP _SII_audmod_loudness_cpp(SEXP PowSpect_inSEXP, SEXP fsSEXP, SEXP NSEXP, SEXP refSEXP, SEXP CouplerSEXP, SEXP TransFactSEXP, SEXP BinauralSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type PowSpect_in(PowSpect_inSEXP);
+    Rcpp::traits::input_parameter< double >::type fs(fsSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type ref(refSEXP);
+    Rcpp::traits::input_parameter< std::string >::type Coupler(CouplerSEXP);
+    Rcpp::traits::input_parameter< std::string >::type TransFact(TransFactSEXP);
+    Rcpp::traits::input_parameter< int >::type Binaural(BinauralSEXP);
+    rcpp_result_gen = Rcpp::wrap(audmod_loudness_cpp(PowSpect_in, fs, N, ref, Coupler, TransFact, Binaural));
+    return rcpp_result_gen;
+END_RCPP
+}
 // calculate_loudness_cpp
-List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB, NumericVector HLcf, NumericVector HLohcdB0, NumericVector HLihcdB0, int NoChan, double E_Beg, double E_End, int Binaural);
-RcppExport SEXP _SII_calculate_loudness_cpp(SEXP inputFSEXP, SEXP inputLdBSEXP, SEXP HLcfSEXP, SEXP HLohcdB0SEXP, SEXP HLihcdB0SEXP, SEXP NoChanSEXP, SEXP E_BegSEXP, SEXP E_EndSEXP, SEXP BinauralSEXP) {
+List calculate_loudness_cpp(NumericVector inputF, NumericVector inputLdB, NumericVector HLcf, NumericVector HLdB, int NoChan, double E_Beg, double E_End, int Binaural);
+RcppExport SEXP _SII_calculate_loudness_cpp(SEXP inputFSEXP, SEXP inputLdBSEXP, SEXP HLcfSEXP, SEXP HLdBSEXP, SEXP NoChanSEXP, SEXP E_BegSEXP, SEXP E_EndSEXP, SEXP BinauralSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type inputF(inputFSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type inputLdB(inputLdBSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type HLcf(HLcfSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type HLohcdB0(HLohcdB0SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type HLihcdB0(HLihcdB0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type HLdB(HLdBSEXP);
     Rcpp::traits::input_parameter< int >::type NoChan(NoChanSEXP);
     Rcpp::traits::input_parameter< double >::type E_Beg(E_BegSEXP);
     Rcpp::traits::input_parameter< double >::type E_End(E_EndSEXP);
     Rcpp::traits::input_parameter< int >::type Binaural(BinauralSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_loudness_cpp(inputF, inputLdB, HLcf, HLohcdB0, HLihcdB0, NoChan, E_Beg, E_End, Binaural));
+    rcpp_result_gen = Rcpp::wrap(calculate_loudness_cpp(inputF, inputLdB, HLcf, HLdB, NoChan, E_Beg, E_End, Binaural));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_SII_calculate_loudness_cpp", (DL_FUNC) &_SII_calculate_loudness_cpp, 9},
+    {"_SII_audmod_reference_cpp", (DL_FUNC) &_SII_audmod_reference_cpp, 8},
+    {"_SII_audmod_loudness_cpp", (DL_FUNC) &_SII_audmod_loudness_cpp, 7},
+    {"_SII_calculate_loudness_cpp", (DL_FUNC) &_SII_calculate_loudness_cpp, 8},
     {NULL, NULL, 0}
 };
 

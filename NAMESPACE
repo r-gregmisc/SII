@@ -4,7 +4,8 @@ export(
        print.SII,
        summary.SII,
        calculate_loudness,
-       calculate_loudness_cpp
+       calculate_loudness_cpp,
+       calculate_loudness_audmod
        )
 
 importFrom("utils", "data")

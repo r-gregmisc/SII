@@ -11,7 +11,7 @@ prescribe_compression(freq, threshold, module = "standard")
 
 \item{threshold}{A numeric vector of hearing thresholds.}
 
-\item{module}{The operating module ("standard", "cin", "mhl").}
+\item{module}{The operating module ("standard", "mhl").}
 }
 \value{
 A list containing compression recommendations.

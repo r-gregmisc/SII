@@ -18,6 +18,11 @@
 #' @param coupling Acoustic coupling ("custom_occluded", "open_dome", "tulip_dome", "double_dome", "vent_1mm_solid", etc.).
 #' @param module Fitting module ("standard", "cin").
 #' @param ldl Loudness Discomfort Levels (optional).
+#' @param cap_override Optional manual loudness cap override in sones.
+#' @param vent_floor Optional manual vent floor limit.
+#' @param x Object for S3 method.
+#' @param object Object for S3 method.
+#' @param ... Additional arguments passed to methods.
 #' @param loss Conductive hearing loss component (optional).
 #' @param distortion_category Distortion category ("Normal", "Low", "Moderate", "High").
 
@@ -29,12 +34,14 @@
 #' @param enable_severe_booster Logical flag to enable severe-loss booster.
 #' @param booster_onset Threshold for the severe-loss booster (default: 70).
 #' @param disable_sdlfp Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).
-#' @param ... Additional graphical or printing parameters.
+#' @param cap_rule Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.
+#' @param objective_sii SII version maximized by the optimizer: "johnson2011_desensitized" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).
 #'
 #' @return An object of class \code{prescription_target}.
 #' @importFrom stats var
 #' @export
-open_nl <- function(speech = 65, threshold, freq, ..., 
+
+open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floor = -10, ..., 
                     gender = "male", experience = "experienced", 
                     config = "bilateral", 
                     coupling = "custom_occluded", module = "standard", 
@@ -42,7 +49,21 @@ open_nl <- function(speech = 65, threshold, freq, ...,
                     loss = NULL, distortion_category = NULL, 
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
-                    abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE) {
+                    abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
+                    cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_desensitized", "none")) {
+  if ("desensitization_scale" %in% names(list(...)))
+    stop("'desensitization_scale' has been removed; use objective_sii = \"none\" ",
+         "or \"johnson2011_desensitized\".", call. = FALSE)
+  if (identical(objective_sii, "johnson2011_complete")) {
+    warning('objective_sii = "johnson2011_complete" is deprecated; ',
+            'use "johnson2011_desensitized".', call. = FALSE)
+    objective_sii <- "johnson2011_desensitized"
+  }
+  cap_rule <- match.arg(cap_rule); objective_sii <- match.arg(objective_sii)
+  # No conductive component unless given. Passing NULL on to sii() inside the
+  # objective made every evaluation fail, so the optimizer silently returned
+  # the starting (rule-based) gains.
+  if (is.null(loss)) loss <- rep(0, length(threshold))
   
   if (length(speech) == 1) {
     if (file.exists(file.path("data", "critical.rda"))) {
@@ -61,7 +82,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
   }
   
   gain <- calculate_open_nl_gain(freq=freq, threshold=threshold, input_level=overall_level, gender=gender, experience=experience, config=config, coupling=coupling, module=module, ldl=ldl, loss=loss, distortion_category=distortion_category, user_cr=user_cr, abg_fraction=abg_fraction, enable_severe_booster=enable_severe_booster, booster_onset=booster_onset, disable_sdlfp=disable_sdlfp, ...)
-  mpo <- calculate_nal_sspl90(threshold, gain, ldl, loss, freq)
+  mpo <- calculate_nal_sspl90(threshold, gain, ldl = ldl, loss = loss, freq = freq)
   
   raw_output <- speech_spec + gain
   overshoot <- pmax(0, raw_output - mpo)
@@ -88,8 +109,10 @@ open_nl <- function(speech = 65, threshold, freq, ...,
     hl_freqs <- c(250, 500, 1000, 2000, 4000, 8000)
     htl <- approx(x = log10(freq), y = threshold, xout = log10(hl_freqs), rule = 2)$y
     sn_htl <- pmax(htl - approx(x = log10(freq), y = local_loss, xout = log10(hl_freqs), rule = 2)$y, 0)
-    ohc_loss <- sn_htl
-    ihc_loss <- rep(0, length(sn_htl))
+    amt_freqs <- c(125, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 10000, 12500)
+    sn_htl_13 <- approx(x = log10(hl_freqs), y = sn_htl, xout = log10(amt_freqs), rule = 2)$y
+    ucl_13 <- rep(120, 13)  # AUDMOD default UCL (dB HL); ldl is not used by the loudness engine
+    audmod_ref <- audmod_reference_cpp(fs = 32000, N = 8192, AGLoss_HL = sn_htl_13, AG_UCL_HL = ucl_13)
     
     sn_octaves <- approx(x = log10(freq), y = (threshold - local_loss), xout = log10(c(500, 1000, 2000, 4000)), rule = 2)$y
     pta_sn_local <- mean(sn_octaves, na.rm = TRUE)
@@ -101,7 +124,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
     # Helper to run optimization at a specific input level
     optimize_level <- function(eval_level, constraint_gain = NULL) {
       gain_base <- calculate_open_nl_gain(freq=freq, threshold=threshold, input_level=eval_level, gender=gender, experience=experience, config=config, coupling=coupling, module=module, ldl=ldl, loss=loss, distortion_category=distortion_category, user_cr=user_cr, abg_fraction=abg_fraction, enable_severe_booster=enable_severe_booster, booster_onset=booster_onset, disable_sdlfp=disable_sdlfp, ...)
-      mpo_base <- calculate_nal_sspl90(threshold, gain_base, ldl, loss, freq)
+      mpo_base <- calculate_nal_sspl90(threshold, gain_base, ldl = ldl, loss = loss, freq = freq)
       
       normal_speech_base <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
       speech_spec_base <- normal_speech_base + (eval_level - overall_normal)
@@ -119,7 +142,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
         out_of_bounds_penalty <- (sum(pmax(0, shifts - 30)^2) + sum(pmax(0, -shifts - 60)^2)) * 1000.0
         clamped_shifts <- pmax(-60, pmin(30, shifts))
         shift_21 <- approx(x = log10(hl_freqs), y = clamped_shifts, xout = log10(freq), rule = 2)$y
-        gain_array <- pmax(-10, pmin(80, final_gain_base + shift_21))
+        gain_array <- pmax(vent_floor, pmin(80, final_gain_base + shift_21))
         
         # --- Guardrails ---
         order_penalty <- 0.0
@@ -153,12 +176,12 @@ open_nl <- function(speech = 65, threshold, freq, ...,
             # G_50 >= G_65
             order_penalty <- sum(pmax(0, cg_oct - gain_oct)^2) * 2000.0
             # CR <= Dynamic: G_50 - G_65 <= max_shift
-            cr_penalty <- sum(pmax(0, (gain_oct - cg_oct) - max_shift_oct)^2) * 200.0
+            cr_penalty <- sum(pmax(0, (gain_oct - cg_oct) - max_shift_oct)^2) * getOption('open_nl_lambda_cr', 200.0)
           } else if (eval_level > 65) {
             # G_80 <= G_65
             order_penalty <- sum(pmax(0, gain_oct - cg_oct)^2) * 2000.0
             # CR <= Dynamic: G_65 - G_80 <= max_shift
-            cr_penalty <- sum(pmax(0, (cg_oct - gain_oct) - max_shift_oct)^2) * 200.0
+            cr_penalty <- sum(pmax(0, (cg_oct - gain_oct) - max_shift_oct)^2) * getOption('open_nl_lambda_cr', 200.0)
           }
         }
         
@@ -178,13 +201,13 @@ open_nl <- function(speech = 65, threshold, freq, ...,
           sii(speech = speech_spec_base, noise = rep(-50, length(freq)), 
               threshold = threshold, loss = loss, freq = freq, 
               prescription = temp_target, interpolate = TRUE, 
-              nal_ldf = TRUE, desensitization = "johnson2011_smoothed")
+              nal_ldf = FALSE, desensitization = objective_sii)
         }, error = function(e) NULL)
         
         if (is.null(res)) return(1000)
         score <- res$sii * 100.0
         
-        aided_spl <- ltass_eval + approx(if(length(gain_array)==6) log10(hl_freqs) else log10(freq), gain_array, log10(hl_freqs), rule=2)$y - approx(if(length(local_loss)==6) log10(hl_freqs) else log10(freq), local_loss, log10(hl_freqs), rule=2)$y
+        aided_spl <- ltass_eval + approx(if(length(gain_array)==6) log10(hl_freqs) else log10(freq), gain_array, log10(hl_freqs), rule=2)$y
         
         f_half <- seq(0, 15000, by = 0.5); f_half[1] <- 1
         li <- approx(log10(hl_freqs), aided_spl, log10(f_half), rule = 2)$y
@@ -201,53 +224,48 @@ open_nl <- function(speech = 65, threshold, freq, ...,
         current_spl <- 10 * log10(sum(10^(dense_l / 10) * 10))
         dense_l <- dense_l + (overall - current_spl)
         
-        loud_res <- tryCatch({
-          calculate_loudness_cpp(inputF = dense_f, inputLdB = dense_l,
-            HLcf = hl_freqs, HLohcdB0 = ohc_loss, HLihcdB0 = ihc_loss,
-            NoChan = 30, E_Beg = 3.0, E_End = 32.0, Binaural = 0)
-        }, error = function(e) NULL)
+        loud_res <- calculate_loudness_audmod(
+          freq = dense_f, level_dB_per_Hz = dense_l - dense_abg,
+          audiogram_freq = hl_freqs, audiogram_HL = sn_htl,
+          fs = 32000, N = 8192, ref = audmod_ref
+        )
         
         loudness_penalty <- 0.0
         if (!is.null(loud_res)) {
-          loudness_sones <- loud_res$Ldn
+          loudness_sones <- loud_res$total
           
-          # Loudness cap knots based on user-provided table
-          pta_knots <- c(10, 32.5, 52.5, 72.5, 90)
-          
-          # U-Shaped Clinical Loudness Tolerance:
-          # Normal hearing (PTA=0) tolerates full natural loudness.
-          # Mild/Moderate losses (PTA 30-50) have severe recruitment/narrow dynamic ranges, requiring heavy compression (low sones).
-          # Severe/Profound losses (PTA 70-90) require raw power just to be audible, necessitating higher loudness caps.
-          if (abs(eval_level - 50) < 0.1) {
-            cap_knots <- c(1.5, 1.0, 0.8, 1.2, 1.2)
-          } else if (abs(eval_level - 80) < 0.1) {
-            cap_knots <- c(20.0, 12.0, 10.0, 15.0, 14.0)
-          } else { # 65 dB
-            cap_knots <- c(7.0, 4.5, 4.0, 6.5, 6.0)
+          if (cap_rule == "normal") {
+            dynamic_cap <- normal_speech_loudness(eval_level) * getOption('open_nl_cap_scalar', 1.0)
+          } else {
+            # Legacy heuristic cap table (PTA-based knots)
+            pta_knots <- c(10, 32.5, 52.5, 72.5, 90)
+            if (abs(eval_level - 50) < 0.1) {
+              cap_knots <- c(1.5, 1.0, 0.8, 1.2, 1.2)
+            } else if (abs(eval_level - 80) < 0.1) {
+              cap_knots <- c(20.0, 12.0, 10.0, 15.0, 14.0)
+            } else { # 65 dB
+              cap_knots <- c(7.0, 4.5, 4.0, 6.5, 6.0)
+            }
+            dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y * getOption('open_nl_cap_scalar', 1.0)
+            
+            low_hf_diff <- mean(htl[1:2]) - mean(htl[5:6])
+            if (low_hf_diff > 10 && eval_level >= 75) {
+                dynamic_cap <- dynamic_cap - (low_hf_diff * 0.10)
+            }
+            
+            if (pta_abg_local > 0) {
+                if (eval_level >= 75) {
+                    dynamic_cap <- dynamic_cap - (pta_abg_local * 0.25)
+                } else {
+                    dynamic_cap <- dynamic_cap + (pta_abg_local * 0.10)
+                }
+            }
           }
           
-          dynamic_cap <- approx(x = pta_knots, y = cap_knots, xout = pta_sn_local, rule = 2)$y
-          
-          # Reverse slope penalty: If lows are significantly worse than highs,
-          # restrict the loud input cap to prevent overamplifying near-normal high frequencies.
-          low_hf_diff <- mean(htl[1:2]) - mean(htl[5:6])
-          if (low_hf_diff > 10 && eval_level >= 75) {
-              dynamic_cap <- dynamic_cap - (low_hf_diff * 0.10)
-          }
-          
-          if (pta_abg_local > 0) {
-              if (eval_level >= 75) {
-                  # For loud inputs, restrict the loudness cap for mixed losses to avoid overamplification 
-                  # and level distortion, bringing gain down closer to NAL-NL2 levels.
-                  dynamic_cap <- dynamic_cap - (pta_abg_local * 0.25)
-              } else {
-                  dynamic_cap <- dynamic_cap + (pta_abg_local * 0.10)
-              }
-          }
-          
+          if (!is.null(cap_override)) dynamic_cap <- cap_override
           if (loudness_sones > dynamic_cap) {
             excess <- loudness_sones - dynamic_cap
-            loudness_penalty <- excess * 2000.0 
+            loudness_penalty <- excess * getOption('open_nl_lambda_loud', 2000.0) 
           }
         }
         
@@ -259,25 +277,31 @@ open_nl <- function(speech = 65, threshold, freq, ...,
         
         anchor_penalty <- sum(abs(shifts)) * 0.1
         
-        # Smoothness penalty to prevent abrupt jumps across frequencies.
-        # Scaled down to 0.5 because evaluating diff() on coarse octave bands geometrically 
-        # exaggerates the squared penalty for smooth, broad slopes compared to 1/3 octave bands.
+        # Smoothness penalty on OUTPUT GAINS to prevent abrupt jumps in the
+        # prescribed frequency response. Applied to gains (not shifts) because 
+        # the heuristic anchor may itself be non-smooth, and penalizing smooth
+        # gains for requiring jagged shifts creates an artificial bias toward
+        # uniform attenuation. Weight 0.001 calibrated so typical gain profiles
+        # (~100-500 sum-of-squared-diffs) produce penalties of 0.1-0.5.
         # For mixed/conductive losses, strictly penalize exceeding the anchor (which intrinsically models the 75% ABG rule)
         # to enforce empirical clinical constraints like feedback limits and acclimatization tolerance.
         abg_penalty <- if (any(local_loss > 0)) sum(pmax(0, shifts)^2) * 1.0 else 0
 
-        roughness_penalty <- sum(diff(shifts)^2) * 0.5
+        gain_oct <- approx(x = if(length(gain_array)==6) log10(hl_freqs) else log10(freq),
+                           y = gain_array, xout = log10(hl_freqs), rule=2)$y
+        roughness_penalty <- sum(diff(gain_oct)^2) * 0.001
         
         return(-score + anchor_penalty + loudness_penalty + out_of_bounds_penalty + spl_penalty + order_penalty + cr_penalty + roughness_penalty + abg_penalty)
       }
       
-      best_score <- -obj_fn(rep(0, 6))
       best_shifts <- rep(0, 6)
       
       # Determine the CR to map the 65 dB SPL anchor to the evaluation level
       cr_use <- 1 + pmax(0, sn_htl - 20) / 40
       
       # Ensure deterministic jitter so the 65 dB anchor is strictly identical across runs
+      best_score <- -obj_fn(rep(0, 6))
+      best_shifts <- rep(0, 6)
       set.seed(as.integer(sum(threshold, na.rm=TRUE) * 100 + eval_level))
       
       # Guarantee audibility for the starting simplex to prevent 0-gradient collapse.
@@ -292,16 +316,17 @@ open_nl <- function(speech = 65, threshold, freq, ...,
       # Keep shift_needed well within the out_of_bounds_penalty threshold (30 dB)
       start_par <- pmin(20.0, pmax(0, shift_needed))
       if (eval_level < 65) start_par <- start_par + 3.0
-      if (eval_level > 65) start_par <- pmax(-10, start_par - 5.0)
+      if (eval_level > 65) start_par <- pmax(vent_floor, start_par - 5.0)
       
-      for (i in 1:3) {
+      open_nl_starts <- getOption('open_nl_starts', 3)
+      for (i in seq_len(open_nl_starts)) {
         current_start_par <- start_par
         
         if (i > 1 || !is.null(seed_noise)) {
           jitter_amount <- if (!is.null(seed_noise)) seed_noise else 5
           current_start_par <- current_start_par + runif(6, -jitter_amount, jitter_amount)
         }
-        opt_res <- suppressWarnings(optim(par = current_start_par, fn = obj_fn, method = optim_method, control = list(maxit = 800)))
+        opt_res <- suppressWarnings(optim(par = current_start_par, fn = obj_fn, method = optim_method, control = list(maxit = getOption('open_nl_maxit', 800))))
         current_score <- -opt_res$value
         if (current_score > best_score) {
           best_score <- current_score
@@ -311,7 +336,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
       
       clamped_shifts <- pmax(-60, pmin(30, best_shifts))
       best_shifts_21 <- approx(x = log10(hl_freqs), y = clamped_shifts, xout = log10(freq), rule = 2)$y
-      final_gain_out <- pmax(-10, pmin(80, final_gain_base + best_shifts_21))
+      final_gain_out <- pmax(vent_floor, pmin(80, final_gain_base + best_shifts_21))
       
       # Hard constraint enforcement post-optimization
       if (!is.null(constraint_gain)) {
@@ -337,7 +362,7 @@ open_nl <- function(speech = 65, threshold, freq, ...,
       return(list(gain = final_gain_out, mpo = mpo_base))
     }
     
-    # 1. Optimize 65 dB anchor always
+    # 1. Optimize the 65 dB anchor at the requested floor
     res_65 <- optimize_level(65, constraint_gain = NULL)
     
     if (abs(overall_level - 65) < 0.1) {

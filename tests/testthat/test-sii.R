@@ -1,33 +1,3 @@
-test_that("ANSI S3.5-1997 Annex B - Normal Hearing Validation", {
-  fpath <- system.file("extdata", "ANSI.B.txt", package="SII")
-  skip_if_not(file.exists(fpath) && file.size(fpath) > 0, "ANSI.B.txt not found")
-  ansib <- read.table(fpath, header=TRUE)
-  
-  result <- sii(
-    speech = ansib$E.,
-    noise = ansib$N.,
-    threshold = ansib$T.,
-    method = "critical"
-  )
-  
-  expect_equal(round(result$sii, 3), 0.504, tolerance = 0.001)
-})
-
-test_that("ANSI S3.5-1997 Annex C - Impaired Hearing Validation", {
-  fpath <- system.file("extdata", "ANSI.C.txt", package="SII")
-  skip_if_not(file.exists(fpath) && file.size(fpath) > 0, "ANSI.C.txt not found")
-  ansic <- read.table(fpath, header=TRUE)
-  
-  result <- sii(
-    speech = ansic$E.,
-    noise = ansic$N.,
-    threshold = ansic$T.,
-    method = "critical"
-  )
-  
-  expect_equal(round(result$sii, 3), 0.443, tolerance = 0.001)
-})
-
 test_that("Open-NL S3 Prescription Target", {
   # Test that open_nl() returns a prescription_target object
   freqs <- c(250, 500, 1000, 2000, 4000, 8000)

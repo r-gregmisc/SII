@@ -11,6 +11,8 @@ open_nl(
   speech = 65,
   threshold,
   freq,
+  cap_override = NULL,
+  vent_floor = -10,
   ...,
   gender = "male",
   experience = "experienced",
@@ -27,7 +29,9 @@ open_nl(
   abg_fraction = 0.75,
   enable_severe_booster = FALSE,
   booster_onset = 70,
-  disable_sdlfp = FALSE
+  disable_sdlfp = FALSE,
+  cap_rule = c("normal", "legacy"),
+  objective_sii = c("johnson2011_desensitized", "none")
 )
 
 \method{print}{prescription_target}(x, ...)
@@ -42,6 +46,12 @@ open_nl(
 \item{threshold}{Hearing threshold level at each frequency.}
 
 \item{freq}{Frequencies at which the thresholds are measured.}
+
+\item{cap_override}{Optional manual loudness cap override in sones.}
+
+\item{vent_floor}{Optional manual vent floor limit.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{gender}{Gender of the patient ("male", "female").}
 
@@ -75,10 +85,13 @@ open_nl(
 
 \item{disable_sdlfp}{Logical flag to disable the Slope-Dependent Low-Frequency Penalty (SD-LFP).}
 
-\item{x}{A \code{prescription_target} object.}
-\item{object}{A \code{prescription_target} object.}
+\item{cap_rule}{Loudness cap rule. "normal" (default) uses the normal-hearing loudness of unaided speech. "legacy" uses the PTA-based knots.}
 
-\item{...}{Additional graphical or printing parameters.}
+\item{objective_sii}{SII version maximized by the optimizer: "johnson2011_desensitized" (default; the Johnson & Dillon (2011) desensitization correction) or "none" (ANSI S3.5 SII).}
+
+\item{x}{Object for S3 method.}
+
+\item{object}{Object for S3 method.}
 }
 \value{
 An object of class \code{prescription_target}.

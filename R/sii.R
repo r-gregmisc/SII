@@ -42,14 +42,26 @@ sii <- function(
                 ...
                 )
 {
+  if ("desensitization_scale" %in% names(list(...)))
+    stop("'desensitization_scale' has been removed; use desensitization = \"none\" ",
+         "or \"johnson2011_desensitized\".", call. = FALSE)
+
   # Map backwards-compatible boolean to new string identifier
   if (is.logical(desensitization)) {
     if (desensitization) {
-      desensitization <- "johnson2011_complete"
+      desensitization <- "johnson2011_desensitized"
     } else {
       desensitization <- "none"
     }
   }
+  if (identical(desensitization, "johnson2011_complete")) {
+    warning('desensitization = "johnson2011_complete" is deprecated; ',
+            'use "johnson2011_desensitized".', call. = FALSE)
+    desensitization <- "johnson2011_desensitized"
+  }
+  if (!is.character(desensitization) || length(desensitization) != 1 ||
+      !desensitization %in% c("none", "johnson2011_desensitized"))
+    stop('`desensitization` must be TRUE, FALSE, "johnson2011_desensitized" or "none".')
 
   ## Assumptions:
   ##
@@ -82,14 +94,13 @@ sii <- function(
                       "equal-contributing"="equal",
                       "octave"="octave"
                       )
-  if (!exists(data.name, envir = environment())) {
-    if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
-      load(file.path("data", paste0(data.name, ".rda")), envir=environment())
-    } else {
-      data(list=data.name, package="SII", envir=environment())
-    }
+  local_env <- new.env(parent = emptyenv())
+  if (file.exists(file.path("data", paste0(data.name, ".rda")))) {
+    load(file.path("data", paste0(data.name, ".rda")), envir=local_env)
+  } else {
+    data(list=data.name, package="SII", envir=local_env)
   }
-  table <- get(data.name, envir=environment())
+  table <- get(data.name, envir=local_env)
 
   ## Get the correct importance functions
   if(missing(importance) || is.character(importance) )
@@ -98,14 +109,12 @@ sii <- function(
       if(importance!="SII")
         {
           sic.name <- paste("sic.",data.name, sep="")
-          if (!exists(sic.name, envir = environment())) {
-            if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
-              load(file.path("data", paste0(sic.name, ".rda")), envir=environment())
-            } else {
-              data(list=sic.name, package="SII", envir=environment())
-            }
+          if (file.exists(file.path("data", paste0(sic.name, ".rda")))) {
+            load(file.path("data", paste0(sic.name, ".rda")), envir=local_env)
+          } else {
+            data(list=sic.name, package="SII", envir=local_env)
           }
-          sic.table <- get(sic.name, envir=environment())
+          sic.table <- get(sic.name, envir=local_env)
           table[,"Ii"] <- sic.table[[importance]]
         }
     }
@@ -374,7 +383,10 @@ sii <- function(
     raw_output <- speech + gain
     overshoot <- pmax(0, raw_output - mpo)
     final_output <- pmin(raw_output, mpo) + (overshoot / 10.0)
-    gain <- pmax(final_output - speech, 0)
+    # Negative insertion gain (e.g. the passive loss of an occluding earmold)
+    # lowers the speech level in the ear canal, so it is passed through rather
+    # than floored at 0 dB.
+    gain <- final_output - speech
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "NAL-R") {
     gain <- calculate_nalr_gain(freq, threshold)
   } else if (!is.null(prescription) && is.character(prescription) && prescription == "Open-NL") {
@@ -421,8 +433,8 @@ sii <- function(
   ## Step 2: Equivalent speech E'i, noise N'i, and hearing threshold
   ##         T'i spectra. (ANSI S3.5: E'i and N'i are decreased by conductive loss Ji)
   #####
-  sii.tab$"E'i" <- speech - loss
-  sii.tab$"N'i" <- noise - loss
+  sii.tab$"E'i" <- speech
+  sii.tab$"N'i" <- noise
   sii.tab$"T'i" <- threshold
   sii.tab$"Ji"  <- loss
 
@@ -451,65 +463,26 @@ sii <- function(
           sii.tab$"Ci" <- -80 + 0.6*( sii.tab$"Bi" + 10*log10(table$"fi") - 6.353 )          
         }
 
-      if(method=="critical" ||
-         method=="equal-contributing")
-        {
-          Zifun <- function(i) 
-            {
-              slow <- TRUE
-
-              if(slow)
-                {
-                  accum <- 10 ^ (0.1 * sii.tab[i,"N'i"])
-                  if(i>1)
-                    for(k in 1:(i-1))
-                      accum <- accum + 10 ^ (0.1 * (sii.tab[k,"Bi"] + 3.32*sii.tab[k,"Ci"] * log10( table[i,"fi"] / table[k,"hi"] ) ) )
-                  retval <- 10 * log10(accum)
-                }
-              else
-                {
-                  if(i>1)
-                    inner <- sum( 10 ^ (0.1 * ( sii.tab[1:(i-1),"Bi"] + 3.32*sii.tab[1:(i-1),"Ci"] * log10( table[i,"fi"] / table[1:(i-1),"hi"] ) ) ) )
-                  else
-                    inner <- 0
-                  retval <- 10 * log10( 10 ^ (0.1 * sii.tab[i,"N'i"] ) + inner )
-                }
-
-              retval
-            }
-          
-          sii.tab$"Zi" = sapply(1:nrow(sii.tab), Zifun)
-
+      N_i <- sii.tab$"N'i"
+      B_i <- sii.tab$"Bi"
+      C_i <- sii.tab$"Ci"
+      f_i <- table$"fi"
+      h_i <- table$"hi"
+      Zi <- numeric(nrow(sii.tab))
+      Zi[1] <- B_i[1]
+      
+      if(method=="critical" || method=="equal-contributing") {
+        for(i in 2:nrow(sii.tab)) {
+          inner <- sum( 10 ^ (0.1 * ( B_i[1:(i-1)] + 3.32*C_i[1:(i-1)] * log10( f_i[i] / h_i[1:(i-1)] ) ) ) )
+          Zi[i] <- 10 * log10( 10 ^ (0.1 * N_i[i]) + inner )
         }
-      else # method=="one-third octave"
-        {
-
-          
-          Zifun <- function(i) 
-            {
-              slow <- FALSE
-              
-              if(slow)
-                {
-                  accum <- 10 ^ (0.1 * sii.tab[i,"N'i"])
-                  if(i>1)
-                    for(k in 1:(i-1))
-                      accum <- accum + 10 ^ (0.1 * ( sii.tab[k,"Bi"] + 3.32*sii.tab[k,"Ci"] * log10( 0.89 * table[i,"fi"] / table[k,"fi"] ) )  )
-                  retval <- 10 * log10(accum)
-                }
-              else
-                {
-
-                  if(i>1)
-                    inner <- sum( 10 ^ (0.1 * ( sii.tab[1:(i-1),"Bi"] + 3.32*sii.tab[1:(i-1),"Ci"] * log10( 0.89 * table[i,"fi"] / table[1:(i-1),"fi"] ) ) ) )
-                  else
-                    inner <- 0
-              
-                  retval <- 10 * log10( 10 ^ (0.1 * sii.tab[i,"N'i"] ) + inner )
-                }
-            }
-          sii.tab$"Zi" = sapply(1:nrow(sii.tab), Zifun)
+      } else { # method=="one-third octave"
+        for(i in 2:nrow(sii.tab)) {
+          inner <- sum( 10 ^ (0.1 * ( B_i[1:(i-1)] + 3.32*C_i[1:(i-1)] * log10( 0.89 * f_i[i] / f_i[1:(i-1)] ) ) ) )
+          Zi[i] <- 10 * log10( 10 ^ (0.1 * N_i[i]) + inner )
         }
+      }
+      sii.tab$"Zi" <- Zi
 
       ## 4.3.2.4
       sii.tab[1,"Zi"] <- sii.tab[1,"Bi"]
@@ -523,9 +496,7 @@ sii <- function(
   sii.tab$"Xi" <- table$"Xi"
   
   ## Calculate  X'i
-  ## Conductive loss (Ji) acts as a pre-cochlear attenuator and does NOT elevate
-  ## internal cochlear noise. Only the sensorineural component contributes to Xi.
-  sii.tab$"X'i" <- sii.tab$"Xi" + pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
+  sii.tab$"X'i" <- sii.tab$"Xi" + sii.tab$"T'i" 
 
   #####
   ## Step 5: Equivalent disturbance spectrum, Di
@@ -549,12 +520,11 @@ sii <- function(
   if (nal_ldf) {
     # NAL-NL2 modifies the LDF onset based on the degree of hearing loss
     # Impaired ears tolerate higher presentation levels without losing intelligibility.
-    # We shift the penalty onset by 0.5 * sensorineural threshold. 
-    # Conductive losses act as pre-cochlear attenuators and are already subtracted from E'i.
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - (0.5 * pmax(0, sii.tab$"T'i" - sii.tab$"Ji")))/160
+    # We shift the penalty onset by 0.5 * threshold.
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" - (0.5 * sii.tab$"T'i"))/160
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   } else {
-    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10)/160 
+    sii.tab$"Li" <- 1 - (sii.tab$"E'i" - sii.tab$"Ui" - 10 - sii.tab$"Ji" )/160 
     sii.tab$"Li" <- enforce.range(sii.tab$"Li")
   }
   
@@ -562,32 +532,28 @@ sii <- function(
   sii.tab$"Ki" <- (sii.tab$"E'i" - sii.tab$"Di" + 15)/30
   sii.tab$"Ki" <- enforce.range( sii.tab$"Ki" )
   
-  if (desensitization == "johnson2011_smoothed" || desensitization == "johnson2011_complete") {
+  if (desensitization == "johnson2011_desensitized") {
     # Apply Hearing Loss Desensitization (Johnson & Dillon 2011 / Ching et al. 1998)
-    # Use sensorineural threshold only: conductive loss (Ji) does not cause
-    # cochlear desensitization, only sensorineural loss does.
-    T_hl <- pmax(0, sii.tab$"T'i" - sii.tab$"Ji")
+    # Use sensorineural threshold only (subtract conductive component)
+    T_sn <- pmax(sii.tab$"T'i" - sii.tab$"Ji", 0)
     
-    # Calculate m and p variables based on frequency-specific hearing loss (T)
-    m <- 1 / (1 + exp(0.075 * (T_hl - 66)))
-    p <- (T_hl / 8) - 15
+    # Calculate m and p variables based on sensorineural hearing loss
+    m <- 1 / (1 + exp(0.075 * (T_sn - 66)))
+    p <- (T_sn / 8) - 15
     
     # Prevent division by exactly zero for mathematical safety
     p[p == 0] <- -1e-6
     
-    if (desensitization == "johnson2011_smoothed") {
-      # Apply desensitization to the audibility index (Ki)
-      # Using a linear multiplier instead of a hard asymptotic cap allows the numerical 
-      # optimizer (L-BFGS-B) to maintain a non-zero gradient while still penalizing dead regions.
-      sii.tab$"Ki" <- sii.tab$"Ki" * m
-    } else if (desensitization == "johnson2011_complete") {
-      # Apply the full asymptotic formula: k' = [(k/30)^p + m^p]^(1/p)
-      # Bounding Ki prevents 0^negative = Inf errors.
-      Ki_safe <- pmax(sii.tab$"Ki", 1e-10)
-      sii.tab$"Ki" <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
-    }
+    # Save raw Ki before desensitization
+    Ki_raw <- sii.tab$"Ki"
     
-    sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
+    # Complete correction: k' = [(k/30)^p + m^p]^(1/p), with Ki = k/30.
+    # Bounding Ki prevents 0^negative = Inf errors.
+    Ki_safe <- pmax(Ki_raw, 1e-10)
+    Ki_desens <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
+    Ki_desens <- enforce.range(Ki_desens)
+    
+    sii.tab$"Ki" <- Ki_desens
   }
   
   ##         Calculate Ai
@@ -701,7 +667,7 @@ get_specific_loudness <- function(x) {
   return(list(E_prime = E_prime, X_prime = X_prime))
 }
 
-calculate_loudness <- function(x, ohc_proportion = 0.65) {
+calculate_loudness <- function(x) {
   if (is.null(x$gain)) {
     return(NA) # Cannot compute loudness without aided gain
   }
@@ -729,33 +695,26 @@ calculate_loudness <- function(x, ohc_proportion = 0.65) {
   # Step 1: Dense 10 Hz grid
   dense_f <- seq(10, 23990, by = 10)
   
-  # Convert 1/3-octave band levels to spectrum density (dB/Hz) before interpolating to 10 Hz grid
-  # A 1/3-octave band has bandwidth ~ 0.23 * fc
-  
   dense_l <- approx(log10(hl_freqs), aided_spl, log10(dense_f), rule = 2)$y
 
   dense_l[dense_f < hl_freqs[1]] <- aided_spl[1] - 24 * log2(hl_freqs[1] / dense_f[dense_f < hl_freqs[1]])
   dense_l[dense_f > hl_freqs[6]] <- aided_spl[6] - 24 * log2(dense_f[dense_f > hl_freqs[6]] / hl_freqs[6])
 
-  # Step 3: OHC/IHC split of sensorineural loss
-  sn_loss  <- pmax(threshold - loss, 0)
-  ohc_loss <- pmin(sn_loss, 65)
-  ihc_loss <- pmax(sn_loss - 65, 0)
-  
-  res <- tryCatch({
-    calculate_loudness_cpp(
-      inputF = dense_f, 
-      inputLdB = dense_l,
-      HLcf = hl_freqs, 
-      HLohcdB0 = ohc_loss, 
-      HLihcdB0 = ihc_loss
-    )
-  }, error = function(e) NULL)
+   # Sensorineural hearing loss (total, for Bramslow 2004 loudness model)
+   sn_loss  <- pmax(threshold - loss, 0)
+   
+   res <- calculate_loudness_audmod(
+     freq = dense_f, 
+     level_dB_per_Hz = dense_l,
+     audiogram_freq = hl_freqs, 
+     audiogram_HL = sn_loss,
+     fs = 32000, N = 8192
+   )
   
   if (is.null(res)) return(NA)
   
   # Return both total loudness (Ldn), specific loudness array (N_prime), and excitation (E)
-  return(list(total = res$Ldn, specific = res$N_prime, freq = res$CF, E = res$E, Cam = res$Cam))
+  return(list(total = res$total, specific = res$specific, freq = res$fc, E = res$E, Cam = res$ref$EC))
 }
 
 #' Calculate Psychoacoustic Binaural Loudness (Sones)

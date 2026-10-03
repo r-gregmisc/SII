@@ -15,4 +15,30 @@ validation/
 scratch/
 OpenNL_Manuscript.pdf
 Figure6_LDL_UCL.png
-cran-comments.md
+
+# Build artifacts and logs
+*.aux
+*.log
+texput.log
+SII_*.tar.gz
+*.o
+SII.Rcheck/
+/doc/
+/Meta/
+
+# Compiled code
+*.so
+*.dll
+
+# Local tools and scratch output
+typst-*/
+*.tar.xz
+test*.typ
+test*.pdf
+user_pasted.*
+scratch*
+*.bak
+
+# Keep the Octave/AMT validation harness and its log
+!reproducibility_scripts/**/*.m
+!reproducibility_scripts/**/*.txt
