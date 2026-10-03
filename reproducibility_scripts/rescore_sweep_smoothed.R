@@ -51,8 +51,8 @@ for (i in seq_len(nrow(d))) {
   htl6 <- FAMILY[d$audiogram[i], ]
   g    <- as.numeric(d[i, gcols])
   tgt  <- build_target(hl_freqs, sp, htl6, rep(0, 6), g, EVAL_LVL)
-  d$sii_smooth[i]   <- report_sii(tgt, "johnson2011_smoothed", desensitization_scale = 1)
-  d$sii_complete[i] <- report_sii(tgt, "johnson2011_complete", desensitization_scale = 1)
+  d$sii_smooth[i]   <- report_sii(tgt, "johnson2011_smoothed")
+  d$sii_complete[i] <- report_sii(tgt, "johnson2011_complete")
   d$sii_ansi[i]     <- report_sii(tgt, "none")
 }
 

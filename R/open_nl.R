@@ -20,7 +20,6 @@
 #' @param ldl Loudness Discomfort Levels (optional).
 #' @param cap_override Optional manual loudness cap override in sones.
 #' @param vent_floor Optional manual vent floor limit.
-#' @param desensitization_scale Scaling factor for high-frequency desensitization (default: 1.0).
 #' @param x Object for S3 method.
 #' @param object Object for S3 method.
 #' @param ... Additional arguments passed to methods.
@@ -51,7 +50,10 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
                     user_cr = NULL,
                     optimize = TRUE, seed_noise = NULL, optim_method = "Nelder-Mead",
                     abg_fraction = 0.75, enable_severe_booster = FALSE, booster_onset = 70, disable_sdlfp = FALSE,
-                    desensitization_scale = 1.0, cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_complete", "none")) {
+                    cap_rule = c("normal", "legacy"), objective_sii = c("johnson2011_complete", "none")) {
+  if ("desensitization_scale" %in% names(list(...)))
+    stop("'desensitization_scale' has been removed; use objective_sii = \"none\" ",
+         "or \"johnson2011_complete\".", call. = FALSE)
   cap_rule <- match.arg(cap_rule); objective_sii <- match.arg(objective_sii)
   
   if (length(speech) == 1) {
@@ -190,8 +192,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
           sii(speech = speech_spec_base, noise = rep(-50, length(freq)), 
               threshold = threshold, loss = loss, freq = freq, 
               prescription = temp_target, interpolate = TRUE, 
-              nal_ldf = FALSE, desensitization = objective_sii,
-              desensitization_scale = desensitization_scale)
+              nal_ldf = FALSE, desensitization = objective_sii)
         }, error = function(e) NULL)
         
         if (is.null(res)) return(1000)

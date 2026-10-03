@@ -49,8 +49,7 @@ score3 <- function(tgt, fun) {
   one <- function(des) fun(speech = tgt$orig_speech, noise = rep(-50, length(tgt$orig_freq)),
                            threshold = tgt$orig_threshold, loss = tgt$orig_loss,
                            freq = tgt$orig_freq, prescription = tgt, interpolate = TRUE,
-                           nal_ldf = FALSE, desensitization = des,
-                           desensitization_scale = 1)$sii
+                           nal_ldf = FALSE, desensitization = des)$sii
   c(smooth = one("johnson2011_smoothed"), complete = one("johnson2011_complete"),
     ansi = one("none"))
 }

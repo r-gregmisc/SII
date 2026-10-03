@@ -44,7 +44,7 @@ sii_of <- function(th, gv, des) {
   tg <- build_target(hl, sp, th, rep(0, 6), gv, 65)
   SII::sii(speech = tg$orig_speech, noise = rep(-50, 6), threshold = th,
            loss = rep(0, 6), freq = hl, prescription = tg, interpolate = TRUE,
-           nal_ldf = FALSE, desensitization = des, desensitization_scale = 1)
+           nal_ldf = FALSE, desensitization = des)
 }
 loud_of <- function(th, gv) loudness_of(65, gv, th, rep(0, 6))$total
 

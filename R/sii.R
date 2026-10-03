@@ -26,7 +26,6 @@ sii <- function(
                 interpolate=FALSE,
                 prescription=NULL,
                 desensitization=FALSE,
-                desensitization_scale=1.0,
                 ldl=NULL,
                 gender="male",
                 experience="experienced",
@@ -43,6 +42,10 @@ sii <- function(
                 ...
                 )
 {
+  if ("desensitization_scale" %in% names(list(...)))
+    stop("'desensitization_scale' has been removed; use desensitization = \"none\" ",
+         "or \"johnson2011_complete\".", call. = FALSE)
+
   # Map backwards-compatible boolean to new string identifier
   if (is.logical(desensitization)) {
     if (desensitization) {
@@ -545,9 +548,7 @@ sii <- function(
     Ki_desens <- ( (Ki_safe)^p + (m)^p ) ^ (1/p)
     Ki_desens <- enforce.range(Ki_desens)
     
-    # Scale: 0.0 = raw ANSI SII (no penalty), 1.0 = full Johnson 2011
-    sii.tab$"Ki" <- (1 - desensitization_scale) * Ki_raw + desensitization_scale * Ki_desens
-    sii.tab$"Ki" <- enforce.range(sii.tab$"Ki")
+    sii.tab$"Ki" <- Ki_desens
   }
   
   ##         Calculate Ai
@@ -569,8 +570,7 @@ sii <- function(
      
      unaided_obj <- sii(speech = unaided_speech, noise = orig_noise, threshold = threshold, 
                         loss = loss, freq = freq, method = method, importance = importance, 
-                        interpolate = FALSE, desensitization = desensitization,
-                        desensitization_scale = desensitization_scale)
+                        interpolate = FALSE, desensitization = desensitization)
      retval$unaided_sii <- unaided_obj$sii
   }
 
@@ -599,7 +599,6 @@ sii <- function(
   retval$table     <- sii.tab
   retval$sii       <- sii.val
   retval$desensitization <- desensitization
-  retval$desensitization_scale <- desensitization_scale
   retval$module    <- module
   retval$measured_wrs <- measured_wrs
   retval$predicted_wrs <- predicted_wrs

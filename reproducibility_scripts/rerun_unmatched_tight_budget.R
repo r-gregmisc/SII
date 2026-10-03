@@ -131,8 +131,8 @@ for (nm in AUDS) {
       cap   = if (is.null(ll)) NA_real_ else ll[["cap"]],
       sones = if (is.null(ll)) NA_real_ else ll[["sones"]],
       objective = -.open_nl_dbg$final_obj,
-      sii_smooth   = report_sii(tgt, "johnson2011_smoothed", desensitization_scale = 1),
-      sii_complete = report_sii(tgt, "johnson2011_complete", desensitization_scale = 1),
+      sii_smooth   = report_sii(tgt, "johnson2011_smoothed"),
+      sii_complete = report_sii(tgt, "johnson2011_complete"),
       sii_ansi     = report_sii(tgt, "none"),
       g250 = g[1], g500 = g[2], g1000 = g[3], g2000 = g[4], g4000 = g[5], g8000 = g[6],
       stringsAsFactors = FALSE)

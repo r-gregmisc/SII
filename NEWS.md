@@ -9,6 +9,11 @@
   The default is `"johnson2011_complete"`, the Johnson & Dillon (2011)
   desensitization correction; `"none"` optimizes the ANSI S3.5 SII.
 
+* Removed the `desensitization_scale` argument from `sii()` and `open_nl()`.
+  Desensitization is now either off (`"none"`, ANSI S3.5 SII) or the full
+  Johnson & Dillon (2011) correction (`"johnson2011_complete"`); there is no
+  partial blend. Passing `desensitization_scale` is an error.
+
 * Removed the `"johnson2011_smoothed"` desensitization option (a product-form
   approximation, K * m) from `sii()` and `open_nl()`. The complete correction
   optimizes without difficulty, so the approximation is no longer needed.

@@ -9,7 +9,9 @@ This is an update from the previous CRAN release to version 1.3.0. Main changes
 * `open_nl()` optimizes the Johnson & Dillon (2011) desensitized SII by default
   and uses a normal-hearing loudness cap (the previous rule remains available
   as `cap_rule = "legacy"`).
-* The `"johnson2011_smoothed"` desensitization option was removed.
+* The `"johnson2011_smoothed"` desensitization option and the
+  `desensitization_scale` argument were removed; desensitization is now
+  either the ANSI SII or the full Johnson & Dillon (2011) correction.
 
 ## Test environments
 
