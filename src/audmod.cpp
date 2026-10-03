@@ -202,7 +202,6 @@ namespace {
                                int NoChan, bool Widen, const std::vector<double>& AGFs_E, const std::vector<double>& AGLoss,
                                const std::vector<double>& RET4153, double E_Beg, double E_End, const std::vector<double>& E_Bin,
                                std::vector<double>& E_Vector, std::vector<double>& HTLL) {
-        double C1 = 24.673;
         double C2 = 4.368;
         bool PU_DEP_HL = true;
         bool PL_DEP_HL = true;

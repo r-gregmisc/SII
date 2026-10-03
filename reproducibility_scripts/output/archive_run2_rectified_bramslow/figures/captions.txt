@@ -1,0 +1,31 @@
+Feasibility figure:
+"Optimal 65-dB SPL solutions for profiles A4 (moderate-to-severe
+precipitous) and A5 (profound precipitous) as a function of the
+loudness cap and the minimum insertion gain allowed at any frequency.
+Top: mean 2-4 kHz insertion gain of the SII-optimal solution. Bottom:
+desensitized SII (smoothed Johnson and Dillon penalty, the quantity maximized) of the same
+solutions. Each tile is one optimization; minimum gains of 0, -5, -10
+and -15 dB were computed. A 0-dB minimum corresponds to an open
+fitting; negative values require an occluding fitting. The dashed line marks the
+loudness of unaided speech for normal hearing; the dotted line
+marks the loudness of unaided speech for the impaired ear. Grey
+tiles: the cap is below what the constraint allows (for a 0-dB
+minimum, below unaided loudness) and cannot be met. The
+cross marks NAL-NL2's predicted loudness with no negative gain; its
+label gives NAL-NL2's own value, whereas the tile beneath it shows the
+optimal solution at that cap. Above about
+9 sones the loudness constraint no longer binds, and from about
+8 sones the minimum gain no longer changes the solution. Isolated
+non-monotonic tiles reflect optimizer precision (about 0.01 SII)."
+
+Sensitivity figure:
+"Change in SII from allowing -10 dB rather than 0 dB minimum insertion
+gain, at equal loudness (the cap was set to NAL-NL2's predicted
+loudness for each profile, 65 dB SPL), as a function of the strength
+of the hearing-loss desensitization penalty (0 = none, 1 = full
+Johnson and Dillon). SII is the smoothed desensitized index at the
+same scale used in optimization. A 0-dB minimum corresponds to an open
+fitting and -10 dB requires an occluding fitting. Profiles A6 and A7
+show no change and overlap at zero. Individual values carry optimizer
+noise of about +/-0.01-0.02."
+

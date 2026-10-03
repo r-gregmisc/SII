@@ -38,6 +38,5 @@ Suggests: splines, readxl, xtable, testthat
 License: GPL-3 | file LICENSE
 LazyLoad: yes
 NeedsCompilation: yes
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 Encoding: UTF-8
-RoxygenNote: 7.3.3
