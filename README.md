@@ -110,7 +110,7 @@ aided <- sii(
 aided$sii          # aided SII
 aided$unaided_sii  # unaided SII, same settings
 
-calculate_loudness(aided)$total   # loudness of the aided speech, sones
+calculate_loudness(target)$total  # loudness of the aided speech, sones
 ```
 
 `calculate_loudness_audmod()` gives direct access to the AUDMOD model; see
