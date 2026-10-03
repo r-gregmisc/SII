@@ -17,10 +17,13 @@ This is an update from the previous CRAN release to version 1.3.0. Main changes
 
 ## Test environments
 
-* local: Pop!_OS (Ubuntu), R x.y.z
+* local: Pop!_OS 24.04 (Ubuntu), R 4.3.3
 * GitHub Actions: ubuntu-latest (release)
 * win-builder: R-devel
 
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
+
+The spell check may flag 'AUDMOD' (the name of a loudness model) and
+Bramslow (an author's surname); both are spelled correctly.

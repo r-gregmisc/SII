@@ -16,7 +16,7 @@ Description:
    the standard computations to allow calculation of SII when the measured
    frequencies do not match those required by the standard by applying
    interpolation. The package also includes a native C++ implementation of
-   the AUDMOD specific loudness model for impaired hearing (Bramslow, 2004),
+   the 'AUDMOD' specific loudness model for impaired hearing (Bramslow, 2004),
    ported from the 'bramslow2004' implementation in the Auditory Modeling
    Toolbox (AMT), to calculate loudness in sones. It provides methods to
    predict aided SII under hearing aid prescriptive rationales, including
