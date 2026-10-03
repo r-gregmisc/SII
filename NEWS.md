@@ -1,5 +1,10 @@
 # SII 1.3.0
 
+* Fixed: `open_nl()` passed `loss` and `freq` to the maximum power output
+  calculation by position, so they landed in unused arguments and the MPO
+  never included the conductive component of a mixed or conductive loss.
+  Results for purely sensorineural losses are unchanged.
+
 * Fixed: `open_nl()` called without `loss` returned its starting rule-based
   gains without optimizing. The missing `loss` was passed to `sii()` inside the
   objective function, where it caused an error that was caught and scored as

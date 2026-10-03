@@ -82,7 +82,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
   }
   
   gain <- calculate_open_nl_gain(freq=freq, threshold=threshold, input_level=overall_level, gender=gender, experience=experience, config=config, coupling=coupling, module=module, ldl=ldl, loss=loss, distortion_category=distortion_category, user_cr=user_cr, abg_fraction=abg_fraction, enable_severe_booster=enable_severe_booster, booster_onset=booster_onset, disable_sdlfp=disable_sdlfp, ...)
-  mpo <- calculate_nal_sspl90(threshold, gain, ldl, loss, freq)
+  mpo <- calculate_nal_sspl90(threshold, gain, ldl = ldl, loss = loss, freq = freq)
   
   raw_output <- speech_spec + gain
   overshoot <- pmax(0, raw_output - mpo)
@@ -124,7 +124,7 @@ open_nl <- function(speech = 65, threshold, freq, cap_override = NULL, vent_floo
     # Helper to run optimization at a specific input level
     optimize_level <- function(eval_level, constraint_gain = NULL) {
       gain_base <- calculate_open_nl_gain(freq=freq, threshold=threshold, input_level=eval_level, gender=gender, experience=experience, config=config, coupling=coupling, module=module, ldl=ldl, loss=loss, distortion_category=distortion_category, user_cr=user_cr, abg_fraction=abg_fraction, enable_severe_booster=enable_severe_booster, booster_onset=booster_onset, disable_sdlfp=disable_sdlfp, ...)
-      mpo_base <- calculate_nal_sspl90(threshold, gain_base, ldl, loss, freq)
+      mpo_base <- calculate_nal_sspl90(threshold, gain_base, ldl = ldl, loss = loss, freq = freq)
       
       normal_speech_base <- approx(x = log10(critical$fi), y = critical$normal, xout = log10(freq), rule = 2)$y
       speech_spec_base <- normal_speech_base + (eval_level - overall_normal)
