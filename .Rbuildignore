@@ -51,3 +51,4 @@
 ^[^/]*\.bak$
 ^[^/]*\.py$
 ^[^/]*\.R$
+^CRAN-SUBMISSION$
