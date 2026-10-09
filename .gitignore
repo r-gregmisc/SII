@@ -42,3 +42,17 @@ scratch*
 # Keep the Octave/AMT validation harness and its log
 !reproducibility_scripts/**/*.m
 !reproducibility_scripts/**/*.txt
+
+# Manuscripts, figures and reviewer material are kept outside the repository
+# (../SII-papers). Scripts that write figures recreate figures/ as needed.
+/figures/
+/manuscript_figures/
+/reviewer_analyses/
+/.agents/
+/JAAA_*
+/OpenNL_*
+/*.typ
+/*.pdf
+/*.docx
+/*.csv
+/*.png
